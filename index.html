@@ -34,9 +34,20 @@
             
             <!-- Logo (Area click segreta) -->
             <div class="flex items-center gap-3 select-none cursor-pointer" onclick="handleSecretClick()" id="logoArea">
-                <div class="bg-white/20 p-2 rounded-full backdrop-blur-sm transition-transform active:scale-95">
+                
+                <!-- LOGO: Cerca 'CF Lampugnano trasp.png'. Se non c'è, mostra l'icona di fallback -->
+                <img 
+                    src="./CF Lampugnano trasp.png" 
+                    alt="Logo Piscina" 
+                    class="w-12 h-12 object-contain bg-white/90 rounded-full p-1 shadow-md transition-transform active:scale-95"
+                    onerror="this.style.display='none'; document.getElementById('fallbackIcon').classList.remove('hidden');"
+                >
+                
+                <!-- ICONA DI FALLBACK (Visibile se l'immagine fallisce) -->
+                <div id="fallbackIcon" class="hidden bg-white/20 p-2 rounded-full backdrop-blur-sm transition-transform active:scale-95">
                     <i data-lucide="droplets" class="w-7 h-7 text-white"></i>
                 </div>
+
                 <div>
                     <h1 class="text-2xl font-bold tracking-tight">AquaBoard</h1>
                     <p class="text-cyan-100 text-sm">Bacheca Digitale Piscina Comunale</p>
