@@ -67,6 +67,17 @@
             gap: 4px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+
+        /* TOAST NOTIFICATION */
+        #toast {
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            transform: translate(-50%, 100px); /* Start hidden below */
+            opacity: 0;
+        }
+        #toast.show {
+            transform: translate(-50%, 0); /* Slide up */
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
@@ -173,6 +184,12 @@
         <p>&copy; 2024 Centro Federale Lampugnano.</p>
     </footer>
 
+    <!-- TOAST NOTIFICATION (POP-UP) -->
+    <div id="toast" class="fixed bottom-6 left-1/2 bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 z-50 pointer-events-none">
+        <i data-lucide="check-circle" class="w-5 h-5 text-green-400"></i>
+        <span id="toastMessage" class="text-sm font-medium">Operazione completata</span>
+    </div>
+
     <!-- MODAL NUOVO AVVISO -->
     <div id="noticeModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
@@ -205,7 +222,7 @@
                     </div>
                 </div>
 
-                <!-- SEZIONE CARICAMENTO FILE (VERSIONE NO STORAGE) -->
+                <!-- SEZIONE CARICAMENTO FILE -->
                 <div class="space-y-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
                     <p class="text-xs text-orange-600 font-semibold mb-2">
                         <i data-lucide="info" class="w-3 h-3 inline"></i> Puoi caricare file dal PC o usare Link Pubblici (Google Drive).
@@ -218,21 +235,17 @@
                             Immagine Copertina
                         </label>
                         
-                        <!-- TAB SCELTA COPERTINA -->
                         <div class="flex gap-2 mb-2 text-xs">
                             <button type="button" onclick="toggleCoverType('file')" id="btnCoverFile" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button>
                             <button type="button" onclick="toggleCoverType('link')" id="btnCoverLink" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive</button>
                         </div>
 
-                        <!-- INPUT FILE COPERTINA -->
                         <div id="coverFileInput">
                             <input type="file" id="coverFile" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                         </div>
 
-                        <!-- INPUT LINK COPERTINA -->
                         <div id="coverLinkInput" class="hidden">
-                            <input type="url" id="coverUrlManual" placeholder="Incolla link Google Drive o web..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                            <p class="text-[10px] text-gray-400 mt-1">Per Drive: assicurati che il file sia "Chiunque abbia il link".</p>
+                            <input type="url" id="coverUrlManual" placeholder="Incolla link Google Drive..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
                         </div>
                     </div>
 
@@ -243,19 +256,16 @@
                             Allegato (PDF o Link Esterno)
                         </label>
                         
-                        <!-- TAB SCELTA ALLEGATO -->
                         <div class="flex gap-2 mb-2 text-xs">
                             <button type="button" onclick="toggleAttachType('file')" id="btnFileType" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button>
                             <button type="button" onclick="toggleAttachType('link')" id="btnLinkType" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive/Web</button>
                         </div>
 
-                        <!-- INPUT FILE ALLEGATO -->
                         <div id="attachFileInput">
                             <input type="file" id="attachmentFile" accept=".pdf,image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100">
                             <p class="text-[10px] text-gray-400 mt-1">Max 400KB. Per file grandi usa "Usa Link".</p>
                         </div>
 
-                        <!-- INPUT LINK ALLEGATO -->
                         <div id="attachLinkInput" class="hidden">
                             <input type="url" id="attachmentUrlManual" placeholder="Es. https://drive.google.com/..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
                         </div>
@@ -311,7 +321,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        // REMOVED: Storage import since we are using Base64 workaround
 
         // --- CONFIGURAZIONE ---
         const myConfig = {
@@ -340,7 +349,6 @@
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
-            console.log("Firebase inizializzato (No Storage Mode)");
         } catch(e) {
             console.error("Errore Init Firebase:", e);
         }
@@ -374,6 +382,7 @@
                 if (!user.isAnonymous) {
                     isAdminLoggedIn = true;
                     updateAdminUI(true);
+                    // Rimosso Toast al refresh, appare solo al click login
                 } else {
                     isAdminLoggedIn = false;
                     updateAdminUI(false);
@@ -427,6 +436,17 @@
             window.toggleAttachType = toggleAttachType;
             window.toggleCoverType = toggleCoverType;
         });
+
+        // --- TOAST FUNCTION ---
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const msg = document.getElementById('toastMessage');
+            msg.innerText = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
 
         // --- FIRESTORE ---
         function setupRealtimeListener() {
@@ -569,7 +589,7 @@
             if (clickCount === SECRET_CLICKS_REQUIRED) {
                 clickCount = 0;
                 if(!isAdminLoggedIn) document.getElementById('loginModal').classList.remove('hidden');
-                else alert("Sei già connesso come Staff.");
+                else showToast("Sei già connesso come Staff.");
             }
         }
 
@@ -585,7 +605,7 @@
             try {
                 await signInWithEmailAndPassword(auth, email, password);
                 closeLoginModal();
-                alert("Login effettuato con successo!");
+                showToast("Login effettuato con successo!"); // TOAST INSTEAD OF ALERT
             } catch (error) {
                 console.error("Login fallito:", error);
                 document.getElementById('loginError').classList.remove('hidden');
@@ -593,7 +613,9 @@
         }
 
         async function handleLogout() {
-            if(confirm("Vuoi uscire dall'area riservata?")) await signOut(auth);
+            // Logout diretto senza conferma, o con toast post-azione
+            await signOut(auth);
+            showToast("Disconnessione effettuata. Modalità pubblica.");
         }
 
         // --- ACTIONS ---
@@ -656,7 +678,6 @@
         }
 
         // --- BASE64 HELPER (NO STORAGE) ---
-        // Comprime l'immagine per farla entrare in Firestore (< 1MB document limit)
         function compressImage(file) {
             return new Promise((resolve, reject) => {
                 const maxWidth = 800; // Riduce dimensione
@@ -760,6 +781,7 @@
                 });
                 
                 closeNoticeModal();
+                showToast("Avviso pubblicato con successo!");
             } catch (err) {
                 console.error("Error adding:", err);
                 alert("Errore salvataggio: " + err.message);
@@ -770,11 +792,17 @@
         }
 
         async function archiveNotice(id) {
-            if(confirm("Archiviare questa notizia?")) await updateDocRef(id, { archived: true, isPinned: false });
+            if(confirm("Archiviare questa notizia?")) {
+                await updateDocRef(id, { archived: true, isPinned: false });
+                showToast("Notizia archiviata");
+            }
         }
 
         async function restoreNotice(id) {
-            if(confirm("Ripristinare notizia?")) await updateDocRef(id, { archived: false });
+            if(confirm("Ripristinare notizia?")) {
+                await updateDocRef(id, { archived: false });
+                showToast("Notizia ripristinata");
+            }
         }
 
         async function togglePin(id, currentStatus) {
