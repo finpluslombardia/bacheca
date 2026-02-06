@@ -65,41 +65,29 @@
         /* Anteprima Allegato (PDF/Drive) */
         .preview-box {
             position: relative;
-            height: 200px;
+            height: 200px; /* Altezza fissa del taglio */
             overflow: hidden;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
             margin-top: 16px;
             margin-bottom: 8px;
-            background: #f8fafc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: #ffffff;
+            display: block;
         }
         
-        /* Placeholder Grafico per PDF */
-        .pdf-placeholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            background-color: #fef2f2; /* Rosso chiarissimo */
-            color: #ef4444;
-            border: 2px dashed #fecaca;
-            border-radius: 8px;
-            margin-top: 12px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.2s;
-        }
-        .card:hover .pdf-placeholder {
-            background-color: #fee2e2;
-            border-color: #ef4444;
+        /* Maschera sfumata sopra l'anteprima */
+        .preview-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
+            pointer-events: none;
+            z-index: 10;
         }
 
-        /* Iframe/Embed dentro l'anteprima (Solo nel Modal) */
+        /* Iframe/Embed dentro l'anteprima */
         .preview-content {
             width: 100%;
             height: 100%; 
@@ -397,7 +385,7 @@
                             <div class="flex justify-between items-start mb-3"><span class="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wide border ${CATEGORIES[n.category] ? CATEGORIES[n.category].class : 'bg-gray-100'}">${CATEGORIES[n.category] ? CATEGORIES[n.category].label : 'Avviso'}</span><div class="flex gap-2">${n.isPinned ? `<i data-lucide="pin" class="w-4 h-4 text-blue-500 fill-blue-500 transform rotate-45"></i>` : ''}${isAdminLoggedIn ? `<button onclick="event.stopPropagation(); editNotice('${n.id}')" class="text-slate-400 hover:text-blue-600 transition"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button onclick="event.stopPropagation(); deleteNoticePermanent('${n.id}')" class="text-slate-400 hover:text-red-600 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div></div>
                             <h3 class="text-lg font-bold text-slate-800 mb-2 leading-tight">${n.title}</h3>
                             <p class="text-slate-600 text-sm leading-relaxed mb-4 whitespace-pre-line line-clamp-4">${n.content}</p>
-                            ${n.attachmentUrl ? `<div class="mt-4"><div class="pdf-placeholder"><i data-lucide="file-text" class="w-8 h-8 mb-2"></i><span class="text-xs font-bold">Documento PDF</span><span class="text-[10px] opacity-70">Clicca per aprire</span></div></div>` : ''}
+                            ${n.attachmentUrl ? `<div class="mt-4 border border-slate-100 rounded-lg overflow-hidden h-48 relative bg-slate-50" style="pointer-events: none;">${renderPreviewBoxHTML(n.attachmentUrl)}</div>` : ''}
                         </div>
                         <div class="px-5 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
                             <div class="flex items-center gap-2"><i data-lucide="calendar" class="w-3.5 h-3.5"></i><span>${n.displayDate ? new Date(n.displayDate).toLocaleDateString('it-IT') : new Date(n.timestamp).toLocaleDateString('it-IT')}</span></div>
@@ -456,12 +444,16 @@
                 return `<iframe src="${cleanUrl}" class="preview-content" loading="lazy"></iframe>`;
             } 
             else if (url.startsWith('data:application/pdf') || url.toLowerCase().endsWith('.pdf')) {
-                // PDF native viewer with #toolbar=0
                 return `<embed src="${url}#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf" class="preview-content">`;
             }
             else {
                 return `<img src="${url}" class="w-full h-full object-cover object-top">`;
             }
+        }
+
+        // Card Preview (Same logic, inserted in pointer-events-none container)
+        function renderPreviewBoxHTML(url) {
+            return renderFullPreviewHTML(url);
         }
 
         function getDrivePreviewUrl(url) {
@@ -476,6 +468,7 @@
             return (match && match[1]) ? `https://drive.google.com/uc?export=view&id=${match[1]}` : url;
         }
 
+        // --- AUTH & LOGIN HANDLERS ---
         function handleSecretClick() {
             const logo = document.getElementById('logoArea'); logo.classList.remove('pulse-animation'); void logo.offsetWidth; logo.classList.add('pulse-animation');
             clickCount++; if (clickTimer) clearTimeout(clickTimer); clickTimer = setTimeout(() => { clickCount = 0; }, 2000);
