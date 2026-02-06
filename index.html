@@ -262,28 +262,40 @@
         import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- CONFIGURAZIONE ---
-        let firebaseConfig;
-        let appId = 'cf-lampugnano-app'; 
-
-        if (typeof __firebase_config !== 'undefined') {
-            firebaseConfig = JSON.parse(__firebase_config);
-            appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        } else {
-            // TUA CONFIGURAZIONE
-            firebaseConfig = {
+        // Priorità alla TUA configurazione personale
+        const myConfig = {
               apiKey: "AIzaSyBVGUYgJhFnj20SED3-qpV5ksoBXBT7xCs",
               authDomain: "bacheca-5acac.firebaseapp.com",
               projectId: "bacheca-5acac",
               storageBucket: "bacheca-5acac.firebasestorage.app",
               messagingSenderId: "65310524220",
               appId: "1:65310524220:web:a7f8bd0cd97539f3325439"
-            };
+        };
+        
+        // Seleziona la config corretta
+        // Se la tua config ha un'apiKey valida, usala. Altrimenti usa quella di test.
+        let firebaseConfig = myConfig.apiKey ? myConfig : null;
+        let useEnvironmentConfig = false;
+        let appId = 'cf-lampugnano-app';
+
+        // Fallback all'ambiente di test SOLO se la tua config è vuota
+        if (!firebaseConfig && typeof __firebase_config !== 'undefined') {
+            firebaseConfig = JSON.parse(__firebase_config);
+            appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            useEnvironmentConfig = true;
         }
 
         // --- INIT FIREBASE ---
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        let app, auth, db;
+        
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            console.log("Firebase inizializzato con progetto:", firebaseConfig.projectId);
+        } catch(e) {
+            console.error("Errore Init Firebase:", e);
+        }
         
         const NOTICES_COLLECTION = 'notices'; 
 
@@ -292,7 +304,8 @@
         let currentFilter = 'all';
         let currentSearch = '';
         let isAdminLoggedIn = false;
-        let showArchived = false; // Admin view toggle
+        let showArchived = false; 
+        let unsubscribeSnapshot = null;
         
         // Secret Login Variables
         let clickCount = 0;
@@ -310,21 +323,36 @@
 
         // --- AUTH LOGIC ---
         
-        // Listener globale per lo stato di autenticazione
         onAuthStateChanged(auth, (user) => {
-            if (user && !user.isAnonymous) {
-                // Utente Loggato con Email/Pass (Admin)
-                console.log("Admin loggato:", user.email);
-                isAdminLoggedIn = true;
-                updateAdminUI(true);
+            if (user) {
+                console.log("Utente autenticato:", user.uid);
+                
+                if (!user.isAnonymous) {
+                    isAdminLoggedIn = true;
+                    updateAdminUI(true);
+                } else {
+                    isAdminLoggedIn = false;
+                    updateAdminUI(false);
+                }
+                
+                // Avvia listener DB solo dopo auth confermata
+                if (!unsubscribeSnapshot) {
+                    setupRealtimeListener();
+                }
+
             } else {
-                // Utente Anonimo (Pubblico) o Non loggato
-                console.log("Utente pubblico/anonimo");
+                console.log("Nessun utente, avvio login anonimo...");
                 isAdminLoggedIn = false;
                 updateAdminUI(false);
-                if (!user) {
-                    signInAnonymously(auth).catch(console.error);
+                
+                if (unsubscribeSnapshot) {
+                    unsubscribeSnapshot();
+                    unsubscribeSnapshot = null;
                 }
+
+                signInAnonymously(auth).catch((error) => {
+                    console.error("Errore Autenticazione Anonima:", error);
+                });
             }
         });
 
@@ -341,17 +369,14 @@
                 adminControls.classList.add('hidden');
                 addBtn.classList.add('hidden');
                 archiveBtn.classList.add('hidden');
-                // Se mi sloggo mentre guardo l'archivio, resetto
                 if (showArchived) toggleArchiveView(); 
             }
-            renderNotices(); // Rerender per mostrare/nascondere controlli sulle card
+            renderNotices(); 
         }
 
-        // --- UI & EVENTS INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             renderFilters();
             lucide.createIcons();
-            setupRealtimeListener();
 
             // Esposizione funzioni globali
             window.handleSecretClick = handleSecretClick;
@@ -364,9 +389,9 @@
             window.openNoticeModal = openNoticeModal;
             window.closeNoticeModal = closeNoticeModal;
             window.handleFormSubmit = handleFormSubmit;
-            window.archiveNotice = archiveNotice; // Nuova funzione Archivia
-            window.restoreNotice = restoreNotice; // Nuova funzione Ripristina
-            window.deleteNotice = deleteNotice; // Eliminazione definitiva (opzionale)
+            window.archiveNotice = archiveNotice; 
+            window.restoreNotice = restoreNotice; 
+            window.deleteNotice = deleteNotice; 
             window.togglePin = togglePin;
             window.toggleArchiveView = toggleArchiveView;
         });
@@ -377,13 +402,15 @@
             loading.classList.remove('hidden');
 
             let q;
-            if (typeof __firebase_config !== 'undefined') {
+            // Se usiamo la configurazione ambiente (test), usiamo il path complesso.
+            // Se usiamo la TUA config (produzione), usiamo il path semplice.
+            if (useEnvironmentConfig) {
                 q = collection(db, 'artifacts', appId, 'public', 'data', NOTICES_COLLECTION);
             } else {
                 q = collection(db, NOTICES_COLLECTION);
             }
             
-            onSnapshot(q, (snapshot) => {
+            unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
                 notices = snapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
@@ -391,6 +418,16 @@
                 
                 loading.classList.add('hidden');
                 renderNotices();
+            }, (error) => {
+                console.error("Errore listener:", error);
+                loading.classList.add('hidden');
+                
+                if (error.code === 'permission-denied') {
+                    // Fallback gentile
+                    const emptyState = document.getElementById('emptyState');
+                    emptyState.querySelector('p').innerText = "Accesso negato. Verifica le regole del database o l'accesso.";
+                    emptyState.classList.remove('hidden');
+                }
             });
         }
 
@@ -415,15 +452,11 @@
             const grid = document.getElementById('noticesGrid');
             const empty = document.getElementById('emptyState');
 
-            // 1. Filtra per Stato Archivio
-            // Se showArchived è true, mostriamo SOLO quelli archiviati.
-            // Se showArchived è false (default), mostriamo SOLO quelli attivi (non archiviati).
             let filtered = notices.filter(n => {
                 const isArchived = !!n.archived;
                 return showArchived ? isArchived : !isArchived;
             });
 
-            // 2. Filtra per Categoria e Cerca
             filtered = filtered.filter(n => {
                 const matchesFilter = currentFilter === 'all' || n.category === currentFilter;
                 const matchesSearch = (n.title || '').toLowerCase().includes(currentSearch.toLowerCase()) || 
@@ -431,7 +464,6 @@
                 return matchesFilter && matchesSearch;
             });
 
-            // 3. Ordina (Pinned prima, poi Data)
             filtered.sort((a, b) => {
                 if (a.isPinned === b.isPinned) {
                     if (a.date && b.date) return new Date(b.date) - new Date(a.date);
@@ -513,9 +545,7 @@
             clickTimer = setTimeout(() => { clickCount = 0; }, 2000);
 
             if (clickCount === SECRET_CLICKS_REQUIRED) {
-                // Se clicchi 5 volte, apri il modal di login vero
                 clickCount = 0;
-                // Se sono già loggato non faccio nulla
                 if(!isAdminLoggedIn) {
                     document.getElementById('loginModal').classList.remove('hidden');
                 } else {
@@ -547,7 +577,6 @@
         async function handleLogout() {
             if(confirm("Vuoi uscire dall'area riservata?")) {
                 await signOut(auth);
-                // Si ricaricherà anonimo grazie al listener onAuthStateChanged
             }
         }
 
@@ -586,12 +615,12 @@
             const content = document.getElementById('newContent').value;
             const category = document.getElementById('newCategory').value;
             const isPinned = document.getElementById('newPinned').checked;
-            const displayDate = document.getElementById('newDate').value; // Data manuale
+            const displayDate = document.getElementById('newDate').value;
             const imageUrl = document.getElementById('newImage').value;
 
             try {
                 let collectionRef;
-                if (typeof __firebase_config !== 'undefined') {
+                if (useEnvironmentConfig) {
                     collectionRef = collection(db, 'artifacts', appId, 'public', 'data', NOTICES_COLLECTION);
                 } else {
                     collectionRef = collection(db, NOTICES_COLLECTION);
@@ -602,10 +631,10 @@
                     content,
                     category,
                     isPinned,
-                    imageUrl, // Nuovo campo
+                    imageUrl, 
                     displayDate, 
                     timestamp: Date.now(),
-                    archived: false // Default attivo
+                    archived: false 
                 });
                 
                 closeNoticeModal();
@@ -628,7 +657,6 @@
         }
 
         async function deleteNotice(id) {
-            // Non usato nell'UI principale, ma tenuto per debug
             if(confirm("Eliminare definitivamente?")) {
                  // Logica deleteDoc...
             }
@@ -638,11 +666,10 @@
             await updateDocRef(id, { isPinned: !currentStatus });
         }
 
-        // Helper per update generico
         async function updateDocRef(id, data) {
             try {
                 let docRef;
-                if (typeof __firebase_config !== 'undefined') {
+                if (useEnvironmentConfig) {
                     docRef = doc(db, 'artifacts', appId, 'public', 'data', NOTICES_COLLECTION, id);
                 } else {
                     docRef = doc(db, NOTICES_COLLECTION, id);
@@ -653,14 +680,12 @@
             }
         }
 
-        // --- MODAL FORM ---
         function openNoticeModal() {
             document.getElementById('noticeModal').classList.remove('hidden');
         }
 
         function closeNoticeModal() {
             document.getElementById('noticeModal').classList.add('hidden');
-            // Reset
             document.getElementById('newTitle').value = '';
             document.getElementById('newContent').value = '';
             document.getElementById('newCategory').value = 'info';
