@@ -94,7 +94,7 @@
             width: 100%;
             height: 200%; /* Più alto per mostrare l'inizio */
             border: none;
-            pointer-events: none; /* Disabilita scroll interno */
+            /* pointer-events: none;  Disabilita scroll interno */
             opacity: 0.95;
             background: white;
         }
@@ -503,17 +503,19 @@
             let content = '';
             
             if (url.includes('drive.google.com')) {
+                // Se non è già un link di anteprima/embed, prova a convertirlo o usalo com'è nell'iframe
+                // Molti link drive funzionano meglio in iframe se sono /preview o /view
                 if (!url.includes('/preview') && !url.includes('/view')) {
-                     // Keep raw url if pattern unknown
+                     // Tentativo conversione se mancano parti essenziali, ma di solito handleFormSubmit lo fa
                 }
                 content = `<iframe src="${url}" class="preview-content"></iframe>`;
             } 
-            else if (url.startsWith('data:application/pdf')) {
+            else if (url.startsWith('data:application/pdf') || url.toLowerCase().endsWith('.pdf')) {
                 content = `<embed src="${url}" type="application/pdf" class="preview-content">`;
             }
             else {
-                // Image fallback
-                content = `<img src="${url}" class="w-full h-full object-cover object-top">`;
+                // Fallback immagine con icona se rotto
+                content = `<img src="${url}" class="w-full h-full object-cover object-top" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'flex flex-col items-center justify-center h-full text-slate-400 gap-2\\'><i data-lucide=\\'file-text\\' class=\\'w-8 h-8\\'></i><span class=\\'text-xs\\'>Anteprima non disponibile</span></div>'; lucide.createIcons();">`;
             }
 
             return `
