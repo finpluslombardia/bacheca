@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaBoard - Bacheca Piscina</title>
+    
+    <!-- Tailwind CSS (per lo stile) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons (per le icone) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Font: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Nascondi elementi condizionali */
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+    <!-- HEADER -->
+    <header class="bg-gradient-to-r from-cyan-600 to-blue-700 text-white shadow-lg sticky top-0 z-20">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            
+            <!-- Logo -->
+            <div class="flex items-center gap-3">
+                <div class="bg-white/20 p-2 rounded-full backdrop-blur-sm">
+                    <i data-lucide="droplets" class="w-7 h-7 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight">AquaBoard</h1>
+                    <p class="text-cyan-100 text-sm">Bacheca Digitale Piscina Comunale</p>
+                </div>
+            </div>
+            
+            <!-- Cerca e Admin -->
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <div class="relative w-full md:w-64">
+                    <i data-lucide="search" class="absolute left-3 top-2.5 text-cyan-200 w-4 h-4"></i>
+                    <input 
+                        type="text" 
+                        id="searchInput"
+                        placeholder="Cerca avvisi..." 
+                        class="w-full bg-white/10 border border-white/20 rounded-full py-2 pl-10 pr-4 text-white placeholder-cyan-200 focus:outline-none focus:bg-white/20 transition"
+                        oninput="updateSearch(this.value)"
+                    >
+                </div>
+                <button 
+                    onclick="toggleAdminMode()"
+                    id="adminToggleBtn"
+                    class="p-2 rounded-full transition bg-white/10 hover:bg-white/20 text-white"
+                    title="Modalità gestione"
+                >
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        
+        <!-- Controlli e Filtri -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <!-- Filtri -->
+            <div class="flex flex-wrap gap-2" id="filterContainer">
+                <!-- Bottoni generati via JS -->
+            </div>
+
+            <!-- Bottone Nuovo Avviso (Visibile solo in Admin Mode) -->
+            <button 
+                id="addNoticeBtn"
+                onclick="openModal()"
+                class="hidden flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-full shadow-md transition font-medium"
+            >
+                <i data-lucide="plus" class="w-5 h-5"></i>
+                Nuovo Avviso
+            </button>
+        </div>
+
+        <!-- Griglia Avvisi -->
+        <div id="noticesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Le card verranno inserite qui da JS -->
+        </div>
+
+        <!-- Stato Vuoto (Nascosto di default) -->
+        <div id="emptyState" class="hidden col-span-full py-12 flex flex-col items-center justify-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-200 mt-6">
+            <i data-lucide="megaphone" class="w-12 h-12 mb-4 opacity-20"></i>
+            <p class="text-lg">Nessun avviso trovato con questi filtri.</p>
+        </div>
+
+    </main>
+
+    <!-- MODAL (Form di Aggiunta) -->
+    <div id="noticeModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="text-xl font-bold text-gray-800">Pubblica Nuovo Avviso</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <form onsubmit="handleFormSubmit(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Titolo</label>
+                    <input type="text" id="newTitle" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Es. Chiusura Vasca">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+                    <select id="newCategory" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="info">Info</option>
+                        <option value="urgent">Urgente</option>
+                        <option value="event">Evento</option>
+                        <option value="lost-found">Oggetti Smarriti</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Messaggio</label>
+                    <textarea id="newContent" required rows="4" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none resize-none" placeholder="Dettagli dell'avviso..."></textarea>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="newPinned" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                    <label for="newPinned" class="text-sm text-gray-700">Metti in evidenza (Pin in alto)</label>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition mt-2">
+                    Pubblica
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- DATA ---
+        let notices = [
+            {
+                id: 1,
+                title: "Chiusura Straordinaria Vasca Piccola",
+                content: "Si avvisano i gentili utenti che la vasca piccola rimarrà chiusa per manutenzione straordinaria filtri nella giornata di Venerdì 14.",
+                category: "urgent",
+                date: "2023-10-26",
+                isPinned: true
+            },
+            {
+                id: 2,
+                title: "Gara Sociale di Fine Mese",
+                content: "Aperte le iscrizioni per la gara sociale 50m Stile Libero. Iscriviti in segreteria entro il 20 del mese!",
+                category: "event",
+                date: "2023-10-25",
+                isPinned: false
+            },
+            {
+                id: 3,
+                title: "Ritrovato: Occhialini Svedesi Blu",
+                content: "Sono stati ritrovati un paio di occhialini svedesi blu negli spogliatoi maschili ieri sera.",
+                category: "lost-found",
+                date: "2023-10-24",
+                isPinned: false
+            },
+            {
+                id: 4,
+                title: "Nuovi orari Nuoto Libero",
+                content: "Dal prossimo mese il nuoto libero serale sarà esteso fino alle 22:00 il martedì e giovedì.",
+                category: "info",
+                date: "2023-10-22",
+                isPinned: false
+            }
+        ];
+
+        const CATEGORIES = {
+            all: { label: "Tutti", class: "bg-gray-100 text-gray-600" },
+            urgent: { label: "Urgenti", class: "bg-red-100 text-red-700 border-red-200" },
+            info: { label: "Info", class: "bg-blue-100 text-blue-700 border-blue-200" },
+            event: { label: "Eventi", class: "bg-green-100 text-green-700 border-green-200" },
+            "lost-found": { label: "Oggetti Smarriti", class: "bg-yellow-100 text-yellow-700 border-yellow-200" }
+        };
+
+        // --- STATE ---
+        let currentFilter = 'all';
+        let currentSearch = '';
+        let isAdminMode = false;
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderFilters();
+            renderNotices();
+            lucide.createIcons();
+        });
+
+        // --- RENDER FUNCTIONS ---
+        function renderFilters() {
+            const container = document.getElementById('filterContainer');
+            container.innerHTML = Object.keys(CATEGORIES).map(key => `
+                <button 
+                    onclick="setFilter('${key}')"
+                    class="px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                        currentFilter === key 
+                        ? 'bg-blue-600 text-white shadow-md transform scale-105' 
+                        : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                    }"
+                >
+                    ${CATEGORIES[key].label}
+                </button>
+            `).join('');
+        }
+
+        function renderNotices() {
+            const grid = document.getElementById('noticesGrid');
+            const empty = document.getElementById('emptyState');
+
+            // Filter logic
+            let filtered = notices.filter(n => {
+                const matchesFilter = currentFilter === 'all' || n.category === currentFilter;
+                const matchesSearch = n.title.toLowerCase().includes(currentSearch.toLowerCase()) || 
+                                      n.content.toLowerCase().includes(currentSearch.toLowerCase());
+                return matchesFilter && matchesSearch;
+            });
+
+            // Sort logic (Pinned first)
+            filtered.sort((a, b) => {
+                if (a.isPinned === b.isPinned) {
+                    return new Date(b.date) - new Date(a.date);
+                }
+                return a.isPinned ? -1 : 1;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                empty.classList.remove('hidden');
+            } else {
+                empty.classList.add('hidden');
+                grid.innerHTML = filtered.map(n => `
+                    <div class="bg-white rounded-xl shadow-sm border transition-all hover:shadow-md overflow-hidden flex flex-col fade-in ${n.isPinned ? 'border-l-4 border-l-blue-500 ring-1 ring-blue-100' : 'border-slate-100'}">
+                        <div class="p-5 flex-1">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wide border ${CATEGORIES[n.category].class}">
+                                    ${CATEGORIES[n.category].label}
+                                </span>
+                                ${n.isPinned ? `<i data-lucide="pin" class="w-4 h-4 text-blue-500 fill-blue-500 transform rotate-45"></i>` : ''}
+                            </div>
+                            
+                            <h3 class="text-lg font-bold text-slate-800 mb-2 leading-tight">${n.title}</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed mb-4">${n.content}</p>
+                        </div>
+
+                        <div class="px-5 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                                <span>${new Date(n.date).toLocaleDateString('it-IT')}</span>
+                            </div>
+                            
+                            <div class="${isAdminMode ? 'flex' : 'hidden'} gap-2">
+                                <button onclick="togglePin(${n.id})" class="p-1.5 rounded hover:bg-blue-100 ${n.isPinned ? 'text-blue-600' : 'text-slate-400'}" title="Evidenza">
+                                    <i data-lucide="pin" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="deleteNotice(${n.id})" class="p-1.5 rounded hover:bg-red-100 text-slate-400 hover:text-red-600 transition" title="Elimina">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Re-initialize icons for newly added elements
+                lucide.createIcons();
+            }
+        }
+
+        // --- ACTIONS ---
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            renderFilters();
+            renderNotices();
+        }
+
+        function updateSearch(val) {
+            currentSearch = val;
+            renderNotices();
+        }
+
+        function toggleAdminMode() {
+            isAdminMode = !isAdminMode;
+            const btn = document.getElementById('adminToggleBtn');
+            const addBtn = document.getElementById('addNoticeBtn');
+            const icon = btn.querySelector('i'); // Get the icon element inside button
+
+            if (isAdminMode) {
+                btn.className = "p-2 rounded-full transition bg-white text-blue-700 shadow-sm";
+                btn.setAttribute("title", "Esci modalità gestione");
+                
+                // Replace icon with Lock
+                icon.setAttribute("data-lucide", "lock");
+                
+                addBtn.classList.remove('hidden');
+            } else {
+                btn.className = "p-2 rounded-full transition bg-white/10 hover:bg-white/20 text-white";
+                btn.setAttribute("title", "Modalità gestione");
+                
+                // Replace icon with User
+                icon.setAttribute("data-lucide", "user");
+                
+                addBtn.classList.add('hidden');
+            }
+            
+            // Re-render icons on the button specifically to update user/lock
+            lucide.createIcons({
+                root: btn
+            });
+
+            renderNotices();
+        }
+
+        function deleteNotice(id) {
+            if(confirm("Sei sicuro di voler eliminare questo avviso?")) {
+                notices = notices.filter(n => n.id !== id);
+                renderNotices();
+            }
+        }
+
+        function togglePin(id) {
+            notices = notices.map(n => n.id === id ? { ...n, isPinned: !n.isPinned } : n);
+            renderNotices();
+        }
+
+        // --- MODAL & FORM ---
+
+        function openModal() {
+            document.getElementById('noticeModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('noticeModal').classList.add('hidden');
+            // Reset form
+            document.getElementById('newTitle').value = '';
+            document.getElementById('newContent').value = '';
+            document.getElementById('newCategory').value = 'info';
+            document.getElementById('newPinned').checked = false;
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const newNotice = {
+                id: Date.now(),
+                title: document.getElementById('newTitle').value,
+                content: document.getElementById('newContent').value,
+                category: document.getElementById('newCategory').value,
+                isPinned: document.getElementById('newPinned').checked,
+                date: new Date().toISOString().split('T')[0]
+            };
+
+            notices.unshift(newNotice); // Add to top
+            closeModal();
+            renderNotices();
+        }
+
+    </script>
+</body>
+</html>
