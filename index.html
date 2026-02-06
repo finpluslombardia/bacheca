@@ -11,6 +11,13 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- PDF.js (Per convertire PDF in immagini) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        // Configura il worker per PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
     <!-- Font: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
@@ -24,7 +31,6 @@
         .pulse-animation { animation: pulse 0.2s; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(0.9); } 100% { transform: scale(1); } }
 
-        /* Loading Spinner */
         .loader {
             border: 3px solid #f3f3f3;
             border-radius: 50%;
@@ -36,7 +42,7 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Immagine Card Copertina */
+        /* Immagine Card */
         .card-image-container {
             width: 100%;
             height: 180px;
@@ -54,7 +60,6 @@
             transform: scale(1.05);
         }
         
-        /* Immagine nel contenuto */
         .content-image {
             width: 100%;
             border-radius: 8px;
@@ -62,38 +67,33 @@
             border: 1px solid #e2e8f0;
         }
 
-        /* Anteprima Allegato (PDF/Drive) */
-        .preview-box {
-            position: relative;
-            height: 200px; /* Altezza fissa del taglio */
-            overflow: hidden;
+        /* Anteprima Allegato nella Card */
+        .card-preview-container {
+            margin-top: 16px;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
-            margin-top: 16px;
-            margin-bottom: 8px;
+            overflow: hidden;
             background: #ffffff;
-            display: block;
-        }
-        
-        /* Maschera sfumata sopra l'anteprima */
-        .preview-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 40px;
-            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
-            pointer-events: none;
-            z-index: 10;
+            height: 200px;
+            position: relative;
+            display: flex;
+            align-items: flex-start; /* Allinea in alto */
+            justify-content: center;
         }
 
-        /* Iframe/Embed dentro l'anteprima */
-        .preview-content {
+        /* Canvas PDF (L'immagine generata) */
+        .pdf-canvas {
             width: 100%;
-            height: 100%; 
-            border: none;
-            background: white;
+            height: auto;
             display: block;
+        }
+
+        /* Drive Iframe */
+        .drive-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            pointer-events: none; /* Blocca click all'interno */
         }
 
         .attachment-badge {
@@ -279,7 +279,6 @@
         import { getAuth, signInAnonymously, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // CONFIGURAZIONE 
         const firebaseConfig = {
               apiKey: "AIzaSyBVGUYgJhFnj20SED3-qpV5ksoBXBT7xCs",
               authDomain: "bacheca-5acac.firebaseapp.com",
@@ -340,9 +339,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             renderFilters(); lucide.createIcons();
             window.handleSecretClick = handleSecretClick; window.handleLoginSubmit = handleLoginSubmit; window.handleLogout = handleLogout; window.closeLoginModal = closeLoginModal; window.setFilter = setFilter; window.updateSearch = updateSearch; window.openNoticeModal = openNoticeModal; window.closeNoticeModal = closeNoticeModal; window.handleFormSubmit = handleFormSubmit; window.archiveNotice = archiveNotice; window.restoreNotice = restoreNotice; window.togglePin = togglePin; window.toggleArchiveView = toggleArchiveView; window.toggleAttachType = toggleAttachType; window.toggleCoverType = toggleCoverType; window.toggleContentType = toggleContentType; window.editNotice = editNotice; window.deleteNoticePermanent = deleteNoticePermanent;
-            
-            window.viewNotice = viewNotice;
-            window.closeViewModal = closeViewModal;
+            window.viewNotice = viewNotice; window.closeViewModal = closeViewModal;
         });
 
         function showToast(message, isError = false) {
@@ -369,7 +366,8 @@
             container.innerHTML = Object.keys(CATEGORIES).map(key => `<button onclick="setFilter('${key}')" class="px-4 py-2 rounded-full text-sm font-medium transition-all ${currentFilter === key ? 'bg-blue-600 text-white shadow-md transform scale-105' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}">${CATEGORIES[key].label}</button>`).join('');
         }
 
-        function renderNotices() {
+        // Funzione asincrona per renderizzare la griglia
+        async function renderNotices() {
             const grid = document.getElementById('noticesGrid'); const empty = document.getElementById('emptyState');
             let filtered = notices.filter(n => showArchived ? !!n.archived : !n.archived);
             filtered = filtered.filter(n => (currentFilter === 'all' || n.category === currentFilter) && ((n.title || '').toLowerCase().includes(currentSearch.toLowerCase()) || (n.content || '').toLowerCase().includes(currentSearch.toLowerCase())));
@@ -378,94 +376,111 @@
             if (filtered.length === 0) { grid.innerHTML = ''; empty.classList.remove('hidden'); document.getElementById('emptyStateText').innerText = showArchived ? "Nessun avviso in archivio." : "Nessun avviso trovato."; } 
             else {
                 empty.classList.add('hidden');
-                grid.innerHTML = filtered.map(n => `
-                    <div class="bg-white rounded-xl shadow-sm border transition-all hover:shadow-md overflow-hidden flex flex-col fade-in card ${n.isPinned ? 'border-l-4 border-l-blue-500 ring-1 ring-blue-100' : 'border-slate-100'} cursor-pointer hover:-translate-y-1" onclick="viewNotice('${n.id}')">
-                        ${n.imageUrl ? `<div class="card-image-container"><img src="${n.imageUrl}" alt="Copertina" class="card-image" onerror="this.style.display='none'">${n.attachmentUrl ? `<div class="attachment-badge"><i data-lucide="paperclip" class="w-3 h-3 text-slate-500"></i> Allegato</div>` : ''}</div>` : ''}
-                        <div class="p-5 flex-1">
-                            <div class="flex justify-between items-start mb-3"><span class="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wide border ${CATEGORIES[n.category] ? CATEGORIES[n.category].class : 'bg-gray-100'}">${CATEGORIES[n.category] ? CATEGORIES[n.category].label : 'Avviso'}</span><div class="flex gap-2">${n.isPinned ? `<i data-lucide="pin" class="w-4 h-4 text-blue-500 fill-blue-500 transform rotate-45"></i>` : ''}${isAdminLoggedIn ? `<button onclick="event.stopPropagation(); editNotice('${n.id}')" class="text-slate-400 hover:text-blue-600 transition"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button onclick="event.stopPropagation(); deleteNoticePermanent('${n.id}')" class="text-slate-400 hover:text-red-600 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div></div>
-                            <h3 class="text-lg font-bold text-slate-800 mb-2 leading-tight">${n.title}</h3>
-                            <p class="text-slate-600 text-sm leading-relaxed mb-4 whitespace-pre-line line-clamp-4">${n.content}</p>
-                            ${n.attachmentUrl ? `<div class="mt-4 border border-slate-100 rounded-lg overflow-hidden h-48 relative bg-slate-50" style="pointer-events: none;">${renderPreviewBoxHTML(n.attachmentUrl)}</div>` : ''}
-                        </div>
+                grid.innerHTML = ''; // Pulisci la griglia
+
+                for (const n of filtered) {
+                    // Crea contenitore card
+                    const card = document.createElement('div');
+                    card.className = "bg-white rounded-xl shadow-sm border transition-all hover:shadow-md overflow-hidden flex flex-col fade-in card cursor-pointer hover:-translate-y-1";
+                    if (n.isPinned) card.classList.add('border-l-4', 'border-l-blue-500', 'ring-1', 'ring-blue-100');
+                    else card.classList.add('border-slate-100');
+                    card.onclick = () => viewNotice(n.id);
+
+                    let cardHtml = '';
+                    
+                    // Copertina
+                    if (n.imageUrl) {
+                        cardHtml += `<div class="card-image-container"><img src="${n.imageUrl}" alt="Copertina" class="card-image" onerror="this.style.display='none'">${n.attachmentUrl ? `<div class="attachment-badge"><i data-lucide="paperclip" class="w-3 h-3 text-slate-500"></i> Allegato</div>` : ''}</div>`;
+                    }
+
+                    cardHtml += `<div class="p-5 flex-1">
+                        <div class="flex justify-between items-start mb-3"><span class="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wide border ${CATEGORIES[n.category] ? CATEGORIES[n.category].class : 'bg-gray-100'}">${CATEGORIES[n.category] ? CATEGORIES[n.category].label : 'Avviso'}</span><div class="flex gap-2">${n.isPinned ? `<i data-lucide="pin" class="w-4 h-4 text-blue-500 fill-blue-500 transform rotate-45"></i>` : ''}${isAdminLoggedIn ? `<button onclick="event.stopPropagation(); editNotice('${n.id}')" class="text-slate-400 hover:text-blue-600 transition"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button onclick="event.stopPropagation(); deleteNoticePermanent('${n.id}')" class="text-slate-400 hover:text-red-600 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div></div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-2 leading-tight">${n.title}</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed mb-4 whitespace-pre-line line-clamp-4">${n.content}</p>
+                    `;
+
+                    // Anteprima PDF
+                    if (n.attachmentUrl) {
+                        cardHtml += `<div class="card-preview-container" id="preview-${n.id}">
+                            <div class="flex items-center justify-center w-full h-full text-slate-300">
+                                <div class="loader"></div>
+                            </div>
+                        </div>`;
+                    }
+
+                    cardHtml += `</div>
                         <div class="px-5 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
                             <div class="flex items-center gap-2"><i data-lucide="calendar" class="w-3.5 h-3.5"></i><span>${n.displayDate ? new Date(n.displayDate).toLocaleDateString('it-IT') : new Date(n.timestamp).toLocaleDateString('it-IT')}</span></div>
                             <div class="${isAdminLoggedIn ? 'flex' : 'hidden'} gap-2"><button onclick="event.stopPropagation(); togglePin('${n.id}', ${n.isPinned})" class="p-1.5 rounded hover:bg-blue-100 ${n.isPinned ? 'text-blue-600' : 'text-slate-400'}" title="Evidenza"><i data-lucide="pin" class="w-4 h-4"></i></button>${showArchived ? `<button onclick="event.stopPropagation(); restoreNotice('${n.id}')" class="p-1.5 rounded hover:bg-green-100 text-slate-400 hover:text-green-600 transition" title="Ripristina"><i data-lucide="refresh-ccw" class="w-4 h-4"></i></button>` : `<button onclick="event.stopPropagation(); archiveNotice('${n.id}')" class="p-1.5 rounded hover:bg-yellow-100 text-slate-400 hover:text-yellow-600 transition" title="Archivia"><i data-lucide="archive" class="w-4 h-4"></i></button>`}</div>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+
+                    card.innerHTML = cardHtml;
+                    grid.appendChild(card);
+
+                    // Genera anteprima asincrona
+                    if (n.attachmentUrl) {
+                        generatePdfThumbnail(n.attachmentUrl, `preview-${n.id}`);
+                    }
+                }
+                
                 lucide.createIcons();
             }
         }
 
-        // --- NEW: VIEW NOTICE LOGIC ---
-        function viewNotice(id) {
-            const notice = notices.find(n => n.id === id);
-            if (!notice) return;
+        async function generatePdfThumbnail(url, containerId) {
+            const container = document.getElementById(containerId);
+            if(!container) return;
 
-            document.getElementById('viewNoticeTitle').innerText = notice.title;
-            document.getElementById('viewNoticeContent').innerText = notice.content;
-            document.getElementById('viewNoticeDate').innerText = notice.displayDate ? new Date(notice.displayDate).toLocaleDateString('it-IT') : new Date(notice.timestamp).toLocaleDateString('it-IT');
-            const cat = CATEGORIES[notice.category];
-            document.getElementById('viewNoticeCategory').innerText = cat.label;
-            document.getElementById('viewNoticeCategory').className = `px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wide border ${cat.class}`;
-
-            const coverContainer = document.getElementById('viewNoticeCover');
-            const coverImg = document.getElementById('viewNoticeCoverImg');
-            if (notice.imageUrl) { coverImg.src = notice.imageUrl; coverContainer.classList.remove('hidden'); } else { coverContainer.classList.add('hidden'); }
-
-            const contentImgContainer = document.getElementById('viewNoticeContentImgContainer');
-            const contentImg = document.getElementById('viewNoticeContentImg');
-            if (notice.contentImageUrl) { contentImg.src = notice.contentImageUrl; contentImgContainer.classList.remove('hidden'); } else { contentImgContainer.classList.add('hidden'); }
-
-            const attachContainer = document.getElementById('viewNoticeAttachmentContainer');
-            if (notice.attachmentUrl) {
-                attachContainer.classList.remove('hidden');
-                document.getElementById('viewNoticeDownloadBtn').href = notice.attachmentUrl;
-                const previewBox = document.getElementById('viewNoticePreviewBox');
-                // Use FULL PREVIEW in modal
-                previewBox.innerHTML = renderFullPreviewHTML(notice.attachmentUrl);
-                previewBox.classList.remove('hidden');
-            } else {
-                attachContainer.classList.add('hidden');
-            }
-
-            document.getElementById('viewNoticeModal').classList.remove('hidden');
-            lucide.createIcons();
-        }
-
-        function closeViewModal() { document.getElementById('viewNoticeModal').classList.add('hidden'); }
-
-        // Full Preview for Modal (With Toolbar hidden)
-        function renderFullPreviewHTML(url) {
+            // Se è Google Drive -> Iframe
             if (url.includes('drive.google.com')) {
                 let cleanUrl = url;
                 if (url.includes('/view')) cleanUrl = url.replace('/view', '/preview');
                 else if (url.includes('open?id=')) cleanUrl = `https://drive.google.com/file/d/${url.split('id=')[1].split('&')[0]}/preview`;
-                return `<iframe src="${cleanUrl}" class="preview-content" loading="lazy"></iframe>`;
-            } 
-            else if (url.startsWith('data:application/pdf') || url.toLowerCase().endsWith('.pdf')) {
-                return `<embed src="${url}#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf" class="preview-content">`;
+                
+                container.innerHTML = `<iframe src="${cleanUrl}" class="drive-frame" loading="lazy"></iframe>`;
+                return;
             }
-            else {
-                return `<img src="${url}" class="w-full h-full object-cover object-top">`;
+
+            // Se è PDF Base64 -> PDF.js Image
+            if (url.startsWith('data:application/pdf') || url.toLowerCase().endsWith('.pdf')) {
+                try {
+                    const loadingTask = pdfjsLib.getDocument(url);
+                    const pdf = await loadingTask.promise;
+                    const page = await pdf.getPage(1);
+                    
+                    const viewport = page.getViewport({ scale: 1.0 }); // Scala normale
+                    const canvas = document.createElement('canvas');
+                    canvas.className = 'pdf-canvas';
+                    const context = canvas.getContext('2d');
+                    
+                    // Alta risoluzione per retina display
+                    const outputScale = window.devicePixelRatio || 1;
+                    canvas.width = Math.floor(viewport.width * outputScale);
+                    canvas.height = Math.floor(viewport.height * outputScale);
+                    
+                    const transform = [outputScale, 0, 0, outputScale, 0, 0];
+
+                    const renderContext = {
+                        canvasContext: context,
+                        transform: transform,
+                        viewport: viewport
+                    };
+                    await page.render(renderContext).promise;
+                    
+                    container.innerHTML = '';
+                    container.appendChild(canvas);
+                } catch (e) {
+                    console.error("PDF Render Error", e);
+                    // Fallback
+                    container.innerHTML = `<div class="flex flex-col items-center justify-center w-full h-full text-slate-400 gap-2"><i data-lucide="file-x" class="w-8 h-8"></i><span class="text-xs">Anteprima non disponibile</span></div>`;
+                    lucide.createIcons();
+                }
+                return;
             }
-        }
 
-        // Card Preview (Same logic, inserted in pointer-events-none container)
-        function renderPreviewBoxHTML(url) {
-            return renderFullPreviewHTML(url);
-        }
-
-        function getDrivePreviewUrl(url) {
-            const driveRegex = /drive\.google\.com\/file\/d\/([-_\w]+)/;
-            const match = url.match(driveRegex);
-            return (match && match[1]) ? `https://drive.google.com/file/d/${match[1]}/preview` : url;
-        }
-
-        function processDriveLink(url) {
-            const driveRegex = /drive\.google\.com\/file\/d\/([-_\w]+)/;
-            const match = url.match(driveRegex);
-            return (match && match[1]) ? `https://drive.google.com/uc?export=view&id=${match[1]}` : url;
+            // Se è immagine -> Img tag
+            container.innerHTML = `<img src="${url}" class="w-full h-full object-cover object-top">`;
         }
 
         // --- AUTH & LOGIN HANDLERS ---
@@ -478,7 +493,8 @@
         async function handleLoginSubmit(e) { e.preventDefault(); try { await signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); closeLoginModal(); showToast("Login effettuato con successo!"); } catch (error) { console.error(error); document.getElementById('loginError').classList.remove('hidden'); } }
         async function handleLogout() { await signOut(auth); showToast("Disconnessione effettuata. Modalità pubblica."); }
 
-        function setFilter(filter) { currentFilter = filter; renderFilters(); renderNotices(); }
+        // --- ACTIONS ---
+        function setFilter(filter) { currentFilter = filter; renderNotices(); }
         function updateSearch(val) { currentSearch = val; renderNotices(); }
         function toggleArchiveView() { showArchived = !showArchived; document.getElementById('archiveBtnText').innerText = showArchived ? "Torna alla Bacheca" : "Mostra Archivio"; const banner = document.getElementById('archiveBanner'); showArchived ? banner.classList.remove('hidden') : banner.classList.add('hidden'); renderNotices(); }
 
@@ -534,9 +550,59 @@
             } catch (err) { console.error(err); showToast("Errore: " + err.message, true); } finally { btn.disabled = false; btn.innerHTML = originalBtnContent; }
         }
 
+        function getDrivePreviewUrl(url) {
+            const driveRegex = /drive\.google\.com\/file\/d\/([-_\w]+)/;
+            const match = url.match(driveRegex);
+            return (match && match[1]) ? `https://drive.google.com/file/d/${match[1]}/preview` : url;
+        }
+
+        function processDriveLink(url) {
+            const driveRegex = /drive\.google\.com\/file\/d\/([-_\w]+)/;
+            const match = url.match(driveRegex);
+            return (match && match[1]) ? `https://drive.google.com/uc?export=view&id=${match[1]}` : url;
+        }
+
         async function archiveNotice(id) { if(confirm("Archiviare?")) { await updateDoc(doc(db, NOTICES_COLLECTION, id), { archived: true, isPinned: false }); showToast("Archiviata"); } }
         async function restoreNotice(id) { if(confirm("Ripristinare?")) { await updateDoc(doc(db, NOTICES_COLLECTION, id), { archived: false }); showToast("Ripristinata"); } }
         async function togglePin(id, currentStatus) { await updateDoc(doc(db, NOTICES_COLLECTION, id), { isPinned: !currentStatus }); }
+
+        // NEW: View Notice Logic
+        function viewNotice(id) {
+            const notice = notices.find(n => n.id === id);
+            if (!notice) return;
+
+            document.getElementById('viewNoticeTitle').innerText = notice.title;
+            document.getElementById('viewNoticeContent').innerText = notice.content;
+            document.getElementById('viewNoticeDate').innerText = notice.displayDate ? new Date(notice.displayDate).toLocaleDateString('it-IT') : new Date(notice.timestamp).toLocaleDateString('it-IT');
+            const cat = CATEGORIES[notice.category];
+            document.getElementById('viewNoticeCategory').innerText = cat.label;
+            document.getElementById('viewNoticeCategory').className = `px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wide border ${cat.class}`;
+
+            const coverContainer = document.getElementById('viewNoticeCover');
+            const coverImg = document.getElementById('viewNoticeCoverImg');
+            if (notice.imageUrl) { coverImg.src = notice.imageUrl; coverContainer.classList.remove('hidden'); } else { coverContainer.classList.add('hidden'); }
+
+            const contentImgContainer = document.getElementById('viewNoticeContentImgContainer');
+            const contentImg = document.getElementById('viewNoticeContentImg');
+            if (notice.contentImageUrl) { contentImg.src = notice.contentImageUrl; contentImgContainer.classList.remove('hidden'); } else { contentImgContainer.classList.add('hidden'); }
+
+            const attachContainer = document.getElementById('viewNoticeAttachmentContainer');
+            if (notice.attachmentUrl) {
+                attachContainer.classList.remove('hidden');
+                document.getElementById('viewNoticeDownloadBtn').href = notice.attachmentUrl;
+                // Render preview
+                const previewBox = document.getElementById('viewNoticePreviewBox');
+                generatePdfThumbnail(notice.attachmentUrl, 'viewNoticePreviewBox');
+                previewBox.classList.remove('hidden');
+            } else {
+                attachContainer.classList.add('hidden');
+            }
+
+            document.getElementById('viewNoticeModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeViewModal() { document.getElementById('viewNoticeModal').classList.add('hidden'); }
 
         function openNoticeModal(notice = null) { if (!notice && !editingId) { document.getElementById('modalTitle').innerText = "Pubblica Avviso"; document.getElementById('submitBtnText').innerText = "Pubblica Avviso"; } document.getElementById('noticeModal').classList.remove('hidden'); }
         function closeNoticeModal() { document.getElementById('noticeModal').classList.add('hidden'); editingId = null; document.getElementById('newTitle').value = ''; document.getElementById('newContent').value = ''; document.getElementById('newCategory').value = 'info'; document.getElementById('newPinned').checked = false; document.getElementById('newDate').value = ''; document.getElementById('coverFile').value = ''; document.getElementById('coverUrlManual').value = ''; document.getElementById('contentImageFile').value = ''; document.getElementById('contentUrlManual').value = ''; document.getElementById('attachmentFile').value = ''; document.getElementById('attachmentUrlManual').value = ''; toggleCoverType('file'); toggleContentType('file'); toggleAttachType('file'); }
