@@ -65,16 +65,15 @@
         /* Anteprima Allegato (PDF/Drive) */
         .preview-box {
             position: relative;
-            height: 200px; /* Altezza fissa del taglio */
+            height: 220px; /* Un po' più alto per vedere meglio */
             overflow: hidden;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
             margin-top: 16px;
             margin-bottom: 8px;
-            background: #f8fafc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: #ffffff;
+            /* Rimosso flex per evitare schiacciamenti iframe */
+            display: block; 
         }
         
         /* Maschera sfumata sopra l'anteprima */
@@ -83,7 +82,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 60px;
+            height: 40px;
             background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
             pointer-events: none;
             z-index: 10;
@@ -92,11 +91,10 @@
         /* Iframe/Embed dentro l'anteprima */
         .preview-content {
             width: 100%;
-            height: 200%; /* Più alto per mostrare l'inizio */
+            height: 100%; 
             border: none;
-            /* pointer-events: none;  Disabilita scroll interno */
-            opacity: 0.95;
             background: white;
+            display: block;
         }
 
         .attachment-badge {
@@ -429,6 +427,9 @@
                             <h3 class="text-lg font-bold text-slate-800 mb-2 leading-tight">${n.title}</h3>
                             <p class="text-slate-600 text-sm leading-relaxed mb-4 whitespace-pre-line line-clamp-4">${n.content}</p>
                             ${n.attachmentUrl ? `<button onclick="event.stopPropagation(); window.open('${n.attachmentUrl}', '_blank')" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium mt-3 p-2 bg-blue-50 rounded-lg w-full justify-center transition hover:bg-blue-100"><i data-lucide="download" class="w-4 h-4"></i>Scarica Allegato</button>` : ''}
+                            
+                            <!-- ANTEPRIMA ALLEGATO IN CARD -->
+                            ${n.attachmentUrl ? `<div class="mt-4">${renderPreviewBoxHTML(n.attachmentUrl)}</div>` : ''}
                         </div>
                         <div class="px-5 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
                             <div class="flex items-center gap-2"><i data-lucide="calendar" class="w-3.5 h-3.5"></i><span>${n.displayDate ? new Date(n.displayDate).toLocaleDateString('it-IT') : new Date(n.timestamp).toLocaleDateString('it-IT')}</span></div>
@@ -500,38 +501,25 @@
 
         // Helper for View Modal Preview
         function renderPreviewBoxHTML(url) {
-            let content = '';
-            
+            // FIX FORCE DRIVE PREVIEW URL
+            let cleanUrl = url;
             if (url.includes('drive.google.com')) {
-                // Se non è già un link di anteprima/embed, prova a convertirlo o usalo com'è nell'iframe
-                // Molti link drive funzionano meglio in iframe se sono /preview o /view
-                if (!url.includes('/preview') && !url.includes('/view')) {
-                     // Tentativo conversione se mancano parti essenziali, ma di solito handleFormSubmit lo fa
+                // If it's a view/open link, convert to preview
+                if (url.includes('/view')) {
+                    cleanUrl = url.replace('/view', '/preview');
+                } else if (url.includes('open?id=')) {
+                    const id = url.split('id=')[1].split('&')[0];
+                    cleanUrl = `https://drive.google.com/file/d/${id}/preview`;
                 }
-                content = `<iframe src="${url}" class="preview-content"></iframe>`;
+                return `<iframe src="${cleanUrl}" class="preview-content" loading="lazy"></iframe>`;
             } 
             else if (url.startsWith('data:application/pdf') || url.toLowerCase().endsWith('.pdf')) {
-                content = `<embed src="${url}" type="application/pdf" class="preview-content">`;
+                return `<embed src="${url}" type="application/pdf" class="preview-content">`;
             }
             else {
-                // Fallback immagine con icona se rotto
-                content = `<img src="${url}" class="w-full h-full object-cover object-top" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'flex flex-col items-center justify-center h-full text-slate-400 gap-2\\'><i data-lucide=\\'file-text\\' class=\\'w-8 h-8\\'></i><span class=\\'text-xs\\'>Anteprima non disponibile</span></div>'; lucide.createIcons();">`;
+                // Image fallback
+                return `<img src="${url}" class="w-full h-full object-cover object-top" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'flex flex-col items-center justify-center h-full text-slate-400 gap-2\\'><i data-lucide=\\'file-text\\' class=\\'w-8 h-8\\'></i><span class=\\'text-xs\\'>Anteprima non disponibile</span></div>'; lucide.createIcons();">`;
             }
-
-            return `
-            <div class="preview-box">
-                ${content}
-                <div class="preview-overlay"></div>
-            </div>
-            `;
-        }
-
-        // Funzione per generare il box di anteprima (Card Version)
-        function renderPreviewBox(url) {
-            // Keep card preview simple/hidden or truncated. 
-            // In grid view we might just show "Allegato" badge or button.
-            // But if we want inline preview in card:
-            return renderPreviewBoxHTML(url);
         }
 
         function getDrivePreviewUrl(url) {
@@ -606,7 +594,7 @@
                 const attachmentFile = document.getElementById('attachmentFile').files[0]; const attachmentUrlManual = document.getElementById('attachmentUrlManual').value;
                 if (attachmentFile) attachmentUrl = await fileToBase64(attachmentFile); 
                 else if (attachmentUrlManual) {
-                    // Always try to get preview URL for Drive attachments
+                    // Force Drive preview format if manually entered
                     if (attachmentUrlManual.includes('drive.google.com')) {
                         attachmentUrl = getDrivePreviewUrl(attachmentUrlManual);
                     } else {
