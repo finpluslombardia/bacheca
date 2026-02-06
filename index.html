@@ -514,7 +514,8 @@
                 return `<iframe src="${cleanUrl}" class="preview-content" loading="lazy"></iframe>`;
             } 
             else if (url.startsWith('data:application/pdf') || url.toLowerCase().endsWith('.pdf')) {
-                return `<embed src="${url}" type="application/pdf" class="preview-content">`;
+                // Append params to hide toolbar
+                return `<embed src="${url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH" type="application/pdf" class="preview-content">`;
             }
             else {
                 // Image fallback
