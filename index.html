@@ -21,7 +21,6 @@
         
         .hidden { display: none !important; }
         
-        /* Animazione pulsazione logo per feedback click */
         .pulse-animation { animation: pulse 0.2s; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(0.9); } 100% { transform: scale(1); } }
 
@@ -40,9 +39,10 @@
         /* Immagine Card */
         .card-image-container {
             width: 100%;
-            height: 160px;
+            height: 180px;
             overflow: hidden;
             background-color: #f1f5f9;
+            position: relative;
         }
         .card-image {
             width: 100%;
@@ -52,6 +52,20 @@
         }
         .card:hover .card-image {
             transform: scale(1.05);
+        }
+        .attachment-badge {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(255,255,255,0.9);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
     </style>
 </head>
@@ -63,20 +77,15 @@
             
             <!-- Logo e Titolo (Area Click Segreta) -->
             <div class="flex items-center gap-3 select-none cursor-pointer" onclick="handleSecretClick()" id="logoArea" title="Centro Federale">
-                
-                <!-- LOGO -->
                 <img 
                     src="./CF Lampugnano trasp.png" 
                     alt="Logo Piscina" 
                     class="w-12 h-12 object-contain bg-white/90 rounded-full p-1 shadow-md transition-transform active:scale-95"
                     onerror="this.style.display='none'; document.getElementById('fallbackIcon').classList.remove('hidden');"
                 >
-                
-                <!-- ICONA DI FALLBACK -->
                 <div id="fallbackIcon" class="hidden bg-white/20 p-2 rounded-full backdrop-blur-sm">
                     <i data-lucide="droplets" class="w-7 h-7 text-white"></i>
                 </div>
-
                 <div>
                     <h1 class="text-xl md:text-2xl font-bold tracking-tight">Centro Federale Lampugnano</h1>
                     <p class="text-cyan-100 text-xs md:text-sm">Bacheca Digitale Ufficiale</p>
@@ -96,7 +105,7 @@
                     >
                 </div>
                 
-                <!-- Admin Info (Visibile solo se loggato) -->
+                <!-- Admin Info -->
                 <div id="adminControls" class="hidden flex items-center gap-2">
                     <span class="text-xs font-semibold bg-blue-800 px-2 py-1 rounded text-white">ADMIN</span>
                     <button 
@@ -116,18 +125,11 @@
         
         <!-- Controlli e Filtri -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-            <!-- Filtri Categorie -->
-            <div class="flex flex-wrap gap-2 items-center" id="filterContainer">
-                <!-- Bottoni generati via JS -->
-            </div>
+            <div class="flex flex-wrap gap-2 items-center" id="filterContainer"></div>
 
             <div class="flex items-center gap-3">
-                <!-- Indicatore Loading -->
-                <div id="loadingIndicator" class="hidden">
-                    <div class="loader"></div>
-                </div>
+                <div id="loadingIndicator" class="hidden"><div class="loader"></div></div>
 
-                <!-- Toggle Archivio (Solo Admin) -->
                 <button 
                     id="archiveToggleBtn"
                     onclick="toggleArchiveView()"
@@ -137,7 +139,6 @@
                     <span id="archiveBtnText">Mostra Archivio</span>
                 </button>
 
-                <!-- Bottone Nuovo Avviso (Solo Admin) -->
                 <button 
                     id="addNoticeBtn"
                     onclick="openNoticeModal()"
@@ -158,9 +159,7 @@
         </div>
 
         <!-- Griglia Avvisi -->
-        <div id="noticesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Le card verranno inserite qui da JS -->
-        </div>
+        <div id="noticesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
         <!-- Stato Vuoto -->
         <div id="emptyState" class="hidden col-span-full py-12 flex flex-col items-center justify-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-200 mt-6">
@@ -206,10 +205,61 @@
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">URL Immagine (Opzionale)</label>
-                    <input type="url" id="newImage" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="https://...">
-                    <p class="text-xs text-gray-400 mt-1">Incolla qui il link di un'immagine dal web.</p>
+                <!-- SEZIONE CARICAMENTO FILE (VERSIONE NO STORAGE) -->
+                <div class="space-y-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                    <p class="text-xs text-orange-600 font-semibold mb-2">
+                        <i data-lucide="info" class="w-3 h-3 inline"></i> Puoi caricare file dal PC o usare Link Pubblici (Google Drive).
+                    </p>
+                    
+                    <!-- Immagine Copertina -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                            <i data-lucide="image" class="w-4 h-4"></i>
+                            Immagine Copertina
+                        </label>
+                        
+                        <!-- TAB SCELTA COPERTINA -->
+                        <div class="flex gap-2 mb-2 text-xs">
+                            <button type="button" onclick="toggleCoverType('file')" id="btnCoverFile" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button>
+                            <button type="button" onclick="toggleCoverType('link')" id="btnCoverLink" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive</button>
+                        </div>
+
+                        <!-- INPUT FILE COPERTINA -->
+                        <div id="coverFileInput">
+                            <input type="file" id="coverFile" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        </div>
+
+                        <!-- INPUT LINK COPERTINA -->
+                        <div id="coverLinkInput" class="hidden">
+                            <input type="url" id="coverUrlManual" placeholder="Incolla link Google Drive o web..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            <p class="text-[10px] text-gray-400 mt-1">Per Drive: assicurati che il file sia "Chiunque abbia il link".</p>
+                        </div>
+                    </div>
+
+                    <!-- Allegato -->
+                    <div class="border-t border-slate-200 pt-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                            <i data-lucide="paperclip" class="w-4 h-4"></i>
+                            Allegato (PDF o Link Esterno)
+                        </label>
+                        
+                        <!-- TAB SCELTA ALLEGATO -->
+                        <div class="flex gap-2 mb-2 text-xs">
+                            <button type="button" onclick="toggleAttachType('file')" id="btnFileType" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button>
+                            <button type="button" onclick="toggleAttachType('link')" id="btnLinkType" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive/Web</button>
+                        </div>
+
+                        <!-- INPUT FILE ALLEGATO -->
+                        <div id="attachFileInput">
+                            <input type="file" id="attachmentFile" accept=".pdf,image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100">
+                            <p class="text-[10px] text-gray-400 mt-1">Max 400KB. Per file grandi usa "Usa Link".</p>
+                        </div>
+
+                        <!-- INPUT LINK ALLEGATO -->
+                        <div id="attachLinkInput" class="hidden">
+                            <input type="url" id="attachmentUrlManual" placeholder="Es. https://drive.google.com/..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                    </div>
                 </div>
 
                 <div>
@@ -222,14 +272,14 @@
                     <label for="newPinned" class="text-sm text-gray-700 font-medium">Metti in evidenza (Pin in alto)</label>
                 </div>
 
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition mt-2 shadow-lg">
-                    Salva Avviso
+                <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition mt-2 shadow-lg flex justify-center items-center gap-2">
+                    <span>Pubblica Avviso</span>
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL LOGIN (Segreto) -->
+    <!-- MODAL LOGIN -->
     <div id="loginModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
             <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
@@ -256,14 +306,14 @@
         </div>
     </div>
 
-    <!-- FIREBASE & APP LOGIC -->
+    <!-- APP LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // REMOVED: Storage import since we are using Base64 workaround
 
         // --- CONFIGURAZIONE ---
-        // Priorità alla TUA configurazione personale
         const myConfig = {
               apiKey: "AIzaSyBVGUYgJhFnj20SED3-qpV5ksoBXBT7xCs",
               authDomain: "bacheca-5acac.firebaseapp.com",
@@ -273,13 +323,10 @@
               appId: "1:65310524220:web:a7f8bd0cd97539f3325439"
         };
         
-        // Seleziona la config corretta
-        // Se la tua config ha un'apiKey valida, usala. Altrimenti usa quella di test.
         let firebaseConfig = myConfig.apiKey ? myConfig : null;
         let useEnvironmentConfig = false;
         let appId = 'cf-lampugnano-app';
 
-        // Fallback all'ambiente di test SOLO se la tua config è vuota
         if (!firebaseConfig && typeof __firebase_config !== 'undefined') {
             firebaseConfig = JSON.parse(__firebase_config);
             appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -293,7 +340,7 @@
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
-            console.log("Firebase inizializzato con progetto:", firebaseConfig.projectId);
+            console.log("Firebase inizializzato (No Storage Mode)");
         } catch(e) {
             console.error("Errore Init Firebase:", e);
         }
@@ -307,8 +354,6 @@
         let isAdminLoggedIn = false;
         let showArchived = false; 
         let unsubscribeSnapshot = null;
-        
-        // Secret Login Variables
         let clickCount = 0;
         let clickTimer = null;
         const SECRET_CLICKS_REQUIRED = 5;
@@ -324,11 +369,8 @@
         };
 
         // --- AUTH LOGIC ---
-        
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                console.log("Utente autenticato:", user.uid);
-                
                 if (!user.isAnonymous) {
                     isAdminLoggedIn = true;
                     updateAdminUI(true);
@@ -336,25 +378,15 @@
                     isAdminLoggedIn = false;
                     updateAdminUI(false);
                 }
-                
-                // Avvia listener DB solo dopo auth confermata
-                if (!unsubscribeSnapshot) {
-                    setupRealtimeListener();
-                }
-
+                if (!unsubscribeSnapshot) setupRealtimeListener();
             } else {
-                console.log("Nessun utente, avvio login anonimo...");
                 isAdminLoggedIn = false;
                 updateAdminUI(false);
-                
                 if (unsubscribeSnapshot) {
                     unsubscribeSnapshot();
                     unsubscribeSnapshot = null;
                 }
-
-                signInAnonymously(auth).catch((error) => {
-                    console.error("Errore Autenticazione Anonima:", error);
-                });
+                signInAnonymously(auth).catch((error) => console.error("Errore Auth Anonima:", error));
             }
         });
 
@@ -379,13 +411,10 @@
         document.addEventListener('DOMContentLoaded', () => {
             renderFilters();
             lucide.createIcons();
-
-            // Esposizione funzioni globali
             window.handleSecretClick = handleSecretClick;
             window.handleLoginSubmit = handleLoginSubmit;
             window.handleLogout = handleLogout;
             window.closeLoginModal = closeLoginModal;
-            
             window.setFilter = setFilter;
             window.updateSearch = updateSearch;
             window.openNoticeModal = openNoticeModal;
@@ -393,9 +422,10 @@
             window.handleFormSubmit = handleFormSubmit;
             window.archiveNotice = archiveNotice; 
             window.restoreNotice = restoreNotice; 
-            window.deleteNotice = deleteNotice; 
             window.togglePin = togglePin;
             window.toggleArchiveView = toggleArchiveView;
+            window.toggleAttachType = toggleAttachType;
+            window.toggleCoverType = toggleCoverType;
         });
 
         // --- FIRESTORE ---
@@ -404,8 +434,6 @@
             loading.classList.remove('hidden');
 
             let q;
-            // Se usiamo la configurazione ambiente (test), usiamo il path complesso.
-            // Se usiamo la TUA config (produzione), usiamo il path semplice.
             if (useEnvironmentConfig) {
                 q = collection(db, 'artifacts', appId, 'public', 'data', NOTICES_COLLECTION);
             } else {
@@ -417,17 +445,14 @@
                     id: doc.id,
                     ...doc.data()
                 }));
-                
                 loading.classList.add('hidden');
                 renderNotices();
             }, (error) => {
                 console.error("Errore listener:", error);
                 loading.classList.add('hidden');
-                
                 if (error.code === 'permission-denied') {
-                    // Fallback gentile
                     const emptyState = document.getElementById('emptyState');
-                    emptyState.querySelector('p').innerText = "Accesso negato. Verifica le regole del database o l'accesso.";
+                    emptyState.querySelector('p').innerText = "Accesso negato. Verifica database.";
                     emptyState.classList.remove('hidden');
                 }
             });
@@ -437,16 +462,7 @@
         function renderFilters() {
             const container = document.getElementById('filterContainer');
             container.innerHTML = Object.keys(CATEGORIES).map(key => `
-                <button 
-                    onclick="setFilter('${key}')"
-                    class="px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                        currentFilter === key 
-                        ? 'bg-blue-600 text-white shadow-md transform scale-105' 
-                        : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
-                    }"
-                >
-                    ${CATEGORIES[key].label}
-                </button>
+                <button onclick="setFilter('${key}')" class="px-4 py-2 rounded-full text-sm font-medium transition-all ${currentFilter === key ? 'bg-blue-600 text-white shadow-md transform scale-105' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}">${CATEGORIES[key].label}</button>
             `).join('');
         }
 
@@ -477,11 +493,7 @@
             if (filtered.length === 0) {
                 grid.innerHTML = '';
                 empty.classList.remove('hidden');
-                if(showArchived) {
-                    empty.querySelector('p').innerText = "Nessun avviso in archivio.";
-                } else {
-                    empty.querySelector('p').innerText = "Nessun avviso trovato.";
-                }
+                empty.querySelector('p').innerText = showArchived ? "Nessun avviso in archivio." : "Nessun avviso trovato.";
             } else {
                 empty.classList.add('hidden');
                 grid.innerHTML = filtered.map(n => `
@@ -490,6 +502,10 @@
                         ${n.imageUrl ? `
                         <div class="card-image-container">
                             <img src="${n.imageUrl}" alt="Immagine avviso" class="card-image" onerror="this.style.display='none'">
+                            ${n.attachmentUrl ? `
+                            <div class="attachment-badge">
+                                <i data-lucide="paperclip" class="w-3 h-3 text-slate-500"></i> Allegato
+                            </div>` : ''}
                         </div>
                         ` : ''}
 
@@ -503,6 +519,13 @@
                             
                             <h3 class="text-lg font-bold text-slate-800 mb-2 leading-tight">${n.title}</h3>
                             <p class="text-slate-600 text-sm leading-relaxed mb-4 whitespace-pre-line">${n.content}</p>
+
+                            ${n.attachmentUrl ? `
+                            <a href="${n.attachmentUrl}" target="_blank" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium mb-3 p-2 bg-blue-50 rounded-lg w-full justify-center transition hover:bg-blue-100">
+                                <i data-lucide="download" class="w-4 h-4"></i>
+                                Scarica Allegato
+                            </a>
+                            ` : ''}
                         </div>
 
                         <div class="px-5 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
@@ -517,11 +540,11 @@
                                 </button>
                                 
                                 ${showArchived ? `
-                                    <button onclick="restoreNotice('${n.id}')" class="p-1.5 rounded hover:bg-green-100 text-slate-400 hover:text-green-600 transition" title="Ripristina in bacheca">
+                                    <button onclick="restoreNotice('${n.id}')" class="p-1.5 rounded hover:bg-green-100 text-slate-400 hover:text-green-600 transition" title="Ripristina">
                                         <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
                                     </button>
                                 ` : `
-                                    <button onclick="archiveNotice('${n.id}')" class="p-1.5 rounded hover:bg-yellow-100 text-slate-400 hover:text-yellow-600 transition" title="Archivia (Nascondi)">
+                                    <button onclick="archiveNotice('${n.id}')" class="p-1.5 rounded hover:bg-yellow-100 text-slate-400 hover:text-yellow-600 transition" title="Archivia">
                                         <i data-lucide="archive" class="w-4 h-4"></i>
                                     </button>
                                 `}
@@ -534,25 +557,19 @@
             }
         }
 
-        // --- SECRET LOGIN HANDLERS ---
+        // --- AUTH & LOGIN HANDLERS ---
         function handleSecretClick() {
             const logo = document.getElementById('logoArea');
             logo.classList.remove('pulse-animation');
             void logo.offsetWidth; 
             logo.classList.add('pulse-animation');
-
             clickCount++;
             if (clickTimer) clearTimeout(clickTimer);
-            
             clickTimer = setTimeout(() => { clickCount = 0; }, 2000);
-
             if (clickCount === SECRET_CLICKS_REQUIRED) {
                 clickCount = 0;
-                if(!isAdminLoggedIn) {
-                    document.getElementById('loginModal').classList.remove('hidden');
-                } else {
-                    alert("Sei già connesso come Staff.");
-                }
+                if(!isAdminLoggedIn) document.getElementById('loginModal').classList.remove('hidden');
+                else alert("Sei già connesso come Staff.");
             }
         }
 
@@ -565,7 +582,6 @@
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-
             try {
                 await signInWithEmailAndPassword(auth, email, password);
                 closeLoginModal();
@@ -577,50 +593,153 @@
         }
 
         async function handleLogout() {
-            if(confirm("Vuoi uscire dall'area riservata?")) {
-                await signOut(auth);
-            }
+            if(confirm("Vuoi uscire dall'area riservata?")) await signOut(auth);
         }
 
         // --- ACTIONS ---
-        function setFilter(filter) {
-            currentFilter = filter;
-            renderFilters();
-            renderNotices();
-        }
-
-        function updateSearch(val) {
-            currentSearch = val;
-            renderNotices();
-        }
-
+        function setFilter(filter) { currentFilter = filter; renderFilters(); renderNotices(); }
+        function updateSearch(val) { currentSearch = val; renderNotices(); }
         function toggleArchiveView() {
             showArchived = !showArchived;
-            const btnText = document.getElementById('archiveBtnText');
+            document.getElementById('archiveBtnText').innerText = showArchived ? "Torna alla Bacheca" : "Mostra Archivio";
             const banner = document.getElementById('archiveBanner');
-            
-            if (showArchived) {
-                btnText.innerText = "Torna alla Bacheca";
-                banner.classList.remove('hidden');
-            } else {
-                btnText.innerText = "Mostra Archivio";
-                banner.classList.add('hidden');
-            }
+            showArchived ? banner.classList.remove('hidden') : banner.classList.add('hidden');
             renderNotices();
+        }
+
+        window.toggleAttachType = function(type) {
+            if(type === 'file') {
+                document.getElementById('attachFileInput').classList.remove('hidden');
+                document.getElementById('attachLinkInput').classList.add('hidden');
+                document.getElementById('btnFileType').classList.replace('bg-white','bg-slate-200');
+                document.getElementById('btnFileType').classList.replace('border','font-medium');
+                document.getElementById('btnLinkType').classList.replace('bg-slate-200','bg-white');
+                document.getElementById('btnLinkType').classList.add('border');
+            } else {
+                document.getElementById('attachFileInput').classList.add('hidden');
+                document.getElementById('attachLinkInput').classList.remove('hidden');
+                document.getElementById('btnLinkType').classList.replace('bg-white','bg-slate-200');
+                document.getElementById('btnLinkType').classList.remove('border');
+                document.getElementById('btnFileType').classList.replace('bg-slate-200','bg-white');
+                document.getElementById('btnFileType').classList.add('border');
+            }
+        }
+
+        window.toggleCoverType = function(type) {
+            if(type === 'file') {
+                document.getElementById('coverFileInput').classList.remove('hidden');
+                document.getElementById('coverLinkInput').classList.add('hidden');
+                document.getElementById('btnCoverFile').classList.replace('bg-white','bg-slate-200');
+                document.getElementById('btnCoverFile').classList.replace('border','font-medium');
+                document.getElementById('btnCoverLink').classList.replace('bg-slate-200','bg-white');
+                document.getElementById('btnCoverLink').classList.add('border');
+            } else {
+                document.getElementById('coverFileInput').classList.add('hidden');
+                document.getElementById('coverLinkInput').classList.remove('hidden');
+                document.getElementById('btnCoverLink').classList.replace('bg-white','bg-slate-200');
+                document.getElementById('btnCoverLink').classList.remove('border');
+                document.getElementById('btnCoverFile').classList.replace('bg-slate-200','bg-white');
+                document.getElementById('btnCoverFile').classList.add('border');
+            }
+        }
+
+        function processDriveLink(url) {
+            if (!url) return null;
+            // Pattern Drive view: drive.google.com/file/d/{ID}/view...
+            const driveRegex = /drive\.google\.com\/file\/d\/([-_\w]+)/;
+            const match = url.match(driveRegex);
+            if (match && match[1]) {
+                // Converte in link diretto per <img>: drive.google.com/uc?export=view&id={ID}
+                return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+            }
+            return url;
+        }
+
+        // --- BASE64 HELPER (NO STORAGE) ---
+        // Comprime l'immagine per farla entrare in Firestore (< 1MB document limit)
+        function compressImage(file) {
+            return new Promise((resolve, reject) => {
+                const maxWidth = 800; // Riduce dimensione
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        if (width > maxWidth) {
+                            height *= maxWidth / width;
+                            width = maxWidth;
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Compressione JPEG 0.7
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                        resolve(dataUrl);
+                    };
+                };
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
         }
 
         // --- CRUD ---
         async function handleFormSubmit(e) {
             e.preventDefault();
             
+            const btn = document.getElementById('submitBtn');
+            const originalBtnContent = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loader mr-2"></div> Elaborazione...';
+
             const title = document.getElementById('newTitle').value;
             const content = document.getElementById('newContent').value;
             const category = document.getElementById('newCategory').value;
             const isPinned = document.getElementById('newPinned').checked;
             const displayDate = document.getElementById('newDate').value;
-            const imageUrl = document.getElementById('newImage').value;
+            
+            // Files & Links
+            const coverFile = document.getElementById('coverFile').files[0];
+            const coverUrlManual = document.getElementById('coverUrlManual').value;
+            const attachmentFile = document.getElementById('attachmentFile').files[0];
+            const attachmentUrlManual = document.getElementById('attachmentUrlManual').value;
 
             try {
+                let imageUrl = null;
+                let attachmentUrl = null;
+
+                // 1. Process Cover (File OR Link)
+                if (coverFile) {
+                    if(coverFile.size > 5 * 1024 * 1024) throw new Error("L'immagine di copertina è troppo grande (>5MB).");
+                    imageUrl = await compressImage(coverFile);
+                } else if (coverUrlManual) {
+                    // Try to convert Drive link to direct image link
+                    imageUrl = processDriveLink(coverUrlManual);
+                }
+
+                // 2. Process Attachment (File OR Link)
+                if (attachmentFile) {
+                    if (attachmentFile.size > 400 * 1024) throw new Error("PDF troppo grande (>400KB). Usa 'Usa Link Drive'.");
+                    attachmentUrl = await fileToBase64(attachmentFile);
+                } else if (attachmentUrlManual) {
+                    attachmentUrl = attachmentUrlManual;
+                }
+
                 let collectionRef;
                 if (useEnvironmentConfig) {
                     collectionRef = collection(db, 'artifacts', appId, 'public', 'data', NOTICES_COLLECTION);
@@ -633,7 +752,8 @@
                     content,
                     category,
                     isPinned,
-                    imageUrl, 
+                    imageUrl,
+                    attachmentUrl,
                     displayDate, 
                     timestamp: Date.now(),
                     archived: false 
@@ -643,25 +763,18 @@
             } catch (err) {
                 console.error("Error adding:", err);
                 alert("Errore salvataggio: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalBtnContent;
             }
         }
 
         async function archiveNotice(id) {
-            if(confirm("Vuoi archiviare questa notizia? Non sarà più visibile al pubblico.")) {
-                await updateDocRef(id, { archived: true, isPinned: false });
-            }
+            if(confirm("Archiviare questa notizia?")) await updateDocRef(id, { archived: true, isPinned: false });
         }
 
         async function restoreNotice(id) {
-            if(confirm("Vuoi ripristinare questa notizia in bacheca?")) {
-                await updateDocRef(id, { archived: false });
-            }
-        }
-
-        async function deleteNotice(id) {
-            if(confirm("Eliminare definitivamente?")) {
-                 // Logica deleteDoc...
-            }
+            if(confirm("Ripristinare notizia?")) await updateDocRef(id, { archived: false });
         }
 
         async function togglePin(id, currentStatus) {
@@ -682,10 +795,7 @@
             }
         }
 
-        function openNoticeModal() {
-            document.getElementById('noticeModal').classList.remove('hidden');
-        }
-
+        function openNoticeModal() { document.getElementById('noticeModal').classList.remove('hidden'); }
         function closeNoticeModal() {
             document.getElementById('noticeModal').classList.add('hidden');
             document.getElementById('newTitle').value = '';
@@ -693,9 +803,17 @@
             document.getElementById('newCategory').value = 'info';
             document.getElementById('newPinned').checked = false;
             document.getElementById('newDate').value = '';
-            document.getElementById('newImage').value = '';
+            
+            // Reset File Inputs
+            document.getElementById('coverFile').value = '';
+            document.getElementById('coverUrlManual').value = '';
+            document.getElementById('attachmentFile').value = '';
+            document.getElementById('attachmentUrlManual').value = '';
+            
+            // Reset Tabs to Default (File)
+            toggleCoverType('file');
+            toggleAttachType('file');
         }
-
     </script>
 </body>
 </html>
