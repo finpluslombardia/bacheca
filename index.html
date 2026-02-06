@@ -62,6 +62,39 @@
             border: 1px solid #e2e8f0;
         }
 
+        /* Anteprima Allegato (PDF/Drive) */
+        .preview-box {
+            position: relative;
+            height: 180px; /* Altezza fissa del taglio */
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-top: 16px;
+            margin-bottom: 8px;
+            background: #f8fafc;
+        }
+        
+        /* Maschera sfumata sopra l'anteprima */
+        .preview-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Iframe/Embed dentro l'anteprima */
+        .preview-content {
+            width: 100%;
+            height: 200%; /* Più alto per mostrare l'inizio */
+            border: none;
+            pointer-events: none; /* Disabilita scroll interno */
+            opacity: 0.9;
+        }
+
         .attachment-badge {
             position: absolute;
             bottom: 8px;
@@ -77,19 +110,16 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* TOAST NOTIFICATION */
         #toast {
             transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            transform: translate(-50%, 100px); /* Start hidden below */
+            transform: translate(-50%, 100px); 
             opacity: 0;
         }
         #toast.show {
-            transform: translate(-50%, 0); /* Slide up */
+            transform: translate(-50%, 0); 
             opacity: 1;
         }
-        #toast.error {
-            background-color: #ef4444; /* Red for errors */
-        }
+        #toast.error { background-color: #ef4444; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
@@ -97,47 +127,24 @@
     <!-- HEADER -->
     <header class="bg-gradient-to-r from-cyan-600 to-blue-700 text-white shadow-lg sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            
-            <!-- Logo e Titolo (Area Click Segreta) -->
+            <!-- Logo e Titolo -->
             <div class="flex items-center gap-3 select-none cursor-pointer" onclick="handleSecretClick()" id="logoArea" title="Centro Federale">
-                <img 
-                    src="./CF Lampugnano trasp.png" 
-                    alt="Logo Piscina" 
-                    class="w-12 h-12 object-contain bg-white/90 rounded-full p-1 shadow-md transition-transform active:scale-95"
-                    onerror="this.style.display='none'; document.getElementById('fallbackIcon').classList.remove('hidden');"
-                >
-                <div id="fallbackIcon" class="hidden bg-white/20 p-2 rounded-full backdrop-blur-sm">
-                    <i data-lucide="droplets" class="w-7 h-7 text-white"></i>
-                </div>
+                <img src="./CF Lampugnano trasp.png" alt="Logo Piscina" class="w-12 h-12 object-contain bg-white/90 rounded-full p-1 shadow-md transition-transform active:scale-95" onerror="this.style.display='none'; document.getElementById('fallbackIcon').classList.remove('hidden');">
+                <div id="fallbackIcon" class="hidden bg-white/20 p-2 rounded-full backdrop-blur-sm"><i data-lucide="droplets" class="w-7 h-7 text-white"></i></div>
                 <div>
                     <h1 class="text-xl md:text-2xl font-bold tracking-tight">Centro Federale Lampugnano</h1>
                     <p class="text-cyan-100 text-xs md:text-sm">Bacheca Digitale Ufficiale</p>
                 </div>
             </div>
-            
             <!-- Cerca e User Info -->
             <div class="flex items-center gap-3 w-full md:w-auto">
                 <div class="relative w-full md:w-64">
                     <i data-lucide="search" class="absolute left-3 top-2.5 text-cyan-200 w-4 h-4"></i>
-                    <input 
-                        type="text" 
-                        id="searchInput"
-                        placeholder="Cerca avvisi..." 
-                        class="w-full bg-white/10 border border-white/20 rounded-full py-2 pl-10 pr-4 text-white placeholder-cyan-200 focus:outline-none focus:bg-white/20 transition"
-                        oninput="updateSearch(this.value)"
-                    >
+                    <input type="text" id="searchInput" placeholder="Cerca avvisi..." class="w-full bg-white/10 border border-white/20 rounded-full py-2 pl-10 pr-4 text-white placeholder-cyan-200 focus:outline-none focus:bg-white/20 transition" oninput="updateSearch(this.value)">
                 </div>
-                
-                <!-- Admin Info -->
                 <div id="adminControls" class="hidden flex items-center gap-2">
                     <span class="text-xs font-semibold bg-blue-800 px-2 py-1 rounded text-white">ADMIN</span>
-                    <button 
-                        onclick="handleLogout()"
-                        class="p-2 rounded-full transition bg-white/10 hover:bg-red-500/80 text-white"
-                        title="Esci"
-                    >
-                        <i data-lucide="log-out" class="w-5 h-5"></i>
-                    </button>
+                    <button onclick="handleLogout()" class="p-2 rounded-full transition bg-white/10 hover:bg-red-500/80 text-white" title="Esci"><i data-lucide="log-out" class="w-5 h-5"></i></button>
                 </div>
             </div>
         </div>
@@ -145,102 +152,47 @@
 
     <!-- MAIN CONTENT -->
     <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full">
-        
         <!-- Controlli e Filtri -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
             <div class="flex flex-wrap gap-2 items-center" id="filterContainer"></div>
-
             <div class="flex items-center gap-3">
                 <div id="loadingIndicator" class="hidden"><div class="loader"></div></div>
-
-                <button 
-                    id="archiveToggleBtn"
-                    onclick="toggleArchiveView()"
-                    class="hidden flex items-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-full text-sm font-medium transition"
-                >
-                    <i data-lucide="archive" class="w-4 h-4"></i>
-                    <span id="archiveBtnText">Mostra Archivio</span>
-                </button>
-
-                <button 
-                    id="addNoticeBtn"
-                    onclick="openNoticeModal()"
-                    class="hidden flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-full shadow-md transition font-medium"
-                >
-                    <i data-lucide="plus" class="w-5 h-5"></i>
-                    Nuovo
-                </button>
+                <button id="archiveToggleBtn" onclick="toggleArchiveView()" class="hidden flex items-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-full text-sm font-medium transition"><i data-lucide="archive" class="w-4 h-4"></i><span id="archiveBtnText">Mostra Archivio</span></button>
+                <button id="addNoticeBtn" onclick="openNoticeModal()" class="hidden flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-full shadow-md transition font-medium"><i data-lucide="plus" class="w-5 h-5"></i>Nuovo</button>
             </div>
         </div>
 
         <!-- Banner Archivio -->
         <div id="archiveBanner" class="hidden mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r shadow-sm">
-            <div class="flex items-center">
-                <i data-lucide="archive" class="w-5 h-5 text-yellow-500 mr-2"></i>
-                <p class="text-sm text-yellow-700 font-bold">Stai visualizzando l'archivio storico (Notizie non visibili al pubblico)</p>
-            </div>
+            <div class="flex items-center"><i data-lucide="archive" class="w-5 h-5 text-yellow-500 mr-2"></i><p class="text-sm text-yellow-700 font-bold">Stai visualizzando l'archivio storico (Notizie non visibili al pubblico)</p></div>
         </div>
 
         <!-- Griglia Avvisi -->
         <div id="noticesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
         <!-- Stato Vuoto -->
-        <div id="emptyState" class="hidden col-span-full py-12 flex flex-col items-center justify-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-200 mt-6">
-            <i data-lucide="megaphone" class="w-12 h-12 mb-4 opacity-20"></i>
-            <p class="text-lg" id="emptyStateText">Nessun avviso trovato.</p>
-        </div>
-
+        <div id="emptyState" class="hidden col-span-full py-12 flex flex-col items-center justify-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-200 mt-6"><i data-lucide="megaphone" class="w-12 h-12 mb-4 opacity-20"></i><p class="text-lg" id="emptyStateText">Nessun avviso trovato.</p></div>
     </main>
     
     <!-- FASCIA CONTATTI & SOCIAL -->
     <div class="bg-slate-800 text-white py-10 border-t border-slate-700">
         <div class="max-w-4xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
-            
-            <!-- Contatti Diretti -->
             <div class="space-y-3">
                 <h4 class="font-bold text-lg text-slate-200">Contattaci</h4>
                 <div class="flex flex-col gap-2 text-sm text-slate-300">
-                    <a href="tel:0221061258" class="flex items-center justify-center md:justify-start gap-2 hover:text-white transition group">
-                        <div class="bg-slate-700 p-1.5 rounded-full group-hover:bg-slate-600 transition">
-                            <i data-lucide="phone" class="w-4 h-4"></i>
-                        </div>
-                        02.21061258
-                    </a>
-                    <a href="mailto:cflampugnano@federnuoto.it" class="flex items-center justify-center md:justify-start gap-2 hover:text-white transition group">
-                        <div class="bg-slate-700 p-1.5 rounded-full group-hover:bg-slate-600 transition">
-                            <i data-lucide="mail" class="w-4 h-4"></i>
-                        </div>
-                        cflampugnano@federnuoto.it
-                    </a>
+                    <a href="tel:0221061258" class="flex items-center justify-center md:justify-start gap-2 hover:text-white transition group"><div class="bg-slate-700 p-1.5 rounded-full group-hover:bg-slate-600 transition"><i data-lucide="phone" class="w-4 h-4"></i></div>02.21061258</a>
+                    <a href="mailto:cflampugnano@federnuoto.it" class="flex items-center justify-center md:justify-start gap-2 hover:text-white transition group"><div class="bg-slate-700 p-1.5 rounded-full group-hover:bg-slate-600 transition"><i data-lucide="mail" class="w-4 h-4"></i></div>cflampugnano@federnuoto.it</a>
                 </div>
             </div>
-
-            <!-- Social Icons -->
             <div class="space-y-3">
                 <h4 class="font-bold text-lg text-slate-200">Seguici sui Social</h4>
                 <div class="flex gap-4 items-center justify-center md:justify-start">
-                    <!-- Whatsapp -->
-                    <a href="https://wa.me/message/SIT75DBXZR2EF1" target="_blank" class="bg-green-500 hover:bg-green-600 p-2.5 rounded-full transition shadow-lg transform hover:scale-110 flex items-center justify-center" title="Whatsapp">
-                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                    </a>
-                    
-                    <!-- Instagram -->
-                    <a href="https://www.instagram.com/cflampugnano?igsh=MWNpYm1haHY3dXRldg%3D%3D&utm_source=qr" target="_blank" class="bg-pink-600 hover:bg-pink-700 p-2.5 rounded-full transition shadow-lg transform hover:scale-110 flex items-center justify-center" title="Instagram">
-                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.069-4.85.069-3.204 0-3.584-.012-4.849-.069-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                    </a>
-
-                    <!-- TikTok (Updated Logo) -->
-                    <a href="https://www.tiktok.com/@cflampugnano?_r=1&_t=ZN-93hDUcVi2Y2" target="_blank" class="bg-black hover:bg-gray-800 p-2.5 rounded-full transition shadow-lg transform hover:scale-110 flex items-center justify-center" title="TikTok">
-                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
-                    </a>
-
-                    <!-- Facebook -->
-                    <a href="https://www.facebook.com/share/17a2adkvpJ/?mibextid=wwXIfr" target="_blank" class="bg-blue-600 hover:bg-blue-700 p-2.5 rounded-full transition shadow-lg transform hover:scale-110 flex items-center justify-center" title="Facebook">
-                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036c-2.148 0-2.971.956-2.971 3.594v.376h3.558l-.46 3.667h-3.098v7.98h-4.943Z"/></svg>
-                    </a>
+                    <a href="https://wa.me/message/SIT75DBXZR2EF1" target="_blank" class="bg-green-500 hover:bg-green-600 p-2.5 rounded-full transition shadow-lg transform hover:scale-110 flex items-center justify-center" title="Whatsapp"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg></a>
+                    <a href="https://www.instagram.com/cflampugnano?igsh=MWNpYm1haHY3dXRldg%3D%3D&utm_source=qr" target="_blank" class="bg-pink-600 hover:bg-pink-700 p-2.5 rounded-full transition shadow-lg transform hover:scale-110 flex items-center justify-center" title="Instagram"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.069-4.85.069-3.204 0-3.584-.012-4.849-.069-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+                    <a href="https://www.tiktok.com/@cflampugnano?_r=1&_t=ZN-93hDUcVi2Y2" target="_blank" class="bg-black hover:bg-gray-800 p-2.5 rounded-full transition shadow-lg transform hover:scale-110 flex items-center justify-center" title="TikTok"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg></a>
+                    <a href="https://www.facebook.com/share/17a2adkvpJ/?mibextid=wwXIfr" target="_blank" class="bg-blue-600 hover:bg-blue-700 p-2.5 rounded-full transition shadow-lg transform hover:scale-110 flex items-center justify-center" title="Facebook"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036c-2.148 0-2.971.956-2.971 3.594v.376h3.558l-.46 3.667h-3.098v7.98h-4.943Z"/></svg></a>
                 </div>
             </div>
-
         </div>
     </div>
     
@@ -249,20 +201,13 @@
         <div class="max-w-4xl mx-auto px-4">
             <p class="font-bold text-slate-700 mb-1">Fin Plus Lombardia S.S.D. a r.l. — FIN Centro Federale Milano Piscina Lampugnano</p>
             <p class="mb-1">P.IVA/CF 14296840961 — SL: Via Piranesi 46, 20137 Milano (MI) - SO: Via Lampugnano 76, 20151 Milano (MI)</p>
-            <p class="flex flex-wrap justify-center gap-x-4 gap-y-1">
-                <span>02.21061258</span>
-                <span class="hidden sm:inline">-</span>
-                <a href="mailto:cflampugnano@federnuoto.it" class="hover:text-blue-600 transition underline decoration-dotted">cflampugnano@federnuoto.it</a>
-                <span class="hidden sm:inline">-</span>
-                <a href="https://federnuoto.lombardia.it" target="_blank" class="hover:text-blue-600 transition underline decoration-dotted">federnuoto.lombardia.it</a>
-            </p>
+            <p class="flex flex-wrap justify-center gap-x-4 gap-y-1"><span>02.21061258</span><span class="hidden sm:inline">-</span><a href="mailto:cflampugnano@federnuoto.it" class="hover:text-blue-600 transition underline decoration-dotted">cflampugnano@federnuoto.it</a><span class="hidden sm:inline">-</span><a href="https://federnuoto.lombardia.it" target="_blank" class="hover:text-blue-600 transition underline decoration-dotted">federnuoto.lombardia.it</a></p>
         </div>
     </footer>
 
-    <!-- TOAST NOTIFICATION (POP-UP) -->
+    <!-- TOAST NOTIFICATION -->
     <div id="toast" class="fixed bottom-6 left-1/2 bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 z-50 pointer-events-none">
-        <i id="toastIcon" data-lucide="check-circle" class="w-5 h-5 text-green-400"></i>
-        <span id="toastMessage" class="text-sm font-medium">Operazione completata</span>
+        <i id="toastIcon" data-lucide="check-circle" class="w-5 h-5 text-green-400"></i><span id="toastMessage" class="text-sm font-medium">Operazione completata</span>
     </div>
 
     <!-- MODAL NUOVO AVVISO / MODIFICA -->
@@ -270,119 +215,28 @@
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
             <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                 <h3 class="text-xl font-bold text-gray-800" id="modalTitle">Pubblica Avviso</h3>
-                <button onclick="closeNoticeModal()" class="text-gray-400 hover:text-gray-600">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
+                <button onclick="closeNoticeModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
             <form onsubmit="handleFormSubmit(event)" class="p-6 space-y-4 overflow-y-auto">
                 <input type="hidden" id="editNoticeId">
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Titolo</label>
-                    <input type="text" id="newTitle" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Es. Chiusura Vasca">
-                </div>
-                
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Titolo</label><input type="text" id="newTitle" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Es. Chiusura Vasca"></div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
-                        <select id="newCategory" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
-                            <option value="info">Info</option>
-                            <option value="urgent">Urgente</option>
-                            <option value="nuoto_libero">Nuoto Libero</option>
-                            <option value="corsi">Corsi</option>
-                            <option value="summer">Attività Estive</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Data Evento (Opz)</label>
-                        <input type="date" id="newDate" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
-                    </div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label><select id="newCategory" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"><option value="info">Info</option><option value="urgent">Urgente</option><option value="nuoto_libero">Nuoto Libero</option><option value="corsi">Corsi</option><option value="summer">Attività Estive</option></select></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Data Evento (Opz)</label><input type="date" id="newDate" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"></div>
                 </div>
-
-                <!-- SEZIONE CARICAMENTO FILE -->
+                <!-- FILE SECTIONS (Cover, Content, Attachment) -->
                 <div class="space-y-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
-                    <p class="text-xs text-orange-600 font-semibold mb-2">
-                        <i data-lucide="info" class="w-3 h-3 inline"></i> Puoi caricare file dal PC o usare Link Pubblici (Google Drive).
-                    </p>
-                    
-                    <!-- Immagine Copertina -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
-                            <i data-lucide="image" class="w-4 h-4"></i>
-                            Immagine Copertina
-                        </label>
-                        
-                        <div class="flex gap-2 mb-2 text-xs">
-                            <button type="button" onclick="toggleCoverType('file')" id="btnCoverFile" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button>
-                            <button type="button" onclick="toggleCoverType('link')" id="btnCoverLink" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive</button>
-                        </div>
-
-                        <div id="coverFileInput">
-                            <input type="file" id="coverFile" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                        </div>
-
-                        <div id="coverLinkInput" class="hidden">
-                            <input type="url" id="coverUrlManual" placeholder="Incolla link Google Drive..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                        </div>
-                    </div>
-
-                    <!-- Immagine nel Testo (NUOVA) -->
-                    <div class="border-t border-slate-200 pt-3">
-                        <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
-                            <i data-lucide="image-plus" class="w-4 h-4"></i>
-                            Immagine nel Testo (Opzionale)
-                        </label>
-                        
-                        <div class="flex gap-2 mb-2 text-xs">
-                            <button type="button" onclick="toggleContentType('file')" id="btnContentFile" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button>
-                            <button type="button" onclick="toggleContentType('link')" id="btnContentLink" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive</button>
-                        </div>
-
-                        <div id="contentFileInput">
-                            <input type="file" id="contentImageFile" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                        </div>
-
-                        <div id="contentLinkInput" class="hidden">
-                            <input type="url" id="contentUrlManual" placeholder="Incolla link Google Drive..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                        </div>
-                    </div>
-
-                    <!-- Allegato -->
-                    <div class="border-t border-slate-200 pt-3">
-                        <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
-                            <i data-lucide="paperclip" class="w-4 h-4"></i>
-                            Allegato (PDF o Link Esterno)
-                        </label>
-                        
-                        <div class="flex gap-2 mb-2 text-xs">
-                            <button type="button" onclick="toggleAttachType('file')" id="btnFileType" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button>
-                            <button type="button" onclick="toggleAttachType('link')" id="btnLinkType" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive/Web</button>
-                        </div>
-
-                        <div id="attachFileInput">
-                            <input type="file" id="attachmentFile" accept=".pdf,image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100">
-                            <p class="text-[10px] text-gray-400 mt-1">Max 400KB. Per file grandi usa "Usa Link".</p>
-                        </div>
-
-                        <div id="attachLinkInput" class="hidden">
-                            <input type="url" id="attachmentUrlManual" placeholder="Es. https://drive.google.com/..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                        </div>
-                    </div>
+                    <p class="text-xs text-orange-600 font-semibold mb-2"><i data-lucide="info" class="w-3 h-3 inline"></i> Puoi caricare file dal PC o usare Link Pubblici (Google Drive).</p>
+                    <!-- Cover -->
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2"><i data-lucide="image" class="w-4 h-4"></i>Immagine Copertina</label><div class="flex gap-2 mb-2 text-xs"><button type="button" onclick="toggleCoverType('file')" id="btnCoverFile" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button><button type="button" onclick="toggleCoverType('link')" id="btnCoverLink" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive</button></div><div id="coverFileInput"><input type="file" id="coverFile" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"></div><div id="coverLinkInput" class="hidden"><input type="url" id="coverUrlManual" placeholder="Incolla link Google Drive..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></div></div>
+                    <!-- Content Image -->
+                    <div class="border-t border-slate-200 pt-3"><label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2"><i data-lucide="image-plus" class="w-4 h-4"></i>Immagine nel Testo (Opzionale)</label><div class="flex gap-2 mb-2 text-xs"><button type="button" onclick="toggleContentType('file')" id="btnContentFile" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button><button type="button" onclick="toggleContentType('link')" id="btnContentLink" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive</button></div><div id="contentFileInput"><input type="file" id="contentImageFile" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"></div><div id="contentLinkInput" class="hidden"><input type="url" id="contentUrlManual" placeholder="Incolla link Google Drive..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></div></div>
+                    <!-- Attachment -->
+                    <div class="border-t border-slate-200 pt-3"><label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2"><i data-lucide="paperclip" class="w-4 h-4"></i>Allegato (PDF o Link Esterno)</label><div class="flex gap-2 mb-2 text-xs"><button type="button" onclick="toggleAttachType('file')" id="btnFileType" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button><button type="button" onclick="toggleAttachType('link')" id="btnLinkType" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive/Web</button></div><div id="attachFileInput"><input type="file" id="attachmentFile" accept=".pdf,image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100"><p class="text-[10px] text-gray-400 mt-1">Max 400KB. Per file grandi usa "Usa Link".</p></div><div id="attachLinkInput" class="hidden"><input type="url" id="attachmentUrlManual" placeholder="Es. https://drive.google.com/..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></div></div>
                 </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Messaggio</label>
-                    <textarea id="newContent" required rows="4" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none resize-none" placeholder="Dettagli dell'avviso..."></textarea>
-                </div>
-
-                <div class="flex items-center gap-2 pt-2">
-                    <input type="checkbox" id="newPinned" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
-                    <label for="newPinned" class="text-sm text-gray-700 font-medium">Metti in evidenza (Pin in alto)</label>
-                </div>
-
-                <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition mt-2 shadow-lg flex justify-center items-center gap-2">
-                    <span id="submitBtnText">Pubblica Avviso</span>
-                </button>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Messaggio</label><textarea id="newContent" required rows="4" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none resize-none" placeholder="Dettagli dell'avviso..."></textarea></div>
+                <div class="flex items-center gap-2 pt-2"><input type="checkbox" id="newPinned" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"><label for="newPinned" class="text-sm text-gray-700 font-medium">Metti in evidenza (Pin in alto)</label></div>
+                <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition mt-2 shadow-lg flex justify-center items-center gap-2"><span id="submitBtnText">Pubblica Avviso</span></button>
             </form>
         </div>
     </div>
@@ -390,27 +244,8 @@
     <!-- MODAL LOGIN -->
     <div id="loginModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
-            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                <h3 class="text-lg font-bold text-gray-800">Area Riservata Staff</h3>
-                <button onclick="closeLoginModal()" class="text-gray-400 hover:text-gray-600">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            <form onsubmit="handleLoginSubmit(event)" class="p-6 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" id="loginEmail" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                    <input type="password" id="loginPassword" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div id="loginError" class="text-red-500 text-sm hidden">Credenziali non valide.</div>
-                
-                <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-lg transition">
-                    Accedi
-                </button>
-            </form>
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50"><h3 class="text-lg font-bold text-gray-800">Area Riservata Staff</h3><button onclick="closeLoginModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+            <form onsubmit="handleLoginSubmit(event)" class="p-6 space-y-4"><div><label class="block text-sm font-medium text-gray-700 mb-1">Email</label><input type="email" id="loginEmail" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"></div><div><label class="block text-sm font-medium text-gray-700 mb-1">Password</label><input type="password" id="loginPassword" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"></div><div id="loginError" class="text-red-500 text-sm hidden">Credenziali non valide.</div><button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-lg transition">Accedi</button></form>
         </div>
     </div>
 
@@ -420,7 +255,7 @@
         import { getAuth, signInAnonymously, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- CONFIGURAZIONE ---
+        // CONFIGURAZIONE 
         const firebaseConfig = {
               apiKey: "AIzaSyBVGUYgJhFnj20SED3-qpV5ksoBXBT7xCs",
               authDomain: "bacheca-5acac.firebaseapp.com",
@@ -430,20 +265,14 @@
               appId: "1:65310524220:web:a7f8bd0cd97539f3325439"
         };
         
-        // --- INIT FIREBASE ---
         let app, auth, db;
-        
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
-        } catch(e) {
-            console.error("Errore Init Firebase:", e);
-        }
+        } catch(e) { console.error("Errore Init Firebase:", e); }
         
         const NOTICES_COLLECTION = 'notices'; 
-
-        // --- STATE ---
         let notices = [];
         let currentFilter = 'all';
         let currentSearch = '';
@@ -452,10 +281,9 @@
         let unsubscribeSnapshot = null;
         let clickCount = 0;
         let clickTimer = null;
-        let editingId = null; // Track ID for editing
+        let editingId = null; 
         const SECRET_CLICKS_REQUIRED = 5;
 
-        // --- CONSTANTS ---
         const CATEGORIES = {
             all: { label: "Tutti", class: "bg-gray-100 text-gray-600" },
             urgent: { label: "Urgenti", class: "bg-red-100 text-red-700 border-red-200" },
@@ -465,24 +293,13 @@
             summer: { label: "Attività Estive", class: "bg-orange-100 text-orange-700 border-orange-200" }
         };
 
-        // --- AUTH LOGIC ---
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                if (!user.isAnonymous) {
-                    isAdminLoggedIn = true;
-                    updateAdminUI(true);
-                } else {
-                    isAdminLoggedIn = false;
-                    updateAdminUI(false);
-                }
+                if (!user.isAnonymous) { isAdminLoggedIn = true; updateAdminUI(true); } else { isAdminLoggedIn = false; updateAdminUI(false); }
                 if (!unsubscribeSnapshot) setupRealtimeListener();
             } else {
-                isAdminLoggedIn = false;
-                updateAdminUI(false);
-                if (unsubscribeSnapshot) {
-                    unsubscribeSnapshot();
-                    unsubscribeSnapshot = null;
-                }
+                isAdminLoggedIn = false; updateAdminUI(false);
+                if (unsubscribeSnapshot) { unsubscribeSnapshot(); unsubscribeSnapshot = null; }
                 signInAnonymously(auth).catch((error) => console.error("Errore Auth Anonima:", error));
             }
         });
@@ -491,315 +308,111 @@
             const adminControls = document.getElementById('adminControls');
             const addBtn = document.getElementById('addNoticeBtn');
             const archiveBtn = document.getElementById('archiveToggleBtn');
-
-            if (isAdmin) {
-                adminControls.classList.remove('hidden');
-                addBtn.classList.remove('hidden');
-                archiveBtn.classList.remove('hidden');
-            } else {
-                adminControls.classList.add('hidden');
-                addBtn.classList.add('hidden');
-                archiveBtn.classList.add('hidden');
-                if (showArchived) toggleArchiveView(); 
-            }
+            if (isAdmin) { adminControls.classList.remove('hidden'); addBtn.classList.remove('hidden'); archiveBtn.classList.remove('hidden'); } 
+            else { adminControls.classList.add('hidden'); addBtn.classList.add('hidden'); archiveBtn.classList.add('hidden'); if (showArchived) toggleArchiveView(); }
             renderNotices(); 
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            renderFilters();
-            lucide.createIcons();
-            window.handleSecretClick = handleSecretClick;
-            window.handleLoginSubmit = handleLoginSubmit;
-            window.handleLogout = handleLogout;
-            window.closeLoginModal = closeLoginModal;
-            window.setFilter = setFilter;
-            window.updateSearch = updateSearch;
-            window.openNoticeModal = openNoticeModal;
-            window.closeNoticeModal = closeNoticeModal;
-            window.handleFormSubmit = handleFormSubmit;
-            window.archiveNotice = archiveNotice; 
-            window.restoreNotice = restoreNotice; 
-            window.togglePin = togglePin;
-            window.toggleArchiveView = toggleArchiveView;
-            window.toggleAttachType = toggleAttachType;
-            window.toggleCoverType = toggleCoverType;
-            window.toggleContentType = toggleContentType; // New for content image
-            window.editNotice = editNotice; // Edit function
-            window.deleteNoticePermanent = deleteNoticePermanent; // Permanent Delete
+            renderFilters(); lucide.createIcons();
+            window.handleSecretClick = handleSecretClick; window.handleLoginSubmit = handleLoginSubmit; window.handleLogout = handleLogout; window.closeLoginModal = closeLoginModal; window.setFilter = setFilter; window.updateSearch = updateSearch; window.openNoticeModal = openNoticeModal; window.closeNoticeModal = closeNoticeModal; window.handleFormSubmit = handleFormSubmit; window.archiveNotice = archiveNotice; window.restoreNotice = restoreNotice; window.togglePin = togglePin; window.toggleArchiveView = toggleArchiveView; window.toggleAttachType = toggleAttachType; window.toggleCoverType = toggleCoverType; window.toggleContentType = toggleContentType; window.editNotice = editNotice; window.deleteNoticePermanent = deleteNoticePermanent;
         });
 
-        // --- TOAST FUNCTION ---
         function showToast(message, isError = false) {
-            const toast = document.getElementById('toast');
-            const msg = document.getElementById('toastMessage');
-            const icon = document.getElementById('toastIcon');
-            
+            const toast = document.getElementById('toast'); const msg = document.getElementById('toastMessage'); const icon = document.getElementById('toastIcon');
             msg.innerText = message;
-            
-            if(isError) {
-                toast.classList.add('error');
-                icon.setAttribute('class', 'w-5 h-5 text-white'); // White icon on red
-                icon.innerHTML = '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'; // X icon
-            } else {
-                toast.classList.remove('error');
-                icon.setAttribute('class', 'w-5 h-5 text-green-400');
-                icon.innerHTML = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'; // Check icon
-            }
-
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 4000);
+            if(isError) { toast.classList.add('error'); icon.setAttribute('class', 'w-5 h-5 text-white'); icon.innerHTML = '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'; } 
+            else { toast.classList.remove('error'); icon.setAttribute('class', 'w-5 h-5 text-green-400'); icon.innerHTML = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'; }
+            toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); }, 4000);
         }
 
-        // --- FIRESTORE ---
         function setupRealtimeListener() {
-            const loading = document.getElementById('loadingIndicator');
-            loading.classList.remove('hidden');
-
-            const q = collection(db, NOTICES_COLLECTION);
-            
-            unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
-                notices = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-                loading.classList.add('hidden');
-                renderNotices();
+            const loading = document.getElementById('loadingIndicator'); loading.classList.remove('hidden');
+            unsubscribeSnapshot = onSnapshot(collection(db, NOTICES_COLLECTION), (snapshot) => {
+                notices = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                loading.classList.add('hidden'); renderNotices();
             }, (error) => {
-                console.error("Errore listener:", error);
-                loading.classList.add('hidden');
-                if (error.code === 'permission-denied') {
-                    showToast("Errore di accesso al Database. Verifica le 'Regole' nella Console Firebase.", true);
-                    const emptyState = document.getElementById('emptyState');
-                    emptyState.querySelector('p').innerText = "Accesso negato. Contatta l'amministratore.";
-                    emptyState.classList.remove('hidden');
-                }
+                console.error("Errore listener:", error); loading.classList.add('hidden');
+                if (error.code === 'permission-denied') { showToast("Errore permessi DB. Controlla console Firebase.", true); }
             });
         }
 
-        // --- RENDER ---
         function renderFilters() {
             const container = document.getElementById('filterContainer');
-            container.innerHTML = Object.keys(CATEGORIES).map(key => `
-                <button onclick="setFilter('${key}')" class="px-4 py-2 rounded-full text-sm font-medium transition-all ${currentFilter === key ? 'bg-blue-600 text-white shadow-md transform scale-105' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}">${CATEGORIES[key].label}</button>
-            `).join('');
+            container.innerHTML = Object.keys(CATEGORIES).map(key => `<button onclick="setFilter('${key}')" class="px-4 py-2 rounded-full text-sm font-medium transition-all ${currentFilter === key ? 'bg-blue-600 text-white shadow-md transform scale-105' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}">${CATEGORIES[key].label}</button>`).join('');
         }
 
         function renderNotices() {
-            const grid = document.getElementById('noticesGrid');
-            const empty = document.getElementById('emptyState');
+            const grid = document.getElementById('noticesGrid'); const empty = document.getElementById('emptyState');
+            let filtered = notices.filter(n => showArchived ? !!n.archived : !n.archived);
+            filtered = filtered.filter(n => (currentFilter === 'all' || n.category === currentFilter) && ((n.title || '').toLowerCase().includes(currentSearch.toLowerCase()) || (n.content || '').toLowerCase().includes(currentSearch.toLowerCase())));
+            filtered.sort((a, b) => (a.isPinned === b.isPinned) ? ((a.date && b.date) ? new Date(b.date) - new Date(a.date) : 0) : (a.isPinned ? -1 : 1));
 
-            let filtered = notices.filter(n => {
-                const isArchived = !!n.archived;
-                return showArchived ? isArchived : !isArchived;
-            });
-
-            filtered = filtered.filter(n => {
-                const matchesFilter = currentFilter === 'all' || n.category === currentFilter;
-                const matchesSearch = (n.title || '').toLowerCase().includes(currentSearch.toLowerCase()) || 
-                                      (n.content || '').toLowerCase().includes(currentSearch.toLowerCase());
-                return matchesFilter && matchesSearch;
-            });
-
-            filtered.sort((a, b) => {
-                if (a.isPinned === b.isPinned) {
-                    if (a.date && b.date) return new Date(b.date) - new Date(a.date);
-                    return 0;
-                }
-                return a.isPinned ? -1 : 1;
-            });
-
-            if (filtered.length === 0) {
-                grid.innerHTML = '';
-                empty.classList.remove('hidden');
-                document.getElementById('emptyStateText').innerText = showArchived ? "Nessun avviso in archivio." : "Nessun avviso trovato.";
-            } else {
+            if (filtered.length === 0) { grid.innerHTML = ''; empty.classList.remove('hidden'); document.getElementById('emptyStateText').innerText = showArchived ? "Nessun avviso in archivio." : "Nessun avviso trovato."; } 
+            else {
                 empty.classList.add('hidden');
                 grid.innerHTML = filtered.map(n => `
                     <div class="bg-white rounded-xl shadow-sm border transition-all hover:shadow-md overflow-hidden flex flex-col fade-in card ${n.isPinned ? 'border-l-4 border-l-blue-500 ring-1 ring-blue-100' : 'border-slate-100'}">
-                        
-                        ${n.imageUrl ? `
-                        <div class="card-image-container">
-                            <img src="${n.imageUrl}" alt="Immagine avviso" class="card-image" onerror="this.style.display='none'">
-                            ${n.attachmentUrl ? `
-                            <div class="attachment-badge">
-                                <i data-lucide="paperclip" class="w-3 h-3 text-slate-500"></i> Allegato
-                            </div>` : ''}
-                        </div>
-                        ` : ''}
-
+                        ${n.imageUrl ? `<div class="card-image-container"><img src="${n.imageUrl}" alt="Copertina" class="card-image" onerror="this.style.display='none'">${n.attachmentUrl ? `<div class="attachment-badge"><i data-lucide="paperclip" class="w-3 h-3 text-slate-500"></i> Allegato</div>` : ''}</div>` : ''}
                         <div class="p-5 flex-1">
-                            <div class="flex justify-between items-start mb-3">
-                                <span class="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wide border ${CATEGORIES[n.category] ? CATEGORIES[n.category].class : 'bg-gray-100'}">
-                                    ${CATEGORIES[n.category] ? CATEGORIES[n.category].label : 'Avviso'}
-                                </span>
-                                
-                                <div class="flex gap-2">
-                                    ${n.isPinned ? `<i data-lucide="pin" class="w-4 h-4 text-blue-500 fill-blue-500 transform rotate-45"></i>` : ''}
-                                    
-                                    ${isAdminLoggedIn ? `
-                                        <button onclick="editNotice('${n.id}')" class="text-slate-400 hover:text-blue-600 transition" title="Modifica">
-                                            <i data-lucide="edit-2" class="w-4 h-4"></i>
-                                        </button>
-                                        <button onclick="deleteNoticePermanent('${n.id}')" class="text-slate-400 hover:text-red-600 transition" title="Elimina Definitivamente">
-                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                        </button>
-                                    ` : ''}
-                                </div>
-                            </div>
-                            
+                            <div class="flex justify-between items-start mb-3"><span class="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wide border ${CATEGORIES[n.category] ? CATEGORIES[n.category].class : 'bg-gray-100'}">${CATEGORIES[n.category] ? CATEGORIES[n.category].label : 'Avviso'}</span><div class="flex gap-2">${n.isPinned ? `<i data-lucide="pin" class="w-4 h-4 text-blue-500 fill-blue-500 transform rotate-45"></i>` : ''}${isAdminLoggedIn ? `<button onclick="editNotice('${n.id}')" class="text-slate-400 hover:text-blue-600 transition"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button onclick="deleteNoticePermanent('${n.id}')" class="text-slate-400 hover:text-red-600 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div></div>
                             <h3 class="text-lg font-bold text-slate-800 mb-2 leading-tight">${n.title}</h3>
                             <p class="text-slate-600 text-sm leading-relaxed mb-4 whitespace-pre-line">${n.content}</p>
-
-                            ${n.contentImageUrl ? `
-                                <img src="${n.contentImageUrl}" alt="Immagine contenuto" class="content-image" onerror="this.style.display='none'">
-                            ` : ''}
-
-                            ${n.attachmentUrl ? `
-                            <a href="${n.attachmentUrl}" target="_blank" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium mt-4 p-2 bg-blue-50 rounded-lg w-full justify-center transition hover:bg-blue-100">
-                                <i data-lucide="download" class="w-4 h-4"></i>
-                                Scarica Allegato
-                            </a>
-                            ` : ''}
-                        </div>
-
-                        <div class="px-5 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
-                            <div class="flex items-center gap-2">
-                                <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
-                                <span>${n.displayDate ? new Date(n.displayDate).toLocaleDateString('it-IT') : new Date(n.timestamp).toLocaleDateString('it-IT')}</span>
-                            </div>
+                            ${n.contentImageUrl ? `<img src="${n.contentImageUrl}" alt="Contenuto" class="content-image" onerror="this.style.display='none'">` : ''}
                             
-                            <div class="${isAdminLoggedIn ? 'flex' : 'hidden'} gap-2">
-                                <button onclick="togglePin('${n.id}', ${n.isPinned})" class="p-1.5 rounded hover:bg-blue-100 ${n.isPinned ? 'text-blue-600' : 'text-slate-400'}" title="Evidenza">
-                                    <i data-lucide="pin" class="w-4 h-4"></i>
-                                </button>
-                                
-                                ${showArchived ? `
-                                    <button onclick="restoreNotice('${n.id}')" class="p-1.5 rounded hover:bg-green-100 text-slate-400 hover:text-green-600 transition" title="Ripristina">
-                                        <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
-                                    </button>
-                                ` : `
-                                    <button onclick="archiveNotice('${n.id}')" class="p-1.5 rounded hover:bg-yellow-100 text-slate-400 hover:text-yellow-600 transition" title="Archivia">
-                                        <i data-lucide="archive" class="w-4 h-4"></i>
-                                    </button>
-                                `}
-                            </div>
+                            <!-- ANTEPRIMA ALLEGATO -->
+                            ${n.attachmentUrl ? renderPreviewBox(n.attachmentUrl) : ''}
+                            
+                            ${n.attachmentUrl ? `<a href="${n.attachmentUrl}" target="_blank" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium mt-3 p-2 bg-blue-50 rounded-lg w-full justify-center transition hover:bg-blue-100"><i data-lucide="download" class="w-4 h-4"></i>Scarica Allegato</a>` : ''}
+                        </div>
+                        <div class="px-5 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
+                            <div class="flex items-center gap-2"><i data-lucide="calendar" class="w-3.5 h-3.5"></i><span>${n.displayDate ? new Date(n.displayDate).toLocaleDateString('it-IT') : new Date(n.timestamp).toLocaleDateString('it-IT')}</span></div>
+                            <div class="${isAdminLoggedIn ? 'flex' : 'hidden'} gap-2"><button onclick="togglePin('${n.id}', ${n.isPinned})" class="p-1.5 rounded hover:bg-blue-100 ${n.isPinned ? 'text-blue-600' : 'text-slate-400'}" title="Evidenza"><i data-lucide="pin" class="w-4 h-4"></i></button>${showArchived ? `<button onclick="restoreNotice('${n.id}')" class="p-1.5 rounded hover:bg-green-100 text-slate-400 hover:text-green-600 transition" title="Ripristina"><i data-lucide="refresh-ccw" class="w-4 h-4"></i></button>` : `<button onclick="archiveNotice('${n.id}')" class="p-1.5 rounded hover:bg-yellow-100 text-slate-400 hover:text-yellow-600 transition" title="Archivia"><i data-lucide="archive" class="w-4 h-4"></i></button>`}</div>
                         </div>
                     </div>
                 `).join('');
-                
                 lucide.createIcons();
             }
         }
 
-        // --- AUTH & LOGIN HANDLERS ---
-        function handleSecretClick() {
-            const logo = document.getElementById('logoArea');
-            logo.classList.remove('pulse-animation');
-            void logo.offsetWidth; 
-            logo.classList.add('pulse-animation');
-            clickCount++;
-            if (clickTimer) clearTimeout(clickTimer);
-            clickTimer = setTimeout(() => { clickCount = 0; }, 2000);
-            if (clickCount === SECRET_CLICKS_REQUIRED) {
-                clickCount = 0;
-                if(!isAdminLoggedIn) document.getElementById('loginModal').classList.remove('hidden');
-                else showToast("Sei già connesso come Staff.");
+        // Funzione per generare il box di anteprima
+        function renderPreviewBox(url) {
+            let content = '';
+            
+            // Caso 1: Drive Link (Preview URL)
+            if (url.includes('drive.google.com') && url.includes('/preview')) {
+                content = `<iframe src="${url}" class="preview-content"></iframe>`;
+            } 
+            // Caso 2: PDF Base64
+            else if (url.startsWith('data:application/pdf')) {
+                content = `<embed src="${url}" type="application/pdf" class="preview-content">`;
             }
-        }
-
-        function closeLoginModal() {
-            document.getElementById('loginModal').classList.add('hidden');
-            document.getElementById('loginError').classList.add('hidden');
-        }
-
-        async function handleLoginSubmit(e) {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                closeLoginModal();
-                showToast("Login effettuato con successo!");
-            } catch (error) {
-                console.error("Login fallito:", error);
-                document.getElementById('loginError').classList.remove('hidden');
+            // Caso 3: Immagine Base64 o Link Immagine
+            else {
+                // Proviamo a trattarlo come immagine
+                content = `<img src="${url}" class="w-full h-full object-cover object-top">`;
             }
+
+            return `
+            <div class="preview-box">
+                ${content}
+                <div class="preview-overlay"></div>
+            </div>
+            `;
         }
 
-        async function handleLogout() {
-            await signOut(auth);
-            showToast("Disconnessione effettuata. Modalità pubblica.");
-        }
-
-        // --- ACTIONS ---
-        function setFilter(filter) { currentFilter = filter; renderFilters(); renderNotices(); }
-        function updateSearch(val) { currentSearch = val; renderNotices(); }
-        function toggleArchiveView() {
-            showArchived = !showArchived;
-            document.getElementById('archiveBtnText').innerText = showArchived ? "Torna alla Bacheca" : "Mostra Archivio";
-            const banner = document.getElementById('archiveBanner');
-            showArchived ? banner.classList.remove('hidden') : banner.classList.add('hidden');
-            renderNotices();
-        }
-
-        window.toggleAttachType = function(type) {
-            if(type === 'file') {
-                document.getElementById('attachFileInput').classList.remove('hidden');
-                document.getElementById('attachLinkInput').classList.add('hidden');
-                document.getElementById('btnFileType').classList.replace('bg-white','bg-slate-200');
-                document.getElementById('btnFileType').classList.replace('border','font-medium');
-                document.getElementById('btnLinkType').classList.replace('bg-slate-200','bg-white');
-                document.getElementById('btnLinkType').classList.add('border');
-            } else {
-                document.getElementById('attachFileInput').classList.add('hidden');
-                document.getElementById('attachLinkInput').classList.remove('hidden');
-                document.getElementById('btnLinkType').classList.replace('bg-white','bg-slate-200');
-                document.getElementById('btnLinkType').classList.remove('border');
-                document.getElementById('btnFileType').classList.replace('bg-slate-200','bg-white');
-                document.getElementById('btnFileType').classList.add('border');
+        function getDrivePreviewUrl(url) {
+            // Converte link Drive view in link preview per iframe
+            const driveRegex = /drive\.google\.com\/file\/d\/([-_\w]+)/;
+            const match = url.match(driveRegex);
+            if (match && match[1]) {
+                return `https://drive.google.com/file/d/${match[1]}/preview`;
             }
-        }
-
-        window.toggleCoverType = function(type) {
-            if(type === 'file') {
-                document.getElementById('coverFileInput').classList.remove('hidden');
-                document.getElementById('coverLinkInput').classList.add('hidden');
-                document.getElementById('btnCoverFile').classList.replace('bg-white','bg-slate-200');
-                document.getElementById('btnCoverFile').classList.replace('border','font-medium');
-                document.getElementById('btnCoverLink').classList.replace('bg-slate-200','bg-white');
-                document.getElementById('btnCoverLink').classList.add('border');
-            } else {
-                document.getElementById('coverFileInput').classList.add('hidden');
-                document.getElementById('coverLinkInput').classList.remove('hidden');
-                document.getElementById('btnCoverLink').classList.replace('bg-white','bg-slate-200');
-                document.getElementById('btnCoverLink').classList.remove('border');
-                document.getElementById('btnCoverFile').classList.replace('bg-slate-200','bg-white');
-                document.getElementById('btnCoverFile').classList.add('border');
-            }
-        }
-
-        window.toggleContentType = function(type) {
-            if(type === 'file') {
-                document.getElementById('contentFileInput').classList.remove('hidden');
-                document.getElementById('contentLinkInput').classList.add('hidden');
-                document.getElementById('btnContentFile').classList.replace('bg-white','bg-slate-200');
-                document.getElementById('btnContentFile').classList.replace('border','font-medium');
-                document.getElementById('btnContentLink').classList.replace('bg-slate-200','bg-white');
-                document.getElementById('btnContentLink').classList.add('border');
-            } else {
-                document.getElementById('contentFileInput').classList.add('hidden');
-                document.getElementById('contentLinkInput').classList.remove('hidden');
-                document.getElementById('btnContentLink').classList.replace('bg-white','bg-slate-200');
-                document.getElementById('btnContentLink').classList.remove('border');
-                document.getElementById('btnContentFile').classList.replace('bg-slate-200','bg-white');
-                document.getElementById('btnContentFile').classList.add('border');
-            }
+            return url;
         }
 
         function processDriveLink(url) {
-            if (!url) return null;
+            // Per immagini: converti in view diretto
             const driveRegex = /drive\.google\.com\/file\/d\/([-_\w]+)/;
             const match = url.match(driveRegex);
             if (match && match[1]) {
@@ -808,226 +421,83 @@
             return url;
         }
 
-        // --- BASE64 HELPER (NO STORAGE) ---
+        // --- AUTH & LOGIN HANDLERS ---
+        function handleSecretClick() {
+            const logo = document.getElementById('logoArea'); logo.classList.remove('pulse-animation'); void logo.offsetWidth; logo.classList.add('pulse-animation');
+            clickCount++; if (clickTimer) clearTimeout(clickTimer); clickTimer = setTimeout(() => { clickCount = 0; }, 2000);
+            if (clickCount === SECRET_CLICKS_REQUIRED) { clickCount = 0; if(!isAdminLoggedIn) document.getElementById('loginModal').classList.remove('hidden'); else showToast("Sei già connesso come Staff."); }
+        }
+        function closeLoginModal() { document.getElementById('loginModal').classList.add('hidden'); document.getElementById('loginError').classList.add('hidden'); }
+        async function handleLoginSubmit(e) { e.preventDefault(); try { await signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); closeLoginModal(); showToast("Login effettuato con successo!"); } catch (error) { console.error(error); document.getElementById('loginError').classList.remove('hidden'); } }
+        async function handleLogout() { await signOut(auth); showToast("Disconnessione effettuata. Modalità pubblica."); }
+
+        // --- ACTIONS ---
+        function setFilter(filter) { currentFilter = filter; renderFilters(); renderNotices(); }
+        function updateSearch(val) { currentSearch = val; renderNotices(); }
+        function toggleArchiveView() { showArchived = !showArchived; document.getElementById('archiveBtnText').innerText = showArchived ? "Torna alla Bacheca" : "Mostra Archivio"; const banner = document.getElementById('archiveBanner'); showArchived ? banner.classList.remove('hidden') : banner.classList.add('hidden'); renderNotices(); }
+
+        window.toggleAttachType = function(type) {
+            if(type === 'file') { document.getElementById('attachFileInput').classList.remove('hidden'); document.getElementById('attachLinkInput').classList.add('hidden'); document.getElementById('btnFileType').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnFileType').classList.replace('border','font-medium'); document.getElementById('btnLinkType').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnLinkType').classList.add('border'); } 
+            else { document.getElementById('attachFileInput').classList.add('hidden'); document.getElementById('attachLinkInput').classList.remove('hidden'); document.getElementById('btnLinkType').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnLinkType').classList.remove('border'); document.getElementById('btnFileType').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnFileType').classList.add('border'); }
+        }
+        window.toggleCoverType = function(type) { if(type === 'file') { document.getElementById('coverFileInput').classList.remove('hidden'); document.getElementById('coverLinkInput').classList.add('hidden'); document.getElementById('btnCoverFile').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnCoverFile').classList.replace('border','font-medium'); document.getElementById('btnCoverLink').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnCoverLink').classList.add('border'); } else { document.getElementById('coverFileInput').classList.add('hidden'); document.getElementById('coverLinkInput').classList.remove('hidden'); document.getElementById('btnCoverLink').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnCoverLink').classList.remove('border'); document.getElementById('btnCoverFile').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnCoverFile').classList.add('border'); } }
+        window.toggleContentType = function(type) { if(type === 'file') { document.getElementById('contentFileInput').classList.remove('hidden'); document.getElementById('contentLinkInput').classList.add('hidden'); document.getElementById('btnContentFile').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnContentFile').classList.replace('border','font-medium'); document.getElementById('btnContentLink').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnContentLink').classList.add('border'); } else { document.getElementById('contentFileInput').classList.add('hidden'); document.getElementById('contentLinkInput').classList.remove('hidden'); document.getElementById('btnContentLink').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnContentLink').classList.remove('border'); document.getElementById('btnContentFile').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnContentFile').classList.add('border'); } }
+
         function compressImage(file) {
             return new Promise((resolve, reject) => {
-                const maxWidth = 800;
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.src = event.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-                        if (width > maxWidth) {
-                            height *= maxWidth / width;
-                            width = maxWidth;
-                        }
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                        resolve(dataUrl);
-                    };
-                };
-                reader.onerror = error => reject(error);
+                const maxWidth = 800; const reader = new FileReader(); reader.readAsDataURL(file);
+                reader.onload = (event) => { const img = new Image(); img.src = event.target.result; img.onload = () => { const canvas = document.createElement('canvas'); let width = img.width; let height = img.height; if (width > maxWidth) { height *= maxWidth / width; width = maxWidth; } canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height); resolve(canvas.toDataURL('image/jpeg', 0.7)); }; }; reader.onerror = error => reject(error);
             });
         }
+        function fileToBase64(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); reader.onerror = error => reject(error); }); }
 
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
-
-        // --- CRUD ---
-        
         function editNotice(id) {
-            const notice = notices.find(n => n.id === id);
-            if (!notice) return;
-
-            editingId = id;
-            document.getElementById('modalTitle').innerText = "Modifica Avviso";
-            document.getElementById('submitBtnText').innerText = "Aggiorna Avviso";
-            
-            document.getElementById('newTitle').value = notice.title;
-            document.getElementById('newContent').value = notice.content;
-            document.getElementById('newCategory').value = notice.category;
-            document.getElementById('newPinned').checked = notice.isPinned;
-            document.getElementById('newDate').value = notice.displayDate || '';
-            
+            const notice = notices.find(n => n.id === id); if (!notice) return; editingId = id;
+            document.getElementById('modalTitle').innerText = "Modifica Avviso"; document.getElementById('submitBtnText').innerText = "Aggiorna Avviso";
+            document.getElementById('newTitle').value = notice.title; document.getElementById('newContent').value = notice.content; document.getElementById('newCategory').value = notice.category; document.getElementById('newPinned').checked = notice.isPinned; document.getElementById('newDate').value = notice.displayDate || '';
             openNoticeModal();
         }
 
-        async function deleteNoticePermanent(id) {
-            if(confirm("Sei sicuro di voler eliminare DEFINITIVAMENTE questo avviso? L'azione è irreversibile.")) {
-                try {
-                    const docRef = doc(db, NOTICES_COLLECTION, id);
-                    await deleteDoc(docRef);
-                    showToast("Avviso eliminato definitivamente.");
-                } catch (err) {
-                    console.error("Errore eliminazione:", err);
-                    showToast("Errore eliminazione: " + err.message, true);
-                }
-            }
-        }
+        async function deleteNoticePermanent(id) { if(confirm("Eliminare DEFINITIVAMENTE?")) { try { await deleteDoc(doc(db, NOTICES_COLLECTION, id)); showToast("Avviso eliminato definitivamente."); } catch (err) { console.error(err); showToast("Errore eliminazione: " + err.message, true); } } }
 
         async function handleFormSubmit(e) {
-            e.preventDefault();
-            
-            const btn = document.getElementById('submitBtn');
-            const originalBtnContent = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<div class="loader mr-2"></div> Elaborazione...';
-
-            const title = document.getElementById('newTitle').value;
-            const content = document.getElementById('newContent').value;
-            const category = document.getElementById('newCategory').value;
-            const isPinned = document.getElementById('newPinned').checked;
-            const displayDate = document.getElementById('newDate').value;
-            
-            const coverFile = document.getElementById('coverFile').files[0];
-            const coverUrlManual = document.getElementById('coverUrlManual').value;
-            
-            const contentImageFile = document.getElementById('contentImageFile').files[0];
-            const contentUrlManual = document.getElementById('contentUrlManual').value;
-
-            const attachmentFile = document.getElementById('attachmentFile').files[0];
-            const attachmentUrlManual = document.getElementById('attachmentUrlManual').value;
-
-            // Timeout safety
-            const timeout = new Promise((_, reject) => 
-                setTimeout(() => reject(new Error("Timeout richiesta. Controlla la connessione o le regole Database.")), 10000)
-            );
-
+            e.preventDefault(); const btn = document.getElementById('submitBtn'); const originalBtnContent = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<div class="loader mr-2"></div> Elaborazione...';
             try {
-                const operation = async () => {
-                    let imageUrl = null;
-                    let contentImageUrl = null;
-                    let attachmentUrl = null;
+                const title = document.getElementById('newTitle').value; const content = document.getElementById('newContent').value; const category = document.getElementById('newCategory').value; const isPinned = document.getElementById('newPinned').checked; const displayDate = document.getElementById('newDate').value;
+                let imageUrl = null; let contentImageUrl = null; let attachmentUrl = null;
 
-                    if (coverFile) {
-                        if(coverFile.size > 5 * 1024 * 1024) throw new Error("Copertina troppo grande (>5MB).");
-                        imageUrl = await compressImage(coverFile);
-                    } else if (coverUrlManual) {
-                        imageUrl = processDriveLink(coverUrlManual);
-                    }
+                const coverFile = document.getElementById('coverFile').files[0]; const coverUrlManual = document.getElementById('coverUrlManual').value;
+                if (coverFile) imageUrl = await compressImage(coverFile); else if (coverUrlManual) imageUrl = processDriveLink(coverUrlManual);
 
-                    if (contentImageFile) {
-                        if(contentImageFile.size > 5 * 1024 * 1024) throw new Error("Immagine nel testo troppo grande (>5MB).");
-                        contentImageUrl = await compressImage(contentImageFile);
-                    } else if (contentUrlManual) {
-                        contentImageUrl = processDriveLink(contentUrlManual);
-                    }
+                const contentImageFile = document.getElementById('contentImageFile').files[0]; const contentUrlManual = document.getElementById('contentUrlManual').value;
+                if (contentImageFile) contentImageUrl = await compressImage(contentImageFile); else if (contentUrlManual) contentImageUrl = processDriveLink(contentUrlManual);
 
-                    if (attachmentFile) {
-                        if (attachmentFile.size > 400 * 1024) throw new Error("PDF troppo grande (>400KB).");
-                        attachmentUrl = await fileToBase64(attachmentFile);
-                    } else if (attachmentUrlManual) {
+                const attachmentFile = document.getElementById('attachmentFile').files[0]; const attachmentUrlManual = document.getElementById('attachmentUrlManual').value;
+                if (attachmentFile) attachmentUrl = await fileToBase64(attachmentFile); 
+                else if (attachmentUrlManual) {
+                    // Check if it's a Drive link and convert to preview for attachment
+                    if (attachmentUrlManual.includes('drive.google.com')) {
+                        attachmentUrl = getDrivePreviewUrl(attachmentUrlManual);
+                    } else {
                         attachmentUrl = attachmentUrlManual;
                     }
+                }
 
-                    const collectionRef = collection(db, NOTICES_COLLECTION);
+                const noticeData = { title, content, category, isPinned, displayDate, timestamp: Date.now() };
+                if (imageUrl) noticeData.imageUrl = imageUrl; if (contentImageUrl) noticeData.contentImageUrl = contentImageUrl; if (attachmentUrl) noticeData.attachmentUrl = attachmentUrl;
 
-                    const noticeData = {
-                        title,
-                        content,
-                        category,
-                        isPinned,
-                        displayDate,
-                        timestamp: Date.now(),
-                    };
-
-                    if (imageUrl) noticeData.imageUrl = imageUrl;
-                    if (contentImageUrl) noticeData.contentImageUrl = contentImageUrl;
-                    if (attachmentUrl) noticeData.attachmentUrl = attachmentUrl;
-
-                    if (editingId) {
-                        const docRef = doc(db, NOTICES_COLLECTION, editingId);
-                        await updateDoc(docRef, noticeData);
-                        showToast("Avviso modificato con successo!");
-                    } else {
-                        noticeData.archived = false;
-                        await addDoc(collectionRef, noticeData);
-                        showToast("Avviso pubblicato con successo!");
-                    }
-                };
-
-                await Promise.race([operation(), timeout]);
+                if (editingId) { await updateDoc(doc(db, NOTICES_COLLECTION, editingId), noticeData); showToast("Modificato con successo!"); } 
+                else { noticeData.archived = false; await addDoc(collection(db, NOTICES_COLLECTION), noticeData); showToast("Pubblicato con successo!"); }
                 closeNoticeModal();
-
-            } catch (err) {
-                console.error("Error adding:", err);
-                showToast("Errore: " + err.message, true);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalBtnContent;
-            }
+            } catch (err) { console.error(err); showToast("Errore: " + err.message, true); } finally { btn.disabled = false; btn.innerHTML = originalBtnContent; }
         }
 
-        async function archiveNotice(id) {
-            if(confirm("Archiviare questa notizia?")) {
-                await updateDocRef(id, { archived: true, isPinned: false });
-                showToast("Notizia archiviata");
-            }
-        }
+        async function archiveNotice(id) { if(confirm("Archiviare?")) { await updateDoc(doc(db, NOTICES_COLLECTION, id), { archived: true, isPinned: false }); showToast("Archiviata"); } }
+        async function restoreNotice(id) { if(confirm("Ripristinare?")) { await updateDoc(doc(db, NOTICES_COLLECTION, id), { archived: false }); showToast("Ripristinata"); } }
+        async function togglePin(id, currentStatus) { await updateDoc(doc(db, NOTICES_COLLECTION, id), { isPinned: !currentStatus }); }
 
-        async function restoreNotice(id) {
-            if(confirm("Ripristinare notizia?")) {
-                await updateDocRef(id, { archived: false });
-                showToast("Notizia ripristinata");
-            }
-        }
-
-        async function togglePin(id, currentStatus) {
-            await updateDocRef(id, { isPinned: !currentStatus });
-        }
-
-        async function updateDocRef(id, data) {
-            try {
-                const docRef = doc(db, NOTICES_COLLECTION, id);
-                await updateDoc(docRef, data);
-            } catch (err) {
-                console.error("Error update:", err);
-                showToast("Errore aggiornamento: " + err.message, true);
-            }
-        }
-
-        function openNoticeModal(notice = null) { 
-            if (!notice && !editingId) {
-                document.getElementById('modalTitle').innerText = "Pubblica Avviso";
-                document.getElementById('submitBtnText').innerText = "Pubblica Avviso";
-            }
-            document.getElementById('noticeModal').classList.remove('hidden'); 
-        }
-
-        function closeNoticeModal() {
-            document.getElementById('noticeModal').classList.add('hidden');
-            editingId = null; 
-            
-            document.getElementById('newTitle').value = '';
-            document.getElementById('newContent').value = '';
-            document.getElementById('newCategory').value = 'info';
-            document.getElementById('newPinned').checked = false;
-            document.getElementById('newDate').value = '';
-            
-            document.getElementById('coverFile').value = '';
-            document.getElementById('coverUrlManual').value = '';
-            document.getElementById('contentImageFile').value = '';
-            document.getElementById('contentUrlManual').value = '';
-            document.getElementById('attachmentFile').value = '';
-            document.getElementById('attachmentUrlManual').value = '';
-            
-            toggleCoverType('file');
-            toggleContentType('file');
-            toggleAttachType('file');
-        }
+        function openNoticeModal(notice = null) { if (!notice && !editingId) { document.getElementById('modalTitle').innerText = "Pubblica Avviso"; document.getElementById('submitBtnText').innerText = "Pubblica Avviso"; } document.getElementById('noticeModal').classList.remove('hidden'); }
+        function closeNoticeModal() { document.getElementById('noticeModal').classList.add('hidden'); editingId = null; document.getElementById('newTitle').value = ''; document.getElementById('newContent').value = ''; document.getElementById('newCategory').value = 'info'; document.getElementById('newPinned').checked = false; document.getElementById('newDate').value = ''; document.getElementById('coverFile').value = ''; document.getElementById('coverUrlManual').value = ''; document.getElementById('contentImageFile').value = ''; document.getElementById('contentUrlManual').value = ''; document.getElementById('attachmentFile').value = ''; document.getElementById('attachmentUrlManual').value = ''; toggleCoverType('file'); toggleContentType('file'); toggleAttachType('file'); }
     </script>
 </body>
 </html>
