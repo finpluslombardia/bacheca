@@ -87,6 +87,9 @@
             transform: translate(-50%, 0); /* Slide up */
             opacity: 1;
         }
+        #toast.error {
+            background-color: #ef4444; /* Red for errors */
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
@@ -184,7 +187,7 @@
         <!-- Stato Vuoto -->
         <div id="emptyState" class="hidden col-span-full py-12 flex flex-col items-center justify-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-200 mt-6">
             <i data-lucide="megaphone" class="w-12 h-12 mb-4 opacity-20"></i>
-            <p class="text-lg">Nessun avviso trovato.</p>
+            <p class="text-lg" id="emptyStateText">Nessun avviso trovato.</p>
         </div>
 
     </main>
@@ -258,7 +261,7 @@
 
     <!-- TOAST NOTIFICATION (POP-UP) -->
     <div id="toast" class="fixed bottom-6 left-1/2 bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 z-50 pointer-events-none">
-        <i data-lucide="check-circle" class="w-5 h-5 text-green-400"></i>
+        <i id="toastIcon" data-lucide="check-circle" class="w-5 h-5 text-green-400"></i>
         <span id="toastMessage" class="text-sm font-medium">Operazione completata</span>
     </div>
 
@@ -272,7 +275,7 @@
                 </button>
             </div>
             <form onsubmit="handleFormSubmit(event)" class="p-6 space-y-4 overflow-y-auto">
-                <input type="hidden" id="editNoticeId"> <!-- ID nascosto per modifica -->
+                <input type="hidden" id="editNoticeId">
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Titolo</label>
@@ -418,7 +421,7 @@
         import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- CONFIGURAZIONE ---
-        const myConfig = {
+        const firebaseConfig = {
               apiKey: "AIzaSyBVGUYgJhFnj20SED3-qpV5ksoBXBT7xCs",
               authDomain: "bacheca-5acac.firebaseapp.com",
               projectId: "bacheca-5acac",
@@ -427,16 +430,6 @@
               appId: "1:65310524220:web:a7f8bd0cd97539f3325439"
         };
         
-        let firebaseConfig = myConfig.apiKey ? myConfig : null;
-        let useEnvironmentConfig = false;
-        let appId = 'cf-lampugnano-app';
-
-        if (!firebaseConfig && typeof __firebase_config !== 'undefined') {
-            firebaseConfig = JSON.parse(__firebase_config);
-            appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-            useEnvironmentConfig = true;
-        }
-
         // --- INIT FIREBASE ---
         let app, auth, db;
         
@@ -536,14 +529,27 @@
         });
 
         // --- TOAST FUNCTION ---
-        function showToast(message) {
+        function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
             const msg = document.getElementById('toastMessage');
+            const icon = document.getElementById('toastIcon');
+            
             msg.innerText = message;
+            
+            if(isError) {
+                toast.classList.add('error');
+                icon.setAttribute('class', 'w-5 h-5 text-white'); // White icon on red
+                icon.innerHTML = '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'; // X icon
+            } else {
+                toast.classList.remove('error');
+                icon.setAttribute('class', 'w-5 h-5 text-green-400');
+                icon.innerHTML = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'; // Check icon
+            }
+
             toast.classList.add('show');
             setTimeout(() => {
                 toast.classList.remove('show');
-            }, 3000);
+            }, 4000);
         }
 
         // --- FIRESTORE ---
@@ -551,12 +557,7 @@
             const loading = document.getElementById('loadingIndicator');
             loading.classList.remove('hidden');
 
-            let q;
-            if (useEnvironmentConfig) {
-                q = collection(db, 'artifacts', appId, 'public', 'data', NOTICES_COLLECTION);
-            } else {
-                q = collection(db, NOTICES_COLLECTION);
-            }
+            const q = collection(db, NOTICES_COLLECTION);
             
             unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
                 notices = snapshot.docs.map(doc => ({
@@ -569,8 +570,9 @@
                 console.error("Errore listener:", error);
                 loading.classList.add('hidden');
                 if (error.code === 'permission-denied') {
+                    showToast("Errore di accesso al Database. Verifica le 'Regole' nella Console Firebase.", true);
                     const emptyState = document.getElementById('emptyState');
-                    emptyState.querySelector('p').innerText = "Accesso negato. Verifica database.";
+                    emptyState.querySelector('p').innerText = "Accesso negato. Contatta l'amministratore.";
                     emptyState.classList.remove('hidden');
                 }
             });
@@ -611,7 +613,7 @@
             if (filtered.length === 0) {
                 grid.innerHTML = '';
                 empty.classList.remove('hidden');
-                empty.querySelector('p').innerText = showArchived ? "Nessun avviso in archivio." : "Nessun avviso trovato.";
+                document.getElementById('emptyStateText').innerText = showArchived ? "Nessun avviso in archivio." : "Nessun avviso trovato.";
             } else {
                 empty.classList.add('hidden');
                 grid.innerHTML = filtered.map(n => `
@@ -854,15 +856,11 @@
             document.getElementById('modalTitle').innerText = "Modifica Avviso";
             document.getElementById('submitBtnText').innerText = "Aggiorna Avviso";
             
-            // Populate Fields
             document.getElementById('newTitle').value = notice.title;
             document.getElementById('newContent').value = notice.content;
             document.getElementById('newCategory').value = notice.category;
             document.getElementById('newPinned').checked = notice.isPinned;
             document.getElementById('newDate').value = notice.displayDate || '';
-            
-            // Note: We can't pre-fill file inputs, so we leave them blank.
-            // If user uploads nothing, we keep old image.
             
             openNoticeModal();
         }
@@ -870,17 +868,12 @@
         async function deleteNoticePermanent(id) {
             if(confirm("Sei sicuro di voler eliminare DEFINITIVAMENTE questo avviso? L'azione è irreversibile.")) {
                 try {
-                    let docRef;
-                    if (useEnvironmentConfig) {
-                        docRef = doc(db, 'artifacts', appId, 'public', 'data', NOTICES_COLLECTION, id);
-                    } else {
-                        docRef = doc(db, NOTICES_COLLECTION, id);
-                    }
+                    const docRef = doc(db, NOTICES_COLLECTION, id);
                     await deleteDoc(docRef);
                     showToast("Avviso eliminato definitivamente.");
                 } catch (err) {
                     console.error("Errore eliminazione:", err);
-                    alert("Errore eliminazione: " + err.message);
+                    showToast("Errore eliminazione: " + err.message, true);
                 }
             }
         }
@@ -899,7 +892,6 @@
             const isPinned = document.getElementById('newPinned').checked;
             const displayDate = document.getElementById('newDate').value;
             
-            // Files & Links
             const coverFile = document.getElementById('coverFile').files[0];
             const coverUrlManual = document.getElementById('coverUrlManual').value;
             
@@ -909,78 +901,70 @@
             const attachmentFile = document.getElementById('attachmentFile').files[0];
             const attachmentUrlManual = document.getElementById('attachmentUrlManual').value;
 
+            // Timeout safety
+            const timeout = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error("Timeout richiesta. Controlla la connessione o le regole Database.")), 10000)
+            );
+
             try {
-                let imageUrl = null;
-                let contentImageUrl = null;
-                let attachmentUrl = null;
+                const operation = async () => {
+                    let imageUrl = null;
+                    let contentImageUrl = null;
+                    let attachmentUrl = null;
 
-                // 1. Process Cover
-                if (coverFile) {
-                    if(coverFile.size > 5 * 1024 * 1024) throw new Error("Copertina troppo grande (>5MB).");
-                    imageUrl = await compressImage(coverFile);
-                } else if (coverUrlManual) {
-                    imageUrl = processDriveLink(coverUrlManual);
-                }
+                    if (coverFile) {
+                        if(coverFile.size > 5 * 1024 * 1024) throw new Error("Copertina troppo grande (>5MB).");
+                        imageUrl = await compressImage(coverFile);
+                    } else if (coverUrlManual) {
+                        imageUrl = processDriveLink(coverUrlManual);
+                    }
 
-                // 2. Process Content Image
-                if (contentImageFile) {
-                    if(contentImageFile.size > 5 * 1024 * 1024) throw new Error("Immagine nel testo troppo grande (>5MB).");
-                    contentImageUrl = await compressImage(contentImageFile);
-                } else if (contentUrlManual) {
-                    contentImageUrl = processDriveLink(contentUrlManual);
-                }
+                    if (contentImageFile) {
+                        if(contentImageFile.size > 5 * 1024 * 1024) throw new Error("Immagine nel testo troppo grande (>5MB).");
+                        contentImageUrl = await compressImage(contentImageFile);
+                    } else if (contentUrlManual) {
+                        contentImageUrl = processDriveLink(contentUrlManual);
+                    }
 
-                // 3. Process Attachment
-                if (attachmentFile) {
-                    if (attachmentFile.size > 400 * 1024) throw new Error("PDF troppo grande (>400KB).");
-                    attachmentUrl = await fileToBase64(attachmentFile);
-                } else if (attachmentUrlManual) {
-                    attachmentUrl = attachmentUrlManual;
-                }
+                    if (attachmentFile) {
+                        if (attachmentFile.size > 400 * 1024) throw new Error("PDF troppo grande (>400KB).");
+                        attachmentUrl = await fileToBase64(attachmentFile);
+                    } else if (attachmentUrlManual) {
+                        attachmentUrl = attachmentUrlManual;
+                    }
 
-                let collectionRef;
-                if (useEnvironmentConfig) {
-                    collectionRef = collection(db, 'artifacts', appId, 'public', 'data', NOTICES_COLLECTION);
-                } else {
-                    collectionRef = collection(db, NOTICES_COLLECTION);
-                }
+                    const collectionRef = collection(db, NOTICES_COLLECTION);
 
-                // Prepare Data object
-                const noticeData = {
-                    title,
-                    content,
-                    category,
-                    isPinned,
-                    displayDate,
-                    timestamp: Date.now(),
+                    const noticeData = {
+                        title,
+                        content,
+                        category,
+                        isPinned,
+                        displayDate,
+                        timestamp: Date.now(),
+                    };
+
+                    if (imageUrl) noticeData.imageUrl = imageUrl;
+                    if (contentImageUrl) noticeData.contentImageUrl = contentImageUrl;
+                    if (attachmentUrl) noticeData.attachmentUrl = attachmentUrl;
+
+                    if (editingId) {
+                        const docRef = doc(db, NOTICES_COLLECTION, editingId);
+                        await updateDoc(docRef, noticeData);
+                        showToast("Avviso modificato con successo!");
+                    } else {
+                        noticeData.archived = false;
+                        await addDoc(collectionRef, noticeData);
+                        showToast("Avviso pubblicato con successo!");
+                    }
                 };
 
-                // Only update file fields if new ones provided
-                if (imageUrl) noticeData.imageUrl = imageUrl;
-                if (contentImageUrl) noticeData.contentImageUrl = contentImageUrl;
-                if (attachmentUrl) noticeData.attachmentUrl = attachmentUrl;
-
-                if (editingId) {
-                    // Update existing
-                    let docRef;
-                    if (useEnvironmentConfig) {
-                        docRef = doc(db, 'artifacts', appId, 'public', 'data', NOTICES_COLLECTION, editingId);
-                    } else {
-                        docRef = doc(db, NOTICES_COLLECTION, editingId);
-                    }
-                    await updateDoc(docRef, noticeData);
-                    showToast("Avviso modificato con successo!");
-                } else {
-                    // Create New
-                    noticeData.archived = false;
-                    await addDoc(collectionRef, noticeData);
-                    showToast("Avviso pubblicato con successo!");
-                }
-                
+                await Promise.race([operation(), timeout]);
                 closeNoticeModal();
+
             } catch (err) {
                 console.error("Error adding:", err);
-                alert("Errore salvataggio: " + err.message);
+                showToast("Errore: " + err.message, true);
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalBtnContent;
@@ -1007,21 +991,16 @@
 
         async function updateDocRef(id, data) {
             try {
-                let docRef;
-                if (useEnvironmentConfig) {
-                    docRef = doc(db, 'artifacts', appId, 'public', 'data', NOTICES_COLLECTION, id);
-                } else {
-                    docRef = doc(db, NOTICES_COLLECTION, id);
-                }
+                const docRef = doc(db, NOTICES_COLLECTION, id);
                 await updateDoc(docRef, data);
             } catch (err) {
                 console.error("Error update:", err);
+                showToast("Errore aggiornamento: " + err.message, true);
             }
         }
 
         function openNoticeModal(notice = null) { 
             if (!notice && !editingId) {
-                // Reset title if new
                 document.getElementById('modalTitle').innerText = "Pubblica Avviso";
                 document.getElementById('submitBtnText').innerText = "Pubblica Avviso";
             }
@@ -1030,16 +1009,14 @@
 
         function closeNoticeModal() {
             document.getElementById('noticeModal').classList.add('hidden');
-            editingId = null; // Clear edit state
+            editingId = null; 
             
-            // Reset fields
             document.getElementById('newTitle').value = '';
             document.getElementById('newContent').value = '';
             document.getElementById('newCategory').value = 'info';
             document.getElementById('newPinned').checked = false;
             document.getElementById('newDate').value = '';
             
-            // Reset File Inputs
             document.getElementById('coverFile').value = '';
             document.getElementById('coverUrlManual').value = '';
             document.getElementById('contentImageFile').value = '';
@@ -1047,7 +1024,6 @@
             document.getElementById('attachmentFile').value = '';
             document.getElementById('attachmentUrlManual').value = '';
             
-            // Reset Tabs
             toggleCoverType('file');
             toggleContentType('file');
             toggleAttachType('file');
