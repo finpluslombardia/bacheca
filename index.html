@@ -21,6 +21,10 @@
         
         .hidden { display: none !important; }
         
+        /* Animazione pulsazione logo per feedback click */
+        .pulse-animation { animation: pulse 0.2s; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(0.9); } 100% { transform: scale(1); } }
+
         /* Loading Spinner */
         .loader {
             border: 3px solid #f3f3f3;
@@ -28,10 +32,27 @@
             border-top: 3px solid #3498db;
             width: 24px;
             height: 24px;
-            -webkit-animation: spin 1s linear infinite; /* Safari */
+            -webkit-animation: spin 1s linear infinite;
             animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Immagine Card */
+        .card-image-container {
+            width: 100%;
+            height: 160px;
+            overflow: hidden;
+            background-color: #f1f5f9;
+        }
+        .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .card:hover .card-image {
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
@@ -40,14 +61,14 @@
     <header class="bg-gradient-to-r from-cyan-600 to-blue-700 text-white shadow-lg sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
             
-            <!-- Logo e Titolo -->
-            <div class="flex items-center gap-3 select-none">
+            <!-- Logo e Titolo (Area Click Segreta) -->
+            <div class="flex items-center gap-3 select-none cursor-pointer" onclick="handleSecretClick()" id="logoArea" title="Centro Federale">
                 
-                <!-- LOGO: Cerca 'CF Lampugnano trasp.png'. Fallback: Icona -->
+                <!-- LOGO -->
                 <img 
                     src="./CF Lampugnano trasp.png" 
                     alt="Logo Piscina" 
-                    class="w-12 h-12 object-contain bg-white/90 rounded-full p-1 shadow-md"
+                    class="w-12 h-12 object-contain bg-white/90 rounded-full p-1 shadow-md transition-transform active:scale-95"
                     onerror="this.style.display='none'; document.getElementById('fallbackIcon').classList.remove('hidden');"
                 >
                 
@@ -62,7 +83,7 @@
                 </div>
             </div>
             
-            <!-- Cerca e Login -->
+            <!-- Cerca e User Info -->
             <div class="flex items-center gap-3 w-full md:w-auto">
                 <div class="relative w-full md:w-64">
                     <i data-lucide="search" class="absolute left-3 top-2.5 text-cyan-200 w-4 h-4"></i>
@@ -75,15 +96,17 @@
                     >
                 </div>
                 
-                <!-- Bottone Login/Logout Admin -->
-                <button 
-                    onclick="toggleAdminAuth()"
-                    id="authBtn"
-                    class="p-2 rounded-full transition bg-white/10 hover:bg-white/20 text-white border border-transparent"
-                    title="Accesso Staff"
-                >
-                    <i data-lucide="lock" class="w-5 h-5"></i>
-                </button>
+                <!-- Admin Info (Visibile solo se loggato) -->
+                <div id="adminControls" class="hidden flex items-center gap-2">
+                    <span class="text-xs font-semibold bg-blue-800 px-2 py-1 rounded text-white">ADMIN</span>
+                    <button 
+                        onclick="handleLogout()"
+                        class="p-2 rounded-full transition bg-white/10 hover:bg-red-500/80 text-white"
+                        title="Esci"
+                    >
+                        <i data-lucide="log-out" class="w-5 h-5"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </header>
@@ -93,8 +116,8 @@
         
         <!-- Controlli e Filtri -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-            <!-- Filtri -->
-            <div class="flex flex-wrap gap-2" id="filterContainer">
+            <!-- Filtri Categorie -->
+            <div class="flex flex-wrap gap-2 items-center" id="filterContainer">
                 <!-- Bottoni generati via JS -->
             </div>
 
@@ -104,15 +127,33 @@
                     <div class="loader"></div>
                 </div>
 
-                <!-- Bottone Nuovo Avviso (Visibile solo se Admin) -->
+                <!-- Toggle Archivio (Solo Admin) -->
+                <button 
+                    id="archiveToggleBtn"
+                    onclick="toggleArchiveView()"
+                    class="hidden flex items-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-full text-sm font-medium transition"
+                >
+                    <i data-lucide="archive" class="w-4 h-4"></i>
+                    <span id="archiveBtnText">Mostra Archivio</span>
+                </button>
+
+                <!-- Bottone Nuovo Avviso (Solo Admin) -->
                 <button 
                     id="addNoticeBtn"
-                    onclick="openModal()"
+                    onclick="openNoticeModal()"
                     class="hidden flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-full shadow-md transition font-medium"
                 >
                     <i data-lucide="plus" class="w-5 h-5"></i>
-                    Nuovo Avviso
+                    Nuovo
                 </button>
+            </div>
+        </div>
+
+        <!-- Banner Archivio -->
+        <div id="archiveBanner" class="hidden mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r shadow-sm">
+            <div class="flex items-center">
+                <i data-lucide="archive" class="w-5 h-5 text-yellow-500 mr-2"></i>
+                <p class="text-sm text-yellow-700 font-bold">Stai visualizzando l'archivio storico (Notizie non visibili al pubblico)</p>
             </div>
         </div>
 
@@ -130,45 +171,85 @@
     </main>
     
     <footer class="bg-slate-100 border-t border-slate-200 py-6 text-center text-slate-400 text-xs">
-        <p>&copy; 2024 Centro Federale Lampugnano. Tutti i diritti riservati.</p>
+        <p>&copy; 2024 Centro Federale Lampugnano.</p>
     </footer>
 
-    <!-- MODAL (Form di Aggiunta) -->
+    <!-- MODAL NUOVO AVVISO -->
     <div id="noticeModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
             <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                <h3 class="text-xl font-bold text-gray-800">Pubblica Nuovo Avviso</h3>
-                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                <h3 class="text-xl font-bold text-gray-800">Pubblica Avviso</h3>
+                <button onclick="closeNoticeModal()" class="text-gray-400 hover:text-gray-600">
                     <i data-lucide="x" class="w-6 h-6"></i>
                 </button>
             </div>
-            <form onsubmit="handleFormSubmit(event)" class="p-6 space-y-4">
-                <!-- Hidden ID for Editing mode (future proofing) -->
-                <input type="hidden" id="editId">
-                
+            <form onsubmit="handleFormSubmit(event)" class="p-6 space-y-4 overflow-y-auto">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Titolo</label>
                     <input type="text" id="newTitle" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Es. Chiusura Vasca">
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
-                    <select id="newCategory" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
-                        <option value="info">Info</option>
-                        <option value="urgent">Urgente</option>
-                        <option value="event">Evento</option>
-                        <option value="lost-found">Oggetti Smarriti</option>
-                    </select>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+                        <select id="newCategory" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                            <option value="info">Info</option>
+                            <option value="urgent">Urgente</option>
+                            <option value="event">Evento</option>
+                            <option value="lost-found">Oggetti Smarriti</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Data Evento (Opz)</label>
+                        <input type="date" id="newDate" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
                 </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">URL Immagine (Opzionale)</label>
+                    <input type="url" id="newImage" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="https://...">
+                    <p class="text-xs text-gray-400 mt-1">Incolla qui il link di un'immagine dal web.</p>
+                </div>
+
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Messaggio</label>
                     <textarea id="newContent" required rows="4" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none resize-none" placeholder="Dettagli dell'avviso..."></textarea>
                 </div>
-                <div class="flex items-center gap-2">
+
+                <div class="flex items-center gap-2 pt-2">
                     <input type="checkbox" id="newPinned" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
-                    <label for="newPinned" class="text-sm text-gray-700">Metti in evidenza (Pin in alto)</label>
+                    <label for="newPinned" class="text-sm text-gray-700 font-medium">Metti in evidenza (Pin in alto)</label>
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition mt-2">
-                    Pubblica Avviso
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition mt-2 shadow-lg">
+                    Salva Avviso
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL LOGIN (Segreto) -->
+    <div id="loginModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="text-lg font-bold text-gray-800">Area Riservata Staff</h3>
+                <button onclick="closeLoginModal()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <form onsubmit="handleLoginSubmit(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="loginEmail" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="loginPassword" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div id="loginError" class="text-red-500 text-sm hidden">Credenziali non valide.</div>
+                
+                <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-lg transition">
+                    Accedi
                 </button>
             </form>
         </div>
@@ -177,20 +258,18 @@
     <!-- FIREBASE & APP LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- CONFIGURATION ---
+        // --- CONFIGURAZIONE ---
         let firebaseConfig;
-        let appId = 'cf-lampugnano-app'; // Nome univoco per i tuoi dati
+        let appId = 'cf-lampugnano-app'; 
 
-        // >>> GESTIONE CONFIGURAZIONE <<<
         if (typeof __firebase_config !== 'undefined') {
-            // Configurazione automatica per l'anteprima (Non toccare se sei qui)
             firebaseConfig = JSON.parse(__firebase_config);
             appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         } else {
-            // === CONFIGURAZIONE UTENTE (BACHECA) ===
+            // TUA CONFIGURAZIONE
             firebaseConfig = {
               apiKey: "AIzaSyBVGUYgJhFnj20SED3-qpV5ksoBXBT7xCs",
               authDomain: "bacheca-5acac.firebaseapp.com",
@@ -202,27 +281,24 @@
         }
 
         // --- INIT FIREBASE ---
-        let app, auth, db;
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
         
-        try {
-            if(firebaseConfig) {
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-            }
-        } catch (e) {
-            console.error("Errore inizializzazione Firebase:", e);
-        }
-        
-        // Use a consistent collection path
         const NOTICES_COLLECTION = 'notices'; 
 
         // --- STATE ---
         let notices = [];
         let currentFilter = 'all';
         let currentSearch = '';
-        let isAdminMode = false;
+        let isAdminLoggedIn = false;
+        let showArchived = false; // Admin view toggle
         
+        // Secret Login Variables
+        let clickCount = 0;
+        let clickTimer = null;
+        const SECRET_CLICKS_REQUIRED = 5;
+
         // --- CONSTANTS ---
         const CATEGORIES = {
             all: { label: "Tutti", class: "bg-gray-100 text-gray-600" },
@@ -232,59 +308,78 @@
             "lost-found": { label: "Oggetti Smarriti", class: "bg-yellow-100 text-yellow-700 border-yellow-200" }
         };
 
-        const ADMIN_PASSWORD = "piscina123";
-
-        // --- INITIALIZATION ---
+        // --- AUTH LOGIC ---
         
-        // 1. Initialize Auth
-        const initAuth = async () => {
-             if (!auth) return;
-             // Anon auth allows reading without explicit login page
-             // Security rules in Firebase Console should be set to allow reads
-             await signInAnonymously(auth).catch(console.error);
-        };
-
-        // 2. Start Logic
-        initAuth();
-        
-        if (auth) {
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    console.log("Connected to cloud storage as:", user.uid);
-                    setupRealtimeListener();
+        // Listener globale per lo stato di autenticazione
+        onAuthStateChanged(auth, (user) => {
+            if (user && !user.isAnonymous) {
+                // Utente Loggato con Email/Pass (Admin)
+                console.log("Admin loggato:", user.email);
+                isAdminLoggedIn = true;
+                updateAdminUI(true);
+            } else {
+                // Utente Anonimo (Pubblico) o Non loggato
+                console.log("Utente pubblico/anonimo");
+                isAdminLoggedIn = false;
+                updateAdminUI(false);
+                if (!user) {
+                    signInAnonymously(auth).catch(console.error);
                 }
-            });
+            }
+        });
+
+        function updateAdminUI(isAdmin) {
+            const adminControls = document.getElementById('adminControls');
+            const addBtn = document.getElementById('addNoticeBtn');
+            const archiveBtn = document.getElementById('archiveToggleBtn');
+
+            if (isAdmin) {
+                adminControls.classList.remove('hidden');
+                addBtn.classList.remove('hidden');
+                archiveBtn.classList.remove('hidden');
+            } else {
+                adminControls.classList.add('hidden');
+                addBtn.classList.add('hidden');
+                archiveBtn.classList.add('hidden');
+                // Se mi sloggo mentre guardo l'archivio, resetto
+                if (showArchived) toggleArchiveView(); 
+            }
+            renderNotices(); // Rerender per mostrare/nascondere controlli sulle card
         }
 
+        // --- UI & EVENTS INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             renderFilters();
             lucide.createIcons();
+            setupRealtimeListener();
+
+            // Esposizione funzioni globali
+            window.handleSecretClick = handleSecretClick;
+            window.handleLoginSubmit = handleLoginSubmit;
+            window.handleLogout = handleLogout;
+            window.closeLoginModal = closeLoginModal;
             
-            // Expose functions to window for HTML event handlers
             window.setFilter = setFilter;
             window.updateSearch = updateSearch;
-            window.toggleAdminAuth = toggleAdminAuth;
-            window.openModal = openModal;
-            window.closeModal = closeModal;
+            window.openNoticeModal = openNoticeModal;
+            window.closeNoticeModal = closeNoticeModal;
             window.handleFormSubmit = handleFormSubmit;
-            window.deleteNotice = deleteNotice;
+            window.archiveNotice = archiveNotice; // Nuova funzione Archivia
+            window.restoreNotice = restoreNotice; // Nuova funzione Ripristina
+            window.deleteNotice = deleteNotice; // Eliminazione definitiva (opzionale)
             window.togglePin = togglePin;
+            window.toggleArchiveView = toggleArchiveView;
         });
 
-        // --- FIRESTORE LISTENERS ---
+        // --- FIRESTORE ---
         function setupRealtimeListener() {
-            if (!db) return;
             const loading = document.getElementById('loadingIndicator');
             loading.classList.remove('hidden');
 
-            // Using standard collection path. 
-            // Note: In production you might just use collection(db, 'notices') directly
-            // but here we use the specific path to keep it compatible with the preview environment
             let q;
             if (typeof __firebase_config !== 'undefined') {
                 q = collection(db, 'artifacts', appId, 'public', 'data', NOTICES_COLLECTION);
             } else {
-                // Percorso standard per quando sei su GitHub (più pulito)
                 q = collection(db, NOTICES_COLLECTION);
             }
             
@@ -296,18 +391,10 @@
                 
                 loading.classList.add('hidden');
                 renderNotices();
-            }, (error) => {
-                console.error("Error fetching notices:", error);
-                loading.classList.add('hidden');
-                // Fallback for demo if DB fails
-                if(notices.length === 0) {
-                     document.getElementById('emptyState').querySelector('p').innerText = "Impossibile caricare gli avvisi (Errore Database)";
-                     document.getElementById('emptyState').classList.remove('hidden');
-                }
             });
         }
 
-        // --- RENDER FUNCTIONS ---
+        // --- RENDER ---
         function renderFilters() {
             const container = document.getElementById('filterContainer');
             container.innerHTML = Object.keys(CATEGORIES).map(key => `
@@ -328,21 +415,26 @@
             const grid = document.getElementById('noticesGrid');
             const empty = document.getElementById('emptyState');
 
-            // Filter logic
+            // 1. Filtra per Stato Archivio
+            // Se showArchived è true, mostriamo SOLO quelli archiviati.
+            // Se showArchived è false (default), mostriamo SOLO quelli attivi (non archiviati).
             let filtered = notices.filter(n => {
+                const isArchived = !!n.archived;
+                return showArchived ? isArchived : !isArchived;
+            });
+
+            // 2. Filtra per Categoria e Cerca
+            filtered = filtered.filter(n => {
                 const matchesFilter = currentFilter === 'all' || n.category === currentFilter;
                 const matchesSearch = (n.title || '').toLowerCase().includes(currentSearch.toLowerCase()) || 
                                       (n.content || '').toLowerCase().includes(currentSearch.toLowerCase());
                 return matchesFilter && matchesSearch;
             });
 
-            // Sort logic (Pinned first, then by date descending)
+            // 3. Ordina (Pinned prima, poi Data)
             filtered.sort((a, b) => {
                 if (a.isPinned === b.isPinned) {
-                    // If dates exist, compare them
-                    if (a.date && b.date) {
-                        return new Date(b.date) - new Date(a.date);
-                    }
+                    if (a.date && b.date) return new Date(b.date) - new Date(a.date);
                     return 0;
                 }
                 return a.isPinned ? -1 : 1;
@@ -351,10 +443,22 @@
             if (filtered.length === 0) {
                 grid.innerHTML = '';
                 empty.classList.remove('hidden');
+                if(showArchived) {
+                    empty.querySelector('p').innerText = "Nessun avviso in archivio.";
+                } else {
+                    empty.querySelector('p').innerText = "Nessun avviso trovato.";
+                }
             } else {
                 empty.classList.add('hidden');
                 grid.innerHTML = filtered.map(n => `
-                    <div class="bg-white rounded-xl shadow-sm border transition-all hover:shadow-md overflow-hidden flex flex-col fade-in ${n.isPinned ? 'border-l-4 border-l-blue-500 ring-1 ring-blue-100' : 'border-slate-100'}">
+                    <div class="bg-white rounded-xl shadow-sm border transition-all hover:shadow-md overflow-hidden flex flex-col fade-in card ${n.isPinned ? 'border-l-4 border-l-blue-500 ring-1 ring-blue-100' : 'border-slate-100'}">
+                        
+                        ${n.imageUrl ? `
+                        <div class="card-image-container">
+                            <img src="${n.imageUrl}" alt="Immagine avviso" class="card-image" onerror="this.style.display='none'">
+                        </div>
+                        ` : ''}
+
                         <div class="p-5 flex-1">
                             <div class="flex justify-between items-start mb-3">
                                 <span class="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wide border ${CATEGORIES[n.category] ? CATEGORIES[n.category].class : 'bg-gray-100'}">
@@ -370,16 +474,23 @@
                         <div class="px-5 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
                             <div class="flex items-center gap-2">
                                 <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
-                                <span>${n.date ? new Date(n.date).toLocaleDateString('it-IT') : 'Oggi'}</span>
+                                <span>${n.displayDate ? new Date(n.displayDate).toLocaleDateString('it-IT') : new Date(n.timestamp).toLocaleDateString('it-IT')}</span>
                             </div>
                             
-                            <div class="${isAdminMode ? 'flex' : 'hidden'} gap-2">
+                            <div class="${isAdminLoggedIn ? 'flex' : 'hidden'} gap-2">
                                 <button onclick="togglePin('${n.id}', ${n.isPinned})" class="p-1.5 rounded hover:bg-blue-100 ${n.isPinned ? 'text-blue-600' : 'text-slate-400'}" title="Evidenza">
                                     <i data-lucide="pin" class="w-4 h-4"></i>
                                 </button>
-                                <button onclick="deleteNotice('${n.id}')" class="p-1.5 rounded hover:bg-red-100 text-slate-400 hover:text-red-600 transition" title="Elimina">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </button>
+                                
+                                ${showArchived ? `
+                                    <button onclick="restoreNotice('${n.id}')" class="p-1.5 rounded hover:bg-green-100 text-slate-400 hover:text-green-600 transition" title="Ripristina in bacheca">
+                                        <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                                    </button>
+                                ` : `
+                                    <button onclick="archiveNotice('${n.id}')" class="p-1.5 rounded hover:bg-yellow-100 text-slate-400 hover:text-yellow-600 transition" title="Archivia (Nascondi)">
+                                        <i data-lucide="archive" class="w-4 h-4"></i>
+                                    </button>
+                                `}
                             </div>
                         </div>
                     </div>
@@ -389,7 +500,58 @@
             }
         }
 
-        // --- INTERACTION ---
+        // --- SECRET LOGIN HANDLERS ---
+        function handleSecretClick() {
+            const logo = document.getElementById('logoArea');
+            logo.classList.remove('pulse-animation');
+            void logo.offsetWidth; 
+            logo.classList.add('pulse-animation');
+
+            clickCount++;
+            if (clickTimer) clearTimeout(clickTimer);
+            
+            clickTimer = setTimeout(() => { clickCount = 0; }, 2000);
+
+            if (clickCount === SECRET_CLICKS_REQUIRED) {
+                // Se clicchi 5 volte, apri il modal di login vero
+                clickCount = 0;
+                // Se sono già loggato non faccio nulla
+                if(!isAdminLoggedIn) {
+                    document.getElementById('loginModal').classList.remove('hidden');
+                } else {
+                    alert("Sei già connesso come Staff.");
+                }
+            }
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.add('hidden');
+            document.getElementById('loginError').classList.add('hidden');
+        }
+
+        async function handleLoginSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                closeLoginModal();
+                alert("Login effettuato con successo!");
+            } catch (error) {
+                console.error("Login fallito:", error);
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        }
+
+        async function handleLogout() {
+            if(confirm("Vuoi uscire dall'area riservata?")) {
+                await signOut(auth);
+                // Si ricaricherà anonimo grazie al listener onAuthStateChanged
+            }
+        }
+
+        // --- ACTIONS ---
         function setFilter(filter) {
             currentFilter = filter;
             renderFilters();
@@ -401,55 +563,33 @@
             renderNotices();
         }
 
-        // --- AUTH & ADMIN ---
-        function toggleAdminAuth() {
-            if (isAdminMode) {
-                // Logout
-                isAdminMode = false;
-                document.getElementById('addNoticeBtn').classList.add('hidden');
-                
-                // Reset button style
-                const btn = document.getElementById('authBtn');
-                btn.className = "p-2 rounded-full transition bg-white/10 hover:bg-white/20 text-white border border-transparent";
-                btn.title = "Accesso Staff";
-                btn.innerHTML = '<i data-lucide="lock" class="w-5 h-5"></i>';
-                
-                renderNotices();
-                lucide.createIcons();
+        function toggleArchiveView() {
+            showArchived = !showArchived;
+            const btnText = document.getElementById('archiveBtnText');
+            const banner = document.getElementById('archiveBanner');
+            
+            if (showArchived) {
+                btnText.innerText = "Torna alla Bacheca";
+                banner.classList.remove('hidden');
             } else {
-                // Login Request
-                const password = prompt("Inserisci password staff per modificare la bacheca:");
-                if (password === ADMIN_PASSWORD) {
-                    isAdminMode = true;
-                    document.getElementById('addNoticeBtn').classList.remove('hidden');
-                    
-                    // Change button style to indicate active state
-                    const btn = document.getElementById('authBtn');
-                    btn.className = "p-2 rounded-full transition bg-white text-blue-700 shadow-md border border-white";
-                    btn.title = "Esci (Logout)";
-                    btn.innerHTML = '<i data-lucide="unlock" class="w-5 h-5"></i>';
-                    
-                    renderNotices();
-                    lucide.createIcons();
-                    alert("Benvenuto Staff CF Lampugnano! Ora puoi gestire gli avvisi.");
-                } else if (password !== null) {
-                    alert("Password errata.");
-                }
+                btnText.innerText = "Mostra Archivio";
+                banner.classList.add('hidden');
             }
+            renderNotices();
         }
 
-        // --- CRUD OPERATIONS (FIRESTORE) ---
+        // --- CRUD ---
         async function handleFormSubmit(e) {
             e.preventDefault();
-            if (!db) return alert("Database non connesso!");
             
             const title = document.getElementById('newTitle').value;
             const content = document.getElementById('newContent').value;
             const category = document.getElementById('newCategory').value;
             const isPinned = document.getElementById('newPinned').checked;
-            
+            const displayDate = document.getElementById('newDate').value; // Data manuale
+            const imageUrl = document.getElementById('newImage').value;
+
             try {
-                // Usa la stessa logica di percorso del listener
                 let collectionRef;
                 if (typeof __firebase_config !== 'undefined') {
                     collectionRef = collection(db, 'artifacts', appId, 'public', 'data', NOTICES_COLLECTION);
@@ -462,35 +602,44 @@
                     content,
                     category,
                     isPinned,
-                    date: new Date().toISOString().split('T')[0],
-                    timestamp: Date.now()
+                    imageUrl, // Nuovo campo
+                    displayDate, 
+                    timestamp: Date.now(),
+                    archived: false // Default attivo
                 });
                 
-                closeModal();
+                closeNoticeModal();
             } catch (err) {
-                console.error("Error adding notice:", err);
-                alert("Errore durante il salvataggio. Riprova.");
+                console.error("Error adding:", err);
+                alert("Errore salvataggio: " + err.message);
+            }
+        }
+
+        async function archiveNotice(id) {
+            if(confirm("Vuoi archiviare questa notizia? Non sarà più visibile al pubblico.")) {
+                await updateDocRef(id, { archived: true, isPinned: false });
+            }
+        }
+
+        async function restoreNotice(id) {
+            if(confirm("Vuoi ripristinare questa notizia in bacheca?")) {
+                await updateDocRef(id, { archived: false });
             }
         }
 
         async function deleteNotice(id) {
-            if(confirm("Sei sicuro di voler eliminare definitivamente questo avviso?")) {
-                try {
-                    let docRef;
-                    if (typeof __firebase_config !== 'undefined') {
-                        docRef = doc(db, 'artifacts', appId, 'public', 'data', NOTICES_COLLECTION, id);
-                    } else {
-                        docRef = doc(db, NOTICES_COLLECTION, id);
-                    }
-                    await deleteDoc(docRef);
-                } catch (err) {
-                    console.error("Error deleting:", err);
-                    alert("Errore nell'eliminazione.");
-                }
+            // Non usato nell'UI principale, ma tenuto per debug
+            if(confirm("Eliminare definitivamente?")) {
+                 // Logica deleteDoc...
             }
         }
 
         async function togglePin(id, currentStatus) {
+            await updateDocRef(id, { isPinned: !currentStatus });
+        }
+
+        // Helper per update generico
+        async function updateDocRef(id, data) {
             try {
                 let docRef;
                 if (typeof __firebase_config !== 'undefined') {
@@ -498,26 +647,26 @@
                 } else {
                     docRef = doc(db, NOTICES_COLLECTION, id);
                 }
-                await updateDoc(docRef, {
-                    isPinned: !currentStatus
-                });
+                await updateDoc(docRef, data);
             } catch (err) {
-                console.error("Error toggling pin:", err);
+                console.error("Error update:", err);
             }
         }
 
-        // --- MODAL HELPERS ---
-        function openModal() {
+        // --- MODAL FORM ---
+        function openNoticeModal() {
             document.getElementById('noticeModal').classList.remove('hidden');
         }
 
-        function closeModal() {
+        function closeNoticeModal() {
             document.getElementById('noticeModal').classList.add('hidden');
-            // Reset form
+            // Reset
             document.getElementById('newTitle').value = '';
             document.getElementById('newContent').value = '';
             document.getElementById('newCategory').value = 'info';
             document.getElementById('newPinned').checked = false;
+            document.getElementById('newDate').value = '';
+            document.getElementById('newImage').value = '';
         }
 
     </script>
