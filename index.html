@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AquaBoard - Bacheca Piscina</title>
+    <title>AquaBoard - Centro Federale Lampugnano</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -21,40 +21,48 @@
         
         .hidden { display: none !important; }
         
-        /* Animazione pulsazione logo per feedback click */
-        .pulse-animation { animation: pulse 0.2s; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(0.9); } 100% { transform: scale(1); } }
+        /* Loading Spinner */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #3498db;
+            width: 24px;
+            height: 24px;
+            -webkit-animation: spin 1s linear infinite; /* Safari */
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
     <!-- HEADER -->
     <header class="bg-gradient-to-r from-cyan-600 to-blue-700 text-white shadow-lg sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
             
-            <!-- Logo (Area click segreta) -->
-            <div class="flex items-center gap-3 select-none cursor-pointer" onclick="handleSecretClick()" id="logoArea">
+            <!-- Logo e Titolo -->
+            <div class="flex items-center gap-3 select-none">
                 
-                <!-- LOGO: Cerca 'CF Lampugnano trasp.png'. Se non c'è, mostra l'icona di fallback -->
+                <!-- LOGO: Cerca 'CF Lampugnano trasp.png'. Fallback: Icona -->
                 <img 
                     src="./CF Lampugnano trasp.png" 
                     alt="Logo Piscina" 
-                    class="w-12 h-12 object-contain bg-white/90 rounded-full p-1 shadow-md transition-transform active:scale-95"
+                    class="w-12 h-12 object-contain bg-white/90 rounded-full p-1 shadow-md"
                     onerror="this.style.display='none'; document.getElementById('fallbackIcon').classList.remove('hidden');"
                 >
                 
-                <!-- ICONA DI FALLBACK (Visibile se l'immagine fallisce) -->
-                <div id="fallbackIcon" class="hidden bg-white/20 p-2 rounded-full backdrop-blur-sm transition-transform active:scale-95">
+                <!-- ICONA DI FALLBACK -->
+                <div id="fallbackIcon" class="hidden bg-white/20 p-2 rounded-full backdrop-blur-sm">
                     <i data-lucide="droplets" class="w-7 h-7 text-white"></i>
                 </div>
 
                 <div>
-                    <h1 class="text-2xl font-bold tracking-tight">AquaBoard</h1>
-                    <p class="text-cyan-100 text-sm">Bacheca Digitale Piscina Comunale</p>
+                    <h1 class="text-xl md:text-2xl font-bold tracking-tight">Centro Federale Lampugnano</h1>
+                    <p class="text-cyan-100 text-xs md:text-sm">Bacheca Digitale Ufficiale</p>
                 </div>
             </div>
             
-            <!-- Cerca e Logout Admin (Nascosto) -->
+            <!-- Cerca e Login -->
             <div class="flex items-center gap-3 w-full md:w-auto">
                 <div class="relative w-full md:w-64">
                     <i data-lucide="search" class="absolute left-3 top-2.5 text-cyan-200 w-4 h-4"></i>
@@ -67,12 +75,12 @@
                     >
                 </div>
                 
-                <!-- Bottone Logout visibile SOLO se admin è loggato -->
+                <!-- Bottone Login/Logout Admin -->
                 <button 
-                    onclick="adminLogout()"
-                    id="adminLogoutBtn"
-                    class="hidden p-2 rounded-full transition bg-white text-blue-700 shadow-sm hover:bg-red-50 hover:text-red-600"
-                    title="Esci da modalità gestione"
+                    onclick="toggleAdminAuth()"
+                    id="authBtn"
+                    class="p-2 rounded-full transition bg-white/10 hover:bg-white/20 text-white border border-transparent"
+                    title="Accesso Staff"
                 >
                     <i data-lucide="lock" class="w-5 h-5"></i>
                 </button>
@@ -81,7 +89,7 @@
     </header>
 
     <!-- MAIN CONTENT -->
-    <main class="max-w-6xl mx-auto px-4 py-8">
+    <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full">
         
         <!-- Controlli e Filtri -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -90,15 +98,22 @@
                 <!-- Bottoni generati via JS -->
             </div>
 
-            <!-- Bottone Nuovo Avviso (Visibile solo in Admin Mode) -->
-            <button 
-                id="addNoticeBtn"
-                onclick="openModal()"
-                class="hidden flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-full shadow-md transition font-medium"
-            >
-                <i data-lucide="plus" class="w-5 h-5"></i>
-                Nuovo Avviso
-            </button>
+            <div class="flex items-center gap-3">
+                <!-- Indicatore Loading -->
+                <div id="loadingIndicator" class="hidden">
+                    <div class="loader"></div>
+                </div>
+
+                <!-- Bottone Nuovo Avviso (Visibile solo se Admin) -->
+                <button 
+                    id="addNoticeBtn"
+                    onclick="openModal()"
+                    class="hidden flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-full shadow-md transition font-medium"
+                >
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    Nuovo Avviso
+                </button>
+            </div>
         </div>
 
         <!-- Griglia Avvisi -->
@@ -109,10 +124,14 @@
         <!-- Stato Vuoto -->
         <div id="emptyState" class="hidden col-span-full py-12 flex flex-col items-center justify-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-200 mt-6">
             <i data-lucide="megaphone" class="w-12 h-12 mb-4 opacity-20"></i>
-            <p class="text-lg">Nessun avviso trovato con questi filtri.</p>
+            <p class="text-lg">Nessun avviso trovato.</p>
         </div>
 
     </main>
+    
+    <footer class="bg-slate-100 border-t border-slate-200 py-6 text-center text-slate-400 text-xs">
+        <p>&copy; 2024 Centro Federale Lampugnano. Tutti i diritti riservati.</p>
+    </footer>
 
     <!-- MODAL (Form di Aggiunta) -->
     <div id="noticeModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
@@ -124,6 +143,9 @@
                 </button>
             </div>
             <form onsubmit="handleFormSubmit(event)" class="p-6 space-y-4">
+                <!-- Hidden ID for Editing mode (future proofing) -->
+                <input type="hidden" id="editId">
+                
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Titolo</label>
                     <input type="text" id="newTitle" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Es. Chiusura Vasca">
@@ -146,50 +168,62 @@
                     <label for="newPinned" class="text-sm text-gray-700">Metti in evidenza (Pin in alto)</label>
                 </div>
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition mt-2">
-                    Pubblica
+                    Pubblica Avviso
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
-    <script>
-        // --- DATA ---
-        let notices = [
-            {
-                id: 1,
-                title: "Chiusura Straordinaria Vasca Piccola",
-                content: "Si avvisano i gentili utenti che la vasca piccola rimarrà chiusa per manutenzione straordinaria filtri nella giornata di Venerdì 14.",
-                category: "urgent",
-                date: "2023-10-26",
-                isPinned: true
-            },
-            {
-                id: 2,
-                title: "Gara Sociale di Fine Mese",
-                content: "Aperte le iscrizioni per la gara sociale 50m Stile Libero. Iscriviti in segreteria entro il 20 del mese!",
-                category: "event",
-                date: "2023-10-25",
-                isPinned: false
-            },
-            {
-                id: 3,
-                title: "Ritrovato: Occhialini Svedesi Blu",
-                content: "Sono stati ritrovati un paio di occhialini svedesi blu negli spogliatoi maschili ieri sera.",
-                category: "lost-found",
-                date: "2023-10-24",
-                isPinned: false
-            },
-            {
-                id: 4,
-                title: "Nuovi orari Nuoto Libero",
-                content: "Dal prossimo mese il nuoto libero serale sarà esteso fino alle 22:00 il martedì e giovedì.",
-                category: "info",
-                date: "2023-10-22",
-                isPinned: false
-            }
-        ];
+    <!-- FIREBASE & APP LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // --- CONFIGURATION ---
+        let firebaseConfig;
+        let appId = 'cf-lampugnano-app'; // Nome univoco per i tuoi dati
+
+        // >>> GESTIONE CONFIGURAZIONE <<<
+        if (typeof __firebase_config !== 'undefined') {
+            // Configurazione automatica per l'anteprima (Non toccare se sei qui)
+            firebaseConfig = JSON.parse(__firebase_config);
+            appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        } else {
+            // === CONFIGURAZIONE UTENTE (BACHECA) ===
+            firebaseConfig = {
+              apiKey: "AIzaSyBVGUYgJhFnj20SED3-qpV5ksoBXBT7xCs",
+              authDomain: "bacheca-5acac.firebaseapp.com",
+              projectId: "bacheca-5acac",
+              storageBucket: "bacheca-5acac.firebasestorage.app",
+              messagingSenderId: "65310524220",
+              appId: "1:65310524220:web:a7f8bd0cd97539f3325439"
+            };
+        }
+
+        // --- INIT FIREBASE ---
+        let app, auth, db;
+        
+        try {
+            if(firebaseConfig) {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+            }
+        } catch (e) {
+            console.error("Errore inizializzazione Firebase:", e);
+        }
+        
+        // Use a consistent collection path
+        const NOTICES_COLLECTION = 'notices'; 
+
+        // --- STATE ---
+        let notices = [];
+        let currentFilter = 'all';
+        let currentSearch = '';
+        let isAdminMode = false;
+        
+        // --- CONSTANTS ---
         const CATEGORIES = {
             all: { label: "Tutti", class: "bg-gray-100 text-gray-600" },
             urgent: { label: "Urgenti", class: "bg-red-100 text-red-700 border-red-200" },
@@ -198,69 +232,79 @@
             "lost-found": { label: "Oggetti Smarriti", class: "bg-yellow-100 text-yellow-700 border-yellow-200" }
         };
 
-        // --- STATE ---
-        let currentFilter = 'all';
-        let currentSearch = '';
-        let isAdminMode = false;
-        
-        // Secret Login State
-        let clickCount = 0;
-        let clickTimer = null;
-        const SECRET_CLICKS_REQUIRED = 5;
-        const ADMIN_PASSWORD = "piscina123"; // PASSWORD DI ESEMPIO
+        const ADMIN_PASSWORD = "piscina123";
 
-        // --- INIT ---
+        // --- INITIALIZATION ---
+        
+        // 1. Initialize Auth
+        const initAuth = async () => {
+             if (!auth) return;
+             // Anon auth allows reading without explicit login page
+             // Security rules in Firebase Console should be set to allow reads
+             await signInAnonymously(auth).catch(console.error);
+        };
+
+        // 2. Start Logic
+        initAuth();
+        
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    console.log("Connected to cloud storage as:", user.uid);
+                    setupRealtimeListener();
+                }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             renderFilters();
-            renderNotices();
             lucide.createIcons();
+            
+            // Expose functions to window for HTML event handlers
+            window.setFilter = setFilter;
+            window.updateSearch = updateSearch;
+            window.toggleAdminAuth = toggleAdminAuth;
+            window.openModal = openModal;
+            window.closeModal = closeModal;
+            window.handleFormSubmit = handleFormSubmit;
+            window.deleteNotice = deleteNotice;
+            window.togglePin = togglePin;
         });
 
-        // --- SECRET LOGIN LOGIC ---
-        function handleSecretClick() {
-            // Visual feedback
-            const logo = document.getElementById('logoArea');
-            logo.classList.remove('pulse-animation');
-            void logo.offsetWidth; // trigger reflow
-            logo.classList.add('pulse-animation');
+        // --- FIRESTORE LISTENERS ---
+        function setupRealtimeListener() {
+            if (!db) return;
+            const loading = document.getElementById('loadingIndicator');
+            loading.classList.remove('hidden');
 
-            clickCount++;
-            
-            // Reset timer on each click
-            if (clickTimer) clearTimeout(clickTimer);
-            
-            // User has 2 seconds to finish clicking
-            clickTimer = setTimeout(() => {
-                clickCount = 0;
-            }, 2000);
-
-            if (clickCount === SECRET_CLICKS_REQUIRED) {
-                // Wait slightly for animation to finish
-                setTimeout(() => {
-                    const password = prompt("Inserisci password amministratore:");
-                    if (password === ADMIN_PASSWORD) {
-                        enableAdminMode();
-                    } else if (password !== null) {
-                        alert("Password errata");
-                    }
-                    clickCount = 0;
-                }, 100);
+            // Using standard collection path. 
+            // Note: In production you might just use collection(db, 'notices') directly
+            // but here we use the specific path to keep it compatible with the preview environment
+            let q;
+            if (typeof __firebase_config !== 'undefined') {
+                q = collection(db, 'artifacts', appId, 'public', 'data', NOTICES_COLLECTION);
+            } else {
+                // Percorso standard per quando sei su GitHub (più pulito)
+                q = collection(db, NOTICES_COLLECTION);
             }
-        }
-
-        function enableAdminMode() {
-            isAdminMode = true;
-            document.getElementById('addNoticeBtn').classList.remove('hidden');
-            document.getElementById('adminLogoutBtn').classList.remove('hidden');
-            renderNotices();
-            alert("Modalità Gestione Attivata!");
-        }
-
-        function adminLogout() {
-            isAdminMode = false;
-            document.getElementById('addNoticeBtn').classList.add('hidden');
-            document.getElementById('adminLogoutBtn').classList.add('hidden');
-            renderNotices();
+            
+            onSnapshot(q, (snapshot) => {
+                notices = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                
+                loading.classList.add('hidden');
+                renderNotices();
+            }, (error) => {
+                console.error("Error fetching notices:", error);
+                loading.classList.add('hidden');
+                // Fallback for demo if DB fails
+                if(notices.length === 0) {
+                     document.getElementById('emptyState').querySelector('p').innerText = "Impossibile caricare gli avvisi (Errore Database)";
+                     document.getElementById('emptyState').classList.remove('hidden');
+                }
+            });
         }
 
         // --- RENDER FUNCTIONS ---
@@ -287,15 +331,19 @@
             // Filter logic
             let filtered = notices.filter(n => {
                 const matchesFilter = currentFilter === 'all' || n.category === currentFilter;
-                const matchesSearch = n.title.toLowerCase().includes(currentSearch.toLowerCase()) || 
-                                      n.content.toLowerCase().includes(currentSearch.toLowerCase());
+                const matchesSearch = (n.title || '').toLowerCase().includes(currentSearch.toLowerCase()) || 
+                                      (n.content || '').toLowerCase().includes(currentSearch.toLowerCase());
                 return matchesFilter && matchesSearch;
             });
 
-            // Sort logic (Pinned first)
+            // Sort logic (Pinned first, then by date descending)
             filtered.sort((a, b) => {
                 if (a.isPinned === b.isPinned) {
-                    return new Date(b.date) - new Date(a.date);
+                    // If dates exist, compare them
+                    if (a.date && b.date) {
+                        return new Date(b.date) - new Date(a.date);
+                    }
+                    return 0;
                 }
                 return a.isPinned ? -1 : 1;
             });
@@ -309,27 +357,27 @@
                     <div class="bg-white rounded-xl shadow-sm border transition-all hover:shadow-md overflow-hidden flex flex-col fade-in ${n.isPinned ? 'border-l-4 border-l-blue-500 ring-1 ring-blue-100' : 'border-slate-100'}">
                         <div class="p-5 flex-1">
                             <div class="flex justify-between items-start mb-3">
-                                <span class="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wide border ${CATEGORIES[n.category].class}">
-                                    ${CATEGORIES[n.category].label}
+                                <span class="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wide border ${CATEGORIES[n.category] ? CATEGORIES[n.category].class : 'bg-gray-100'}">
+                                    ${CATEGORIES[n.category] ? CATEGORIES[n.category].label : 'Avviso'}
                                 </span>
                                 ${n.isPinned ? `<i data-lucide="pin" class="w-4 h-4 text-blue-500 fill-blue-500 transform rotate-45"></i>` : ''}
                             </div>
                             
                             <h3 class="text-lg font-bold text-slate-800 mb-2 leading-tight">${n.title}</h3>
-                            <p class="text-slate-600 text-sm leading-relaxed mb-4">${n.content}</p>
+                            <p class="text-slate-600 text-sm leading-relaxed mb-4 whitespace-pre-line">${n.content}</p>
                         </div>
 
                         <div class="px-5 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
                             <div class="flex items-center gap-2">
                                 <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
-                                <span>${new Date(n.date).toLocaleDateString('it-IT')}</span>
+                                <span>${n.date ? new Date(n.date).toLocaleDateString('it-IT') : 'Oggi'}</span>
                             </div>
                             
                             <div class="${isAdminMode ? 'flex' : 'hidden'} gap-2">
-                                <button onclick="togglePin(${n.id})" class="p-1.5 rounded hover:bg-blue-100 ${n.isPinned ? 'text-blue-600' : 'text-slate-400'}" title="Evidenza">
+                                <button onclick="togglePin('${n.id}', ${n.isPinned})" class="p-1.5 rounded hover:bg-blue-100 ${n.isPinned ? 'text-blue-600' : 'text-slate-400'}" title="Evidenza">
                                     <i data-lucide="pin" class="w-4 h-4"></i>
                                 </button>
-                                <button onclick="deleteNotice(${n.id})" class="p-1.5 rounded hover:bg-red-100 text-slate-400 hover:text-red-600 transition" title="Elimina">
+                                <button onclick="deleteNotice('${n.id}')" class="p-1.5 rounded hover:bg-red-100 text-slate-400 hover:text-red-600 transition" title="Elimina">
                                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                                 </button>
                             </div>
@@ -337,13 +385,11 @@
                     </div>
                 `).join('');
                 
-                // Re-initialize icons for newly added elements
                 lucide.createIcons();
             }
         }
 
-        // --- ACTIONS ---
-
+        // --- INTERACTION ---
         function setFilter(filter) {
             currentFilter = filter;
             renderFilters();
@@ -355,20 +401,112 @@
             renderNotices();
         }
 
-        function deleteNotice(id) {
-            if(confirm("Sei sicuro di voler eliminare questo avviso?")) {
-                notices = notices.filter(n => n.id !== id);
+        // --- AUTH & ADMIN ---
+        function toggleAdminAuth() {
+            if (isAdminMode) {
+                // Logout
+                isAdminMode = false;
+                document.getElementById('addNoticeBtn').classList.add('hidden');
+                
+                // Reset button style
+                const btn = document.getElementById('authBtn');
+                btn.className = "p-2 rounded-full transition bg-white/10 hover:bg-white/20 text-white border border-transparent";
+                btn.title = "Accesso Staff";
+                btn.innerHTML = '<i data-lucide="lock" class="w-5 h-5"></i>';
+                
                 renderNotices();
+                lucide.createIcons();
+            } else {
+                // Login Request
+                const password = prompt("Inserisci password staff per modificare la bacheca:");
+                if (password === ADMIN_PASSWORD) {
+                    isAdminMode = true;
+                    document.getElementById('addNoticeBtn').classList.remove('hidden');
+                    
+                    // Change button style to indicate active state
+                    const btn = document.getElementById('authBtn');
+                    btn.className = "p-2 rounded-full transition bg-white text-blue-700 shadow-md border border-white";
+                    btn.title = "Esci (Logout)";
+                    btn.innerHTML = '<i data-lucide="unlock" class="w-5 h-5"></i>';
+                    
+                    renderNotices();
+                    lucide.createIcons();
+                    alert("Benvenuto Staff CF Lampugnano! Ora puoi gestire gli avvisi.");
+                } else if (password !== null) {
+                    alert("Password errata.");
+                }
             }
         }
 
-        function togglePin(id) {
-            notices = notices.map(n => n.id === id ? { ...n, isPinned: !n.isPinned } : n);
-            renderNotices();
+        // --- CRUD OPERATIONS (FIRESTORE) ---
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            if (!db) return alert("Database non connesso!");
+            
+            const title = document.getElementById('newTitle').value;
+            const content = document.getElementById('newContent').value;
+            const category = document.getElementById('newCategory').value;
+            const isPinned = document.getElementById('newPinned').checked;
+            
+            try {
+                // Usa la stessa logica di percorso del listener
+                let collectionRef;
+                if (typeof __firebase_config !== 'undefined') {
+                    collectionRef = collection(db, 'artifacts', appId, 'public', 'data', NOTICES_COLLECTION);
+                } else {
+                    collectionRef = collection(db, NOTICES_COLLECTION);
+                }
+
+                await addDoc(collectionRef, {
+                    title,
+                    content,
+                    category,
+                    isPinned,
+                    date: new Date().toISOString().split('T')[0],
+                    timestamp: Date.now()
+                });
+                
+                closeModal();
+            } catch (err) {
+                console.error("Error adding notice:", err);
+                alert("Errore durante il salvataggio. Riprova.");
+            }
         }
 
-        // --- MODAL & FORM ---
+        async function deleteNotice(id) {
+            if(confirm("Sei sicuro di voler eliminare definitivamente questo avviso?")) {
+                try {
+                    let docRef;
+                    if (typeof __firebase_config !== 'undefined') {
+                        docRef = doc(db, 'artifacts', appId, 'public', 'data', NOTICES_COLLECTION, id);
+                    } else {
+                        docRef = doc(db, NOTICES_COLLECTION, id);
+                    }
+                    await deleteDoc(docRef);
+                } catch (err) {
+                    console.error("Error deleting:", err);
+                    alert("Errore nell'eliminazione.");
+                }
+            }
+        }
 
+        async function togglePin(id, currentStatus) {
+            try {
+                let docRef;
+                if (typeof __firebase_config !== 'undefined') {
+                    docRef = doc(db, 'artifacts', appId, 'public', 'data', NOTICES_COLLECTION, id);
+                } else {
+                    docRef = doc(db, NOTICES_COLLECTION, id);
+                }
+                await updateDoc(docRef, {
+                    isPinned: !currentStatus
+                });
+            } catch (err) {
+                console.error("Error toggling pin:", err);
+            }
+        }
+
+        // --- MODAL HELPERS ---
         function openModal() {
             document.getElementById('noticeModal').classList.remove('hidden');
         }
@@ -380,23 +518,6 @@
             document.getElementById('newContent').value = '';
             document.getElementById('newCategory').value = 'info';
             document.getElementById('newPinned').checked = false;
-        }
-
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            
-            const newNotice = {
-                id: Date.now(),
-                title: document.getElementById('newTitle').value,
-                content: document.getElementById('newContent').value,
-                category: document.getElementById('newCategory').value,
-                isPinned: document.getElementById('newPinned').checked,
-                date: new Date().toISOString().split('T')[0]
-            };
-
-            notices.unshift(newNotice); // Add to top
-            closeModal();
-            renderNotices();
         }
 
     </script>
