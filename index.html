@@ -11,10 +11,9 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- PDF.js (Per convertire PDF in immagini) -->
+    <!-- PDF.js (Per convertire PDF caricati in immagini) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
-        // Configura il worker per PDF.js
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
 
@@ -42,7 +41,6 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Immagine Card */
         .card-image-container {
             width: 100%;
             height: 180px;
@@ -67,33 +65,36 @@
             border: 1px solid #e2e8f0;
         }
 
-        /* Anteprima Allegato nella Card */
+        /* Anteprima Allegato nella Card (Stile Immagine) */
         .card-preview-container {
             margin-top: 16px;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
             overflow: hidden;
             background: #ffffff;
-            height: 200px;
+            height: 220px; /* Altezza fissa */
             position: relative;
             display: flex;
-            align-items: flex-start; /* Allinea in alto */
+            align-items: flex-start;
             justify-content: center;
         }
 
-        /* Canvas PDF (L'immagine generata) */
-        .pdf-canvas {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        /* Drive Iframe */
-        .drive-frame {
+        .card-preview-container img, .card-preview-container canvas {
             width: 100%;
             height: 100%;
-            border: none;
-            pointer-events: none; /* Blocca click all'interno */
+            object-fit: cover; /* Taglia l'eccesso */
+            object-position: top; /* Mostra sempre la parte alta */
+        }
+
+        /* Effetto sfumato in basso per far capire che continua */
+        .card-preview-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
+            pointer-events: none;
         }
 
         .attachment-badge {
@@ -225,7 +226,7 @@
                     <div id="viewNoticeContentImgContainer" class="hidden mb-6"><img id="viewNoticeContentImg" class="w-full rounded-xl border border-slate-200"></div>
                     <div id="viewNoticeAttachmentContainer" class="hidden mt-8 pt-6 border-t border-slate-100">
                         <h4 class="text-sm font-bold text-slate-500 uppercase mb-3 flex items-center gap-2"><i data-lucide="paperclip" class="w-4 h-4"></i> Allegato</h4>
-                        <div id="viewNoticePreviewBox" class="hidden mb-4"></div>
+                        <div id="viewNoticePreviewBox" class="hidden mb-4 rounded-lg overflow-hidden border border-slate-200"></div>
                         <a id="viewNoticeDownloadBtn" href="#" target="_blank" class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-xl font-semibold transition w-full sm:w-auto shadow-md hover:shadow-lg"><i data-lucide="download" class="w-5 h-5"></i>Scarica / Apri Documento</a>
                     </div>
                 </div>
@@ -279,6 +280,7 @@
         import { getAuth, signInAnonymously, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // CONFIGURAZIONE 
         const firebaseConfig = {
               apiKey: "AIzaSyBVGUYgJhFnj20SED3-qpV5ksoBXBT7xCs",
               authDomain: "bacheca-5acac.firebaseapp.com",
@@ -376,10 +378,9 @@
             if (filtered.length === 0) { grid.innerHTML = ''; empty.classList.remove('hidden'); document.getElementById('emptyStateText').innerText = showArchived ? "Nessun avviso in archivio." : "Nessun avviso trovato."; } 
             else {
                 empty.classList.add('hidden');
-                grid.innerHTML = ''; // Pulisci la griglia
+                grid.innerHTML = ''; 
 
                 for (const n of filtered) {
-                    // Crea contenitore card
                     const card = document.createElement('div');
                     card.className = "bg-white rounded-xl shadow-sm border transition-all hover:shadow-md overflow-hidden flex flex-col fade-in card cursor-pointer hover:-translate-y-1";
                     if (n.isPinned) card.classList.add('border-l-4', 'border-l-blue-500', 'ring-1', 'ring-blue-100');
@@ -387,8 +388,6 @@
                     card.onclick = () => viewNotice(n.id);
 
                     let cardHtml = '';
-                    
-                    // Copertina
                     if (n.imageUrl) {
                         cardHtml += `<div class="card-image-container"><img src="${n.imageUrl}" alt="Copertina" class="card-image" onerror="this.style.display='none'">${n.attachmentUrl ? `<div class="attachment-badge"><i data-lucide="paperclip" class="w-3 h-3 text-slate-500"></i> Allegato</div>` : ''}</div>`;
                     }
@@ -405,6 +404,7 @@
                             <div class="flex items-center justify-center w-full h-full text-slate-300">
                                 <div class="loader"></div>
                             </div>
+                            <div class="card-preview-overlay"></div>
                         </div>`;
                     }
 
@@ -418,7 +418,6 @@
                     card.innerHTML = cardHtml;
                     grid.appendChild(card);
 
-                    // Genera anteprima asincrona
                     if (n.attachmentUrl) {
                         generatePdfThumbnail(n.attachmentUrl, `preview-${n.id}`);
                     }
@@ -432,14 +431,18 @@
             const container = document.getElementById(containerId);
             if(!container) return;
 
-            // Se è Google Drive -> Iframe
+            // Se è Google Drive -> Usa l'API Thumbnail di Google (FOTO STATICA)
             if (url.includes('drive.google.com')) {
-                let cleanUrl = url;
-                if (url.includes('/view')) cleanUrl = url.replace('/view', '/preview');
-                else if (url.includes('open?id=')) cleanUrl = `https://drive.google.com/file/d/${url.split('id=')[1].split('&')[0]}/preview`;
+                let id = '';
+                if (url.includes('/file/d/')) id = url.split('/file/d/')[1].split('/')[0];
+                else if (url.includes('id=')) id = url.split('id=')[1].split('&')[0];
                 
-                container.innerHTML = `<iframe src="${cleanUrl}" class="drive-frame" loading="lazy"></iframe>`;
-                return;
+                if(id) {
+                    // Questa API di Google genera una JPG statica del documento
+                    const thumbUrl = `https://drive.google.com/thumbnail?sz=w800&id=${id}`;
+                    container.innerHTML = `<img src="${thumbUrl}" class="w-full h-full object-cover object-top" onerror="this.parentElement.innerHTML='<div class=\\'flex flex-col items-center justify-center w-full h-full text-slate-400 gap-2\\'><i data-lucide=\\'file-text\\' class=\\'w-8 h-8\\'></i><span class=\\'text-xs\\'>Documento</span></div>'; lucide.createIcons();">`;
+                    return;
+                }
             }
 
             // Se è PDF Base64 -> PDF.js Image
@@ -448,38 +451,26 @@
                     const loadingTask = pdfjsLib.getDocument(url);
                     const pdf = await loadingTask.promise;
                     const page = await pdf.getPage(1);
-                    
-                    const viewport = page.getViewport({ scale: 1.0 }); // Scala normale
+                    const viewport = page.getViewport({ scale: 1.0 });
                     const canvas = document.createElement('canvas');
-                    canvas.className = 'pdf-canvas';
+                    canvas.className = 'w-full h-auto';
                     const context = canvas.getContext('2d');
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
                     
-                    // Alta risoluzione per retina display
-                    const outputScale = window.devicePixelRatio || 1;
-                    canvas.width = Math.floor(viewport.width * outputScale);
-                    canvas.height = Math.floor(viewport.height * outputScale);
-                    
-                    const transform = [outputScale, 0, 0, outputScale, 0, 0];
-
-                    const renderContext = {
-                        canvasContext: context,
-                        transform: transform,
-                        viewport: viewport
-                    };
-                    await page.render(renderContext).promise;
+                    await page.render({canvasContext: context, viewport: viewport}).promise;
                     
                     container.innerHTML = '';
                     container.appendChild(canvas);
                 } catch (e) {
                     console.error("PDF Render Error", e);
-                    // Fallback
                     container.innerHTML = `<div class="flex flex-col items-center justify-center w-full h-full text-slate-400 gap-2"><i data-lucide="file-x" class="w-8 h-8"></i><span class="text-xs">Anteprima non disponibile</span></div>`;
                     lucide.createIcons();
                 }
                 return;
             }
 
-            // Se è immagine -> Img tag
+            // Fallback immagine
             container.innerHTML = `<img src="${url}" class="w-full h-full object-cover object-top">`;
         }
 
@@ -566,7 +557,7 @@
         async function restoreNotice(id) { if(confirm("Ripristinare?")) { await updateDoc(doc(db, NOTICES_COLLECTION, id), { archived: false }); showToast("Ripristinata"); } }
         async function togglePin(id, currentStatus) { await updateDoc(doc(db, NOTICES_COLLECTION, id), { isPinned: !currentStatus }); }
 
-        // NEW: View Notice Logic
+        // NEW: View Notice Logic (MODAL) - Usa ancora IFRAME per lettura
         function viewNotice(id) {
             const notice = notices.find(n => n.id === id);
             if (!notice) return;
@@ -590,9 +581,18 @@
             if (notice.attachmentUrl) {
                 attachContainer.classList.remove('hidden');
                 document.getElementById('viewNoticeDownloadBtn').href = notice.attachmentUrl;
-                // Render preview
                 const previewBox = document.getElementById('viewNoticePreviewBox');
-                generatePdfThumbnail(notice.attachmentUrl, 'viewNoticePreviewBox');
+                // Usa iframe nel modal per permettere lettura
+                let previewHtml = '';
+                if (notice.attachmentUrl.includes('drive.google.com')) {
+                    const cleanUrl = getDrivePreviewUrl(notice.attachmentUrl);
+                    previewHtml = `<iframe src="${cleanUrl}" class="w-full h-96 border-none" loading="lazy"></iframe>`;
+                } else if (notice.attachmentUrl.startsWith('data:application/pdf')) {
+                    previewHtml = `<embed src="${notice.attachmentUrl}#toolbar=0" type="application/pdf" class="w-full h-96 border-none">`;
+                } else {
+                    previewHtml = `<img src="${notice.attachmentUrl}" class="w-full h-auto">`;
+                }
+                previewBox.innerHTML = previewHtml;
                 previewBox.classList.remove('hidden');
             } else {
                 attachContainer.classList.add('hidden');
