@@ -1308,8 +1308,10 @@
 
         function renderFilters() {
             const container = document.getElementById('filterContainer');
+            const currentScroll = container.scrollLeft; // Save scroll position
             // MODIFICA MOBILE: Aggiunte classi per scroll orizzontale (whitespace-nowrap, shrink-0)
             container.innerHTML = Object.keys(CATEGORIES).map(key => `<button onclick="setFilter('${key}')" class="whitespace-nowrap shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${currentFilter === key ? 'bg-blue-600 text-white shadow-md transform scale-105' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}">${CATEGORIES[key].label}</button>`).join('');
+            container.scrollLeft = currentScroll; // Restore scroll position
         }
         
         function renderCategoryCheckboxes() {
@@ -1486,7 +1488,7 @@
         async function handleLogout() { await signOut(auth); showToast("Disconnessione effettuata. Modalità pubblica."); }
 
         // --- ACTIONS ---
-        function setFilter(filter) { currentFilter = filter; renderNotices(); }
+        function setFilter(filter) { currentFilter = filter; renderNotices(); renderFilters(); }
         function updateSearch(val) { currentSearch = val; renderNotices(); }
         function toggleArchiveView() { showArchived = !showArchived; document.getElementById('archiveBtnText').innerText = showArchived ? "Torna alla Bacheca" : "Mostra Archivio"; const banner = document.getElementById('archiveBanner'); showArchived ? banner.classList.remove('hidden') : banner.classList.add('hidden'); renderNotices(); }
 
