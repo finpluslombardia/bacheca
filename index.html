@@ -42,14 +42,20 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Immagine Card Copertina */
+        /* Immagine Card Copertina - Responsive Height */
         .card-image-container {
             width: 100%;
-            height: 180px;
+            height: 150px; /* Altezza ridotta su mobile */
             overflow: hidden;
             background-color: #f1f5f9;
             position: relative;
         }
+        @media (min-width: 768px) {
+            .card-image-container {
+                height: 180px; /* Altezza originale su desktop */
+            }
+        }
+
         .card-image {
             width: 100%;
             height: 100%;
@@ -321,17 +327,20 @@
         <i id="toastIcon" data-lucide="check-circle" class="w-5 h-5 text-green-400"></i><span id="toastMessage" class="text-sm font-medium">Operazione completata</span>
     </div>
 
-    <!-- MODAL VIEW NOTICE -->
+    <!-- MODAL VIEW NOTICE (Aggiornato Mobile) -->
     <div id="viewNoticeModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-md fade-in">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] relative">
             <button onclick="closeViewModal()" class="absolute top-4 right-4 bg-white/80 p-2 rounded-full hover:bg-gray-100 z-10 transition"><i data-lucide="x" class="w-6 h-6 text-slate-700"></i></button>
             <div class="overflow-y-auto custom-scrollbar">
                 <div id="viewNoticeCover" class="w-full h-64 bg-slate-100 hidden"><img id="viewNoticeCoverImg" class="w-full h-full object-cover"></div>
-                <div class="p-8">
+                <!-- Ridotto padding su mobile da p-8 a p-5 -->
+                <div class="p-5 md:p-8">
                     <div class="flex flex-wrap items-center gap-3 mb-4" id="viewNoticeCategoriesContainer"></div>
                     <div class="flex items-center gap-1 text-slate-400 text-xs mb-2"><i data-lucide="calendar" class="w-3 h-3"></i><span id="viewNoticeDate"></span></div>
-                    <h2 id="viewNoticeTitle" class="text-3xl font-bold text-slate-900 mb-6 leading-tight"></h2>
-                    <div id="viewNoticeContent" class="text-slate-700 leading-relaxed text-lg mb-6 whitespace-pre-line"></div>
+                    <!-- Ridotto testo titolo su mobile da 3xl a xl -->
+                    <h2 id="viewNoticeTitle" class="text-xl md:text-3xl font-bold text-slate-900 mb-6 leading-tight"></h2>
+                    <!-- Ridotto testo contenuto su mobile da lg a base -->
+                    <div id="viewNoticeContent" class="text-slate-700 leading-relaxed text-base md:text-lg mb-6 whitespace-pre-line"></div>
                     <div id="viewNoticeContentImgContainer" class="hidden mb-6"><img id="viewNoticeContentImg" class="w-full rounded-xl border border-slate-200"></div>
                     <div id="viewNoticeAttachmentContainer" class="hidden mt-8 pt-6 border-t border-slate-100">
                         <h4 class="text-sm font-bold text-slate-500 uppercase mb-3 flex items-center gap-2"><i data-lucide="paperclip" class="w-4 h-4"></i> Allegato</h4>
@@ -556,8 +565,9 @@
                         badgesHtml += `<span class="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wide border ${catData.class} mr-1 mb-1">${catData.label}</span>`;
                     });
 
-                    cardHtml += `<div class="p-5 flex-1">
-                        <div class="flex flex-wrap items-start mb-3 gap-1 w-full justify-between">
+                    // Modifiche Mobile: ridotto padding da p-5 a p-4
+                    cardHtml += `<div class="p-4 md:p-5 flex-1">
+                        <div class="flex flex-wrap items-start mb-2 gap-1 w-full justify-between">
                             <div class="flex flex-wrap gap-1">${badgesHtml}</div>
                             <div class="flex gap-2 shrink-0">${n.isPinned ? `<i data-lucide="pin" class="w-4 h-4 text-blue-500 fill-blue-500 transform rotate-45"></i>` : ''}${isAdminLoggedIn ? `<button onclick="event.stopPropagation(); editNotice('${n.id}')" class="text-slate-400 hover:text-blue-600 transition"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button onclick="event.stopPropagation(); deleteNoticePermanent('${n.id}')" class="text-slate-400 hover:text-red-600 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div>
                         </div>
@@ -575,8 +585,9 @@
                         </div>`;
                     }
 
+                    // Modifiche Mobile Footer: ridotto padding
                     cardHtml += `</div>
-                        <div class="px-5 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
+                        <div class="px-4 py-3 md:px-5 md:py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
                             <div class="flex flex-col">
                                 <div class="flex items-center gap-2 mb-0.5"><i data-lucide="calendar" class="w-3.5 h-3.5"></i><span>${n.displayDate ? new Date(n.displayDate).toLocaleDateString('it-IT') : new Date(n.timestamp).toLocaleDateString('it-IT')}</span></div>
                                 ${n.expirationDate ? `<div class="flex items-center gap-2 text-red-400"><i data-lucide="clock" class="w-3.5 h-3.5"></i><span>Scade: ${new Date(n.expirationDate).toLocaleDateString('it-IT')}</span></div>` : ''}
