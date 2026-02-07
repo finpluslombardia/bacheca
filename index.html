@@ -1022,10 +1022,10 @@
                 // Aggiunge un badge se è un orario variato
                 const overrideBadge = isOverride ? '<span class="text-[10px] bg-purple-100 text-purple-700 px-1.5 rounded ml-2 font-bold animate-pulse">VARIAZIONE</span>' : '';
 
-                // MODIFICA: items-start per allineare in alto in caso di più righe
+                // MODIFICA: items-center per centratura verticale
                 html += `
-                <div class="flex justify-between items-start py-3 border-b border-gray-100 last:border-0 ${isToday ? 'bg-blue-50 px-2 rounded -mx-2' : ''}">
-                    <span class="font-medium ${isToday ? 'text-blue-700 font-bold' : 'text-gray-600'} mt-0.5">
+                <div class="flex justify-between items-center py-3 border-b border-gray-100 last:border-0 ${isToday ? 'bg-blue-50 px-3 -mx-3 rounded-lg' : ''}">
+                    <span class="font-medium ${isToday ? 'text-blue-700 font-bold' : 'text-gray-600'}">
                         ${DAYS_MAP[dayIdx]} 
                         ${isToday ? '<span class="text-[10px] bg-blue-100 text-blue-600 px-1.5 rounded ml-1">OGGI</span>' : ''}
                         ${overrideBadge}
@@ -1058,8 +1058,8 @@
                              </div>`;
                          }
                          specialHtml += `
-                         <div class="flex justify-between items-start py-2 text-xs border-b border-gray-50 last:border-0">
-                            <span class="font-semibold text-gray-700 mt-0.5">${new Date(date).toLocaleDateString('it-IT')}</span>
+                         <div class="flex justify-between items-center py-2 text-xs border-b border-gray-50 last:border-0">
+                            <span class="font-semibold text-gray-700">${new Date(date).toLocaleDateString('it-IT')}</span>
                             <div class="${spData.active ? 'text-gray-800' : 'text-red-500'} text-right">
                                 ${spText}
                             </div>
