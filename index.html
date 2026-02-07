@@ -237,13 +237,8 @@
                     <p class="text-cyan-100 text-xs md:text-sm">Bacheca Digitale Ufficiale</p>
                 </div>
             </div>
-            <!-- Cerca e User Info -->
+            <!-- User Info (Cerca rimossa da qui) -->
             <div class="flex items-center gap-3 w-full md:w-auto">
-                <!-- Search Bar VISIBILE SOLO SU DESKTOP -->
-                <div class="relative w-full md:w-64 hidden md:block">
-                    <i data-lucide="search" class="absolute left-3 top-2.5 text-cyan-200 w-4 h-4"></i>
-                    <input type="text" id="searchInput" placeholder="Cerca avvisi..." class="w-full bg-white/10 border border-white/20 rounded-full py-2 pl-10 pr-4 text-white placeholder-cyan-200 focus:outline-none focus:bg-white/20 transition" oninput="updateSearch(this.value)">
-                </div>
                 <div id="adminControls" class="hidden flex items-center gap-2">
                     <button onclick="openHoursModal()" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> Orari</button>
                     <span class="text-xs font-semibold bg-blue-800 px-2 py-1 rounded text-white">ADMIN</span>
@@ -340,8 +335,8 @@
     <div class="bg-slate-800 text-white py-12 border-t border-slate-700">
         <div class="max-w-6xl mx-auto px-4">
             
-            <!-- Mobile Search Bar (NUOVA) -->
-            <div class="mb-10 md:hidden">
+            <!-- Search Bar in fondo (Visibile su tutti i dispositivi) -->
+            <div class="mb-10">
                 <div class="relative w-full">
                      <i data-lucide="search" class="absolute left-4 top-3.5 text-slate-400 w-5 h-5"></i>
                      <input type="text" placeholder="Cerca avvisi..." class="w-full bg-slate-700 border border-slate-600 rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-inner" oninput="updateSearch(this.value)">
@@ -606,6 +601,22 @@
                 <div><label class="block text-sm font-medium text-gray-700 mb-1">Messaggio</label><textarea id="newContent" required rows="4" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none resize-none" placeholder="Dettagli dell'avviso..."></textarea></div>
                 <div class="flex items-center gap-2 pt-2"><input type="checkbox" id="newPinned" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"><label for="newPinned" class="text-sm text-gray-700 font-medium">Metti in evidenza (Pin in alto)</label></div>
                 <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition mt-2 shadow-lg flex justify-center items-center gap-2"><span id="submitBtnText">Pubblica Avviso</span></button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- MODAL LOGIN (AGGIUNTO per funzionalità Admin) -->
+    <div id="loginModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Area Riservata</h3>
+            <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+                <input type="email" id="loginEmail" placeholder="Email" class="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500" required>
+                <input type="password" id="loginPassword" placeholder="Password" class="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500" required>
+                <div id="loginError" class="hidden text-red-500 text-sm font-medium">Credenziali non valide</div>
+                <div class="flex gap-2">
+                    <button type="button" onclick="closeLoginModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2 rounded-lg">Annulla</button>
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg">Accedi</button>
+                </div>
             </form>
         </div>
     </div>
