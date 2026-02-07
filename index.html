@@ -828,59 +828,85 @@
             const order = [1, 2, 3, 4, 5, 6, 0];
             const now = new Date();
             const todayIdx = now.getDay();
+            const todayStr = now.toISOString().split('T')[0];
 
             order.forEach(dayIdx => {
-                const dayData = config[dayIdx] || { active: true, slots: [] };
+                let dayData = config[dayIdx] || { active: true, slots: [] };
                 const isToday = dayIdx === todayIdx;
                 
+                // MODIFICA RICHIESTA: Se è oggi, sovrascrivi con eventuali variazioni
+                let isOverride = false;
+                if (isToday) {
+                    // 1. Chiusura Straordinaria
+                    if (hoursConfig.specialClosures && hoursConfig.specialClosures.includes(todayStr)) {
+                        dayData = { active: false, slots: [] };
+                        isOverride = true;
+                    } 
+                    // 2. Orario Speciale
+                    else if (hoursConfig.specialHours && hoursConfig.specialHours[todayStr] && hoursConfig.specialHours[todayStr][type]) {
+                        dayData = hoursConfig.specialHours[todayStr][type];
+                        isOverride = true;
+                    }
+                }
+
                 let hoursText = '<span class="text-red-500 font-bold">Chiuso</span>';
                 if (dayData.active && dayData.slots && dayData.slots.length > 0) {
                     hoursText = dayData.slots.map(s => `${s.start} - ${s.end}`).join(' / ');
                 }
 
+                // Aggiunge un badge se è un orario variato
+                const overrideBadge = isOverride ? '<span class="text-[10px] bg-purple-100 text-purple-700 px-1.5 rounded ml-2 font-bold animate-pulse">VARIAZIONE</span>' : '';
+
                 html += `
                 <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 ${isToday ? 'bg-blue-50 px-2 rounded -mx-2' : ''}">
-                    <span class="font-medium ${isToday ? 'text-blue-700 font-bold' : 'text-gray-600'}">${DAYS_MAP[dayIdx]} ${isToday ? '<span class="text-[10px] bg-blue-100 text-blue-600 px-1.5 rounded ml-1">OGGI</span>' : ''}</span>
+                    <span class="font-medium ${isToday ? 'text-blue-700 font-bold' : 'text-gray-600'}">
+                        ${DAYS_MAP[dayIdx]} 
+                        ${isToday ? '<span class="text-[10px] bg-blue-100 text-blue-600 px-1.5 rounded ml-1">OGGI</span>' : ''}
+                        ${overrideBadge}
+                    </span>
                     <span class="text-sm ${dayData.active ? 'text-gray-800' : 'text-red-500'}">${hoursText}</span>
                 </div>`;
             });
 
-            // Sezione Variazioni Future
-            const todayStr = now.toISOString().split('T')[0];
+            // Sezione Variazioni Future (Esclude OGGI perché già mostrato sopra)
             const upcomingSpecial = Object.keys(hoursConfig.specialHours || {})
-                .filter(d => d >= todayStr)
+                .filter(d => d > todayStr) // Usa > invece di >=
                 .sort();
             
             if (upcomingSpecial.length > 0) {
-                html += `<div class="mt-4 pt-3 border-t border-dashed border-gray-300">
-                    <h5 class="text-xs font-bold text-purple-700 uppercase mb-2">Variazioni in programma</h5>`;
+                let hasItems = false;
+                let specialHtml = `<div class="mt-4 pt-3 border-t border-dashed border-gray-300">
+                    <h5 class="text-xs font-bold text-purple-700 uppercase mb-2">Variazioni future in programma</h5>`;
                 
                 upcomingSpecial.forEach(date => {
                      const spData = hoursConfig.specialHours[date][type];
                      if(spData) {
+                         hasItems = true;
                          let spText = '<span class="text-red-500 font-bold">Chiuso</span>';
                          if (spData.active && spData.slots && spData.slots.length > 0) {
                              spText = spData.slots.map(s => `${s.start} - ${s.end}`).join(' / ');
                          }
-                         html += `
+                         specialHtml += `
                          <div class="flex justify-between items-center py-1 text-xs">
                             <span class="font-semibold text-gray-700">${new Date(date).toLocaleDateString('it-IT')}</span>
                             <span class="${spData.active ? 'text-gray-800' : 'text-red-500'}">${spText}</span>
                          </div>`;
                      }
                 });
-                html += `</div>`;
+                specialHtml += `</div>`;
+                
+                if(hasItems) html += specialHtml;
             }
 
             document.getElementById('scheduleModalContent').innerHTML = html;
 
-            // Mostra avviso chiusure speciali se ce ne sono in futuro
-            const upcomingClosures = hoursConfig.specialClosures.filter(d => d >= todayStr).sort();
+            // Mostra avviso chiusure speciali se ce ne sono in futuro (Esclude OGGI)
+            const upcomingClosures = hoursConfig.specialClosures.filter(d => d > todayStr).sort(); // Usa > invece di >=
             
             const noteEl = document.getElementById('scheduleSpecialNote');
             if (upcomingClosures.length > 0) {
                 const datesHtml = upcomingClosures.map(d => new Date(d).toLocaleDateString('it-IT')).join(', ');
-                noteEl.innerHTML = `<strong>Nota Chiusure:</strong> L'impianto rimarrà COMPLETAMENTE CHIUSO il: ${datesHtml}`;
+                noteEl.innerHTML = `<strong>Nota Chiusure Future:</strong> L'impianto rimarrà COMPLETAMENTE CHIUSO il: ${datesHtml}`;
                 noteEl.classList.remove('hidden');
             } else {
                 noteEl.classList.add('hidden');
