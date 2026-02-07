@@ -337,7 +337,7 @@
             
             <!-- Search Bar in fondo (Visibile su tutti i dispositivi) -->
             <div class="mb-10">
-                <div class="relative w-full">
+                <div class="relative w-full md:w-1/4">
                      <i data-lucide="search" class="absolute left-4 top-3.5 text-slate-400 w-5 h-5"></i>
                      <input type="text" placeholder="Cerca avvisi..." class="w-full bg-slate-700 border border-slate-600 rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-inner" oninput="updateSearch(this.value)">
                 </div>
@@ -1338,6 +1338,8 @@
 
         function renderFilters() {
             const container = document.getElementById('filterContainer');
+            if (!container) return; // Safety Check
+
             const currentScroll = container.scrollLeft; // Save scroll position
             
             // Keys to exclude from bottom scroll
@@ -1360,7 +1362,7 @@
             const btnCorsi = document.getElementById('highlight_corsi');
             
             // Reset classes
-            const baseClass = "flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-all shadow-sm group";
+            const baseClass = "flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-all shadow-sm group";
             const inactiveClass = "bg-white border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50";
             
             // Active Styles
@@ -1373,6 +1375,7 @@
         
         function renderCategoryCheckboxes() {
             const container = document.getElementById('categoryCheckboxes');
+            if (!container) return; // Safety check
             let html = '';
             // Salta "all" che non è una categoria assegnabile
             for (const key in CATEGORIES) {
