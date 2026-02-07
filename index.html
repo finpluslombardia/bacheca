@@ -297,14 +297,14 @@
     </div>
 
     <!-- NUOVO BANNER CATEGORIE EVIDENZA -->
-    <div class="bg-white border-b border-slate-200 py-4 shadow-sm">
-        <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row gap-3 justify-center md:justify-start">
-            <button onclick="setFilter('nuoto_libero')" id="highlight_nuoto_libero" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-slate-200 bg-white text-slate-600 hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700 transition-all shadow-sm group">
-                <div class="p-1.5 bg-cyan-100 rounded-full text-cyan-600 group-hover:scale-110 transition-transform"><i data-lucide="waves" class="w-5 h-5"></i></div>
+    <div class="bg-white border-b border-slate-200 py-2 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 flex flex-row gap-3 justify-center md:justify-start">
+            <button onclick="setFilter('nuoto_libero')" id="highlight_nuoto_libero" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-600 hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700 transition-all shadow-sm group">
+                <div class="p-1 bg-cyan-100 rounded-full text-cyan-600 group-hover:scale-110 transition-transform"><i data-lucide="waves" class="w-4 h-4"></i></div>
                 <span class="font-bold text-sm">Nuoto Libero</span>
             </button>
-            <button onclick="setFilter('corsi')" id="highlight_corsi" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-slate-200 bg-white text-slate-600 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 transition-all shadow-sm group">
-                <div class="p-1.5 bg-indigo-100 rounded-full text-indigo-600 group-hover:scale-110 transition-transform"><i data-lucide="users" class="w-5 h-5"></i></div>
+            <button onclick="setFilter('corsi')" id="highlight_corsi" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-600 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 transition-all shadow-sm group">
+                <div class="p-1 bg-indigo-100 rounded-full text-indigo-600 group-hover:scale-110 transition-transform"><i data-lucide="users" class="w-4 h-4"></i></div>
                 <span class="font-bold text-sm">Corsi</span>
             </button>
         </div>
@@ -1354,7 +1354,7 @@
             const btnCorsi = document.getElementById('highlight_corsi');
             
             // Reset classes
-            const baseClass = "flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-xl border transition-all shadow-sm group";
+            const baseClass = "flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-all shadow-sm group";
             const inactiveClass = "bg-white border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50";
             
             // Active Styles
