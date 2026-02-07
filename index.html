@@ -228,7 +228,7 @@
     <div class="bg-slate-900 text-slate-200 text-xs md:text-sm py-2 px-4 shadow-md border-b border-slate-700">
         <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
             <div id="currentDateTime" class="font-mono text-cyan-400 flex items-center gap-2"><i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> <span>--/--/---- --:--</span></div>
-            <div class="flex items-center gap-4 md:gap-6 w-full md:w-auto justify-center md:justify-end">
+            <div class="flex items-center gap-4 md:gap-6 w-full md:w-auto justify-center md:justify-end flex-wrap">
                 <div class="flex items-center gap-2" id="statusWidgetSegreteria">
                     <span class="font-semibold text-slate-400">Segreteria:</span>
                     <div class="flex items-center gap-1.5 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700" id="badgeSegreteria">
@@ -238,6 +238,13 @@
                 <div class="flex items-center gap-2" id="statusWidgetNuoto">
                     <span class="font-semibold text-slate-400">Nuoto Libero:</span>
                     <div class="flex items-center gap-1.5 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700" id="badgeNuoto">
+                        <span class="status-dot-red"></span> <span class="font-bold">CHIUSO</span>
+                    </div>
+                </div>
+                <!-- Vasca Esterna (Opzionale) -->
+                <div class="flex items-center gap-2 hidden" id="statusWidgetVascaEsterna">
+                    <span class="font-semibold text-slate-400">Vasca Esterna:</span>
+                    <div class="flex items-center gap-1.5 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700" id="badgeVascaEsterna">
                         <span class="status-dot-red"></span> <span class="font-bold">CHIUSO</span>
                     </div>
                 </div>
@@ -409,9 +416,21 @@
                         <div id="scheduleNuotoContainer" class="space-y-2 text-sm"></div>
                     </div>
                 </div>
+                
+                <!-- Vasca Esterna (Opzionale) -->
+                <div class="border-t pt-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-bold text-orange-700 flex items-center gap-2"><i data-lucide="sun" class="w-4 h-4"></i> Orari Vasca Esterna (Estiva)</h4>
+                        <div class="flex items-center gap-2 bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
+                            <input type="checkbox" id="vascaEsternaVisible" class="w-4 h-4 text-orange-600 rounded">
+                            <label for="vascaEsternaVisible" class="text-sm font-bold text-gray-700 cursor-pointer select-none">Mostra sul sito</label>
+                        </div>
+                    </div>
+                    <div id="scheduleVascaEsternaContainer" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm"></div>
+                </div>
 
                 <!-- Chiusure Straordinarie -->
-                <div class="bg-red-50 p-4 rounded-lg border border-red-100">
+                <div class="bg-red-50 p-4 rounded-lg border border-red-100 mt-4">
                     <h4 class="font-bold text-red-800 mb-2 flex items-center gap-2"><i data-lucide="calendar-off" class="w-4 h-4"></i> Chiusure Straordinarie (Feste, Manutenzione)</h4>
                     <p class="text-xs text-red-600 mb-3">Inserisci le date in cui l'impianto è COMPLETAMENTE CHIUSO (Es. 25 Dicembre). Queste date sovrascrivono l'orario settimanale.</p>
                     <div class="flex gap-2 mb-3">
@@ -510,12 +529,14 @@
         let hoursConfig = {
             specialClosures: [],
             segreteria: {},
-            nuoto: {}
+            nuoto: {},
+            vascaEsterna: { visible: false } // default invisibile
         };
         // Inizializza giorni vuoti
         for(let i=0; i<7; i++) {
             hoursConfig.segreteria[i] = { start: "09:00", end: "18:00", active: true };
             hoursConfig.nuoto[i] = { start: "07:00", end: "21:00", active: true };
+            hoursConfig.vascaEsterna[i] = { start: "10:00", end: "19:00", active: true };
         }
 
         const CATEGORIES = {
@@ -576,6 +597,7 @@
                     // Merge per sicurezza
                     if(data.segreteria) hoursConfig.segreteria = { ...hoursConfig.segreteria, ...data.segreteria };
                     if(data.nuoto) hoursConfig.nuoto = { ...hoursConfig.nuoto, ...data.nuoto };
+                    if(data.vascaEsterna) hoursConfig.vascaEsterna = { ...hoursConfig.vascaEsterna, ...data.vascaEsterna };
                     if(data.specialClosures) hoursConfig.specialClosures = data.specialClosures;
                 }
                 updateStatusWidget();
@@ -596,8 +618,17 @@
                 const endN = document.getElementById(`nuoto_end_${i}`).value;
                 const activeN = !document.getElementById(`nuoto_closed_${i}`).checked;
                 hoursConfig.nuoto[i] = { start: startN, end: endN, active: activeN };
+                
+                // Vasca Esterna
+                const startV = document.getElementById(`vasca_start_${i}`).value;
+                const endV = document.getElementById(`vasca_end_${i}`).value;
+                const activeV = !document.getElementById(`vasca_closed_${i}`).checked;
+                hoursConfig.vascaEsterna[i] = { start: startV, end: endV, active: activeV };
             }
             
+            // Toggle Visibilità Vasca Esterna
+            hoursConfig.vascaEsterna.visible = document.getElementById('vascaEsternaVisible').checked;
+
             try {
                 await setDoc(doc(db, CONFIG_COLLECTION, HOURS_DOC_ID), hoursConfig);
                 showToast("Orari aggiornati con successo!");
@@ -615,9 +646,17 @@
             // Calcola Stato
             const statusSeg = calculateStatus('segreteria', now);
             const statusNuoto = calculateStatus('nuoto', now);
+            const statusVasca = calculateStatus('vascaEsterna', now);
 
             renderBadge('badgeSegreteria', statusSeg);
             renderBadge('badgeNuoto', statusNuoto);
+            renderBadge('badgeVascaEsterna', statusVasca);
+            
+            // Mostra/Nascondi Widget Vasca Esterna
+            const widgetVasca = document.getElementById('statusWidgetVascaEsterna');
+            if(hoursConfig.vascaEsterna.visible) widgetVasca.classList.remove('hidden');
+            else widgetVasca.classList.add('hidden');
+
             lucide.createIcons();
         }
 
@@ -660,6 +699,8 @@
         function openHoursModal() {
             renderScheduleInputs('scheduleSegreteriaContainer', 'seg', hoursConfig.segreteria);
             renderScheduleInputs('scheduleNuotoContainer', 'nuoto', hoursConfig.nuoto);
+            renderScheduleInputs('scheduleVascaEsternaContainer', 'vasca', hoursConfig.vascaEsterna);
+            document.getElementById('vascaEsternaVisible').checked = !!hoursConfig.vascaEsterna.visible;
             renderSpecialDates();
             document.getElementById('hoursModal').classList.remove('hidden');
         }
@@ -677,13 +718,13 @@
                 <div class="flex items-center gap-2 bg-gray-50 p-2 rounded border border-gray-200">
                     <div class="w-20 font-semibold text-gray-700">${DAYS_MAP[dayIdx]}</div>
                     <div class="flex items-center gap-1">
-                        <input type="time" id="${prefix}_start_${dayIdx}" value="${dayData.start}" class="border rounded px-1 text-xs">
+                        <input type="time" id="${prefix}_start_${dayIdx}" value="${dayData.start}" class="border rounded px-1 text-xs w-16">
                         <span>-</span>
-                        <input type="time" id="${prefix}_end_${dayIdx}" value="${dayData.end}" class="border rounded px-1 text-xs">
+                        <input type="time" id="${prefix}_end_${dayIdx}" value="${dayData.end}" class="border rounded px-1 text-xs w-16">
                     </div>
                     <div class="ml-auto flex items-center gap-1">
                         <input type="checkbox" id="${prefix}_closed_${dayIdx}" ${!dayData.active ? 'checked' : ''} class="w-4 h-4 text-red-600 rounded">
-                        <label for="${prefix}_closed_${dayIdx}" class="text-xs text-red-600 font-bold">Chiuso</label>
+                        <label for="${prefix}_closed_${dayIdx}" class="text-xs text-red-600 font-bold hidden sm:inline">Chiuso</label>
                     </div>
                 </div>`;
             });
