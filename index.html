@@ -420,12 +420,12 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Segreteria -->
                     <div class="space-y-3">
-                        <h4 class="font-bold text-blue-800 border-b pb-2">Orari Segreteria</h4>
+                        <h4 class="font-bold text-blue-800 border-b pb-2">Orari Segreteria (Settimanali)</h4>
                         <div id="scheduleSegreteriaContainer" class="space-y-2 text-sm"></div>
                     </div>
                     <!-- Nuoto Libero -->
                     <div class="space-y-3">
-                        <h4 class="font-bold text-cyan-800 border-b pb-2">Orari Nuoto Libero</h4>
+                        <h4 class="font-bold text-cyan-800 border-b pb-2">Orari Nuoto Libero (Settimanali)</h4>
                         <div id="scheduleNuotoContainer" class="space-y-2 text-sm"></div>
                     </div>
                 </div>
@@ -451,6 +451,22 @@
                         <button onclick="addSpecialDate()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-bold">Aggiungi</button>
                     </div>
                     <div id="specialDatesList" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <!-- Orari Speciali (NEW) -->
+                <div class="border-t border-purple-100 bg-purple-50 p-4 rounded-lg mt-4">
+                    <h4 class="font-bold text-purple-800 mb-2 flex items-center gap-2">
+                        <i data-lucide="calendar-clock" class="w-4 h-4"></i> Giorni con Orari Speciali
+                    </h4>
+                    <p class="text-xs text-purple-600 mb-3">Definisci orari specifici per singole date (es. 24 Dicembre mezza giornata). Questi orari hanno priorità su quelli settimanali.</p>
+                    
+                    <div class="flex gap-2 mb-3">
+                        <input type="date" id="newSpecialHourDate" class="border border-purple-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <button onclick="addSpecialHourDate()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm font-bold">Configura Data</button>
+                    </div>
+                    <div id="specialHoursContainer" class="space-y-4">
+                        <!-- Cards generated via JS -->
+                    </div>
                 </div>
 
                 <button onclick="saveHoursConfig()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg">Salva Impostazioni Orari</button>
@@ -557,6 +573,7 @@
         // Struttura dati orari default MULTI-SLOT
         let hoursConfig = {
             specialClosures: [],
+            specialHours: {}, // NEW: Key=YYYY-MM-DD, Value={ segreteria: {active, slots}, ... }
             segreteria: {},
             nuoto: {},
             vascaEsterna: { visible: false } // default invisibile
@@ -616,6 +633,7 @@
             window.openHoursModal = openHoursModal; window.closeHoursModal = closeHoursModal; window.saveHoursConfig = saveHoursConfig; window.addSpecialDate = addSpecialDate; window.removeSpecialDate = removeSpecialDate;
             window.addSlot = addSlot; window.removeSlot = removeSlot; 
             window.openScheduleModal = openScheduleModal; window.closeScheduleModal = closeScheduleModal; // Public Schedule View
+            window.addSpecialHourDate = addSpecialHourDate; window.removeSpecialHourDate = removeSpecialHourDate;
         });
 
         // --- GESTIONE ORARI (DB & LOGICA) ---
@@ -650,13 +668,14 @@
                         if(typeof data.vascaEsterna.visible !== 'undefined') hoursConfig.vascaEsterna.visible = data.vascaEsterna.visible;
                     }
                     if(data.specialClosures) hoursConfig.specialClosures = data.specialClosures;
+                    if(data.specialHours) hoursConfig.specialHours = data.specialHours;
                 }
                 updateStatusWidget();
             } catch(e) { console.error("Err fetch hours", e); }
         }
 
         async function saveHoursConfig() {
-            // Helper per leggere i dati dal DOM
+            // Helper per leggere i dati dal DOM per SETTIMANA STANDARD
             const readScheduleFromDOM = (prefix) => {
                 let schedule = {};
                 for(let i=0; i<7; i++) {
@@ -685,6 +704,29 @@
                 ...vascaSchedule, 
                 visible: document.getElementById('vascaEsternaVisible').checked 
             };
+
+            // LEGGI ORARI SPECIALI DAL DOM
+            const specialContainers = document.querySelectorAll('.special-day-card');
+            let newSpecialHours = {};
+            
+            specialContainers.forEach(card => {
+                const dateKey = card.getAttribute('data-date');
+                newSpecialHours[dateKey] = {};
+                
+                ['segreteria', 'nuoto', 'vascaEsterna'].forEach(type => {
+                    const typeContainer = card.querySelector(`[data-type="${type}"]`);
+                    const isActive = !typeContainer.querySelector('.special-closed-check').checked;
+                    const slotRows = typeContainer.querySelectorAll('.slot-row');
+                    let slots = [];
+                    slotRows.forEach(row => {
+                        const start = row.querySelector('.slot-start').value;
+                        const end = row.querySelector('.slot-end').value;
+                        if(start && end) slots.push({start, end});
+                    });
+                    newSpecialHours[dateKey][type] = { active: isActive, slots: slots };
+                });
+            });
+            hoursConfig.specialHours = newSpecialHours;
 
             try {
                 await setDoc(doc(db, CONFIG_COLLECTION, HOURS_DOC_ID), hoursConfig);
@@ -718,19 +760,37 @@
         }
 
         function calculateStatus(type, now) {
-            // 1. Controlla Chiusure Straordinarie
-            const todayStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
-            if (hoursConfig.specialClosures && hoursConfig.specialClosures.includes(todayStr)) {
+            const dateKey = now.toISOString().split('T')[0];
+            
+            // 1. Controlla Chiusure Straordinarie (PRIORITÀ MASSIMA)
+            if (hoursConfig.specialClosures && hoursConfig.specialClosures.includes(dateKey)) {
                 return false; // CHIUSO (Speciale)
             }
 
-            // 2. Controlla Giorno Settimana
+            // 2. Controlla Orari Speciali per Data Specifica (PRIORITÀ ALTA)
+            if (hoursConfig.specialHours && hoursConfig.specialHours[dateKey]) {
+                const dayData = hoursConfig.specialHours[dateKey][type];
+                // Se c'è configurazione speciale per questo tipo (es. segreteria)
+                if (dayData) {
+                    if (!dayData.active || !dayData.slots || dayData.slots.length === 0) return false;
+                    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+                    return dayData.slots.some(slot => {
+                        const [startH, startM] = slot.start.split(':').map(Number);
+                        const [endH, endM] = slot.end.split(':').map(Number);
+                        const startMinutes = startH * 60 + startM;
+                        const endMinutes = endH * 60 + endM;
+                        return nowMinutes >= startMinutes && nowMinutes < endMinutes;
+                    });
+                }
+            }
+
+            // 3. Controlla Giorno Settimana Standard (PRIORITÀ STANDARD)
             const dayIdx = now.getDay(); // 0 Dom - 6 Sab
             const config = hoursConfig[type][dayIdx];
             
             if (!config || !config.active || !config.slots || config.slots.length === 0) return false; // CHIUSO
 
-            // 3. Controlla Tutte le Fasce Orarie
+            // 4. Controlla Tutte le Fasce Orarie
             const nowMinutes = now.getHours() * 60 + now.getMinutes();
             
             // Se anche solo UNA fascia è aperta, ritorna TRUE
@@ -785,16 +845,42 @@
                 </div>`;
             });
 
+            // Sezione Variazioni Future
+            const todayStr = now.toISOString().split('T')[0];
+            const upcomingSpecial = Object.keys(hoursConfig.specialHours || {})
+                .filter(d => d >= todayStr)
+                .sort();
+            
+            if (upcomingSpecial.length > 0) {
+                html += `<div class="mt-4 pt-3 border-t border-dashed border-gray-300">
+                    <h5 class="text-xs font-bold text-purple-700 uppercase mb-2">Variazioni in programma</h5>`;
+                
+                upcomingSpecial.forEach(date => {
+                     const spData = hoursConfig.specialHours[date][type];
+                     if(spData) {
+                         let spText = '<span class="text-red-500 font-bold">Chiuso</span>';
+                         if (spData.active && spData.slots && spData.slots.length > 0) {
+                             spText = spData.slots.map(s => `${s.start} - ${s.end}`).join(' / ');
+                         }
+                         html += `
+                         <div class="flex justify-between items-center py-1 text-xs">
+                            <span class="font-semibold text-gray-700">${new Date(date).toLocaleDateString('it-IT')}</span>
+                            <span class="${spData.active ? 'text-gray-800' : 'text-red-500'}">${spText}</span>
+                         </div>`;
+                     }
+                });
+                html += `</div>`;
+            }
+
             document.getElementById('scheduleModalContent').innerHTML = html;
 
             // Mostra avviso chiusure speciali se ce ne sono in futuro
-            const todayStr = now.toISOString().split('T')[0];
             const upcomingClosures = hoursConfig.specialClosures.filter(d => d >= todayStr).sort();
             
             const noteEl = document.getElementById('scheduleSpecialNote');
             if (upcomingClosures.length > 0) {
                 const datesHtml = upcomingClosures.map(d => new Date(d).toLocaleDateString('it-IT')).join(', ');
-                noteEl.innerHTML = `<strong>Nota:</strong> L'impianto rimarrà chiuso nelle seguenti date: ${datesHtml}`;
+                noteEl.innerHTML = `<strong>Nota Chiusure:</strong> L'impianto rimarrà COMPLETAMENTE CHIUSO il: ${datesHtml}`;
                 noteEl.classList.remove('hidden');
             } else {
                 noteEl.classList.add('hidden');
@@ -814,6 +900,7 @@
             renderScheduleInputs('scheduleVascaEsternaContainer', 'vasca', hoursConfig.vascaEsterna);
             document.getElementById('vascaEsternaVisible').checked = !!hoursConfig.vascaEsterna.visible;
             renderSpecialDates();
+            renderSpecialHoursEditor(); // NEW
             document.getElementById('hoursModal').classList.remove('hidden');
             lucide.createIcons();
         }
@@ -907,6 +994,9 @@
         function addSpecialDate() {
             const val = document.getElementById('newSpecialDate').value;
             if(val && !hoursConfig.specialClosures.includes(val)) {
+                // Rimuovi se presente in specialHours per evitare conflitti
+                if(hoursConfig.specialHours[val]) { delete hoursConfig.specialHours[val]; renderSpecialHoursEditor(); }
+                
                 hoursConfig.specialClosures.push(val);
                 hoursConfig.specialClosures.sort();
                 renderSpecialDates();
@@ -917,6 +1007,89 @@
             hoursConfig.specialClosures = hoursConfig.specialClosures.filter(d => d !== date);
             renderSpecialDates();
         }
+
+        // --- NEW: SPECIAL HOURS EDITOR LOGIC ---
+        function renderSpecialHoursEditor() {
+            const container = document.getElementById('specialHoursContainer');
+            if(!hoursConfig.specialHours) hoursConfig.specialHours = {};
+            const sortedDates = Object.keys(hoursConfig.specialHours).sort();
+            
+            container.innerHTML = sortedDates.map(date => {
+                const dayConfig = hoursConfig.specialHours[date];
+                // Unique ID per gli accordion
+                const uid = `sp_${date}`;
+                
+                // Helper per generare editor per un tipo (es. segreteria)
+                const renderTypeEditor = (type, label, data) => {
+                    let slotsHtml = '';
+                    if(data.slots) {
+                         data.slots.forEach(s => slotsHtml += createSlotHtml(s.start, s.end));
+                    }
+                    const subId = `${uid}_${type}`;
+                    
+                    return `
+                    <div class="bg-white p-2 rounded border border-gray-100 mb-2" data-type="${type}" id="${subId}">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs font-bold uppercase text-gray-500">${label}</span>
+                            <div class="flex items-center gap-1">
+                                <input type="checkbox" class="special-closed-check w-3 h-3 text-red-600 rounded" ${!data.active ? 'checked' : ''} onchange="toggleDayStatus('${subId}', this.checked)">
+                                <label class="text-[10px] text-red-600 font-bold uppercase">Chiuso</label>
+                            </div>
+                        </div>
+                        <div class="slots-container space-y-1 ${!data.active ? 'opacity-50 pointer-events-none' : ''}">
+                            ${slotsHtml}
+                        </div>
+                        <button onclick="addSlot('${subId}')" class="mt-1 text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded hover:bg-gray-200 flex items-center gap-1 w-full justify-center ${!data.active ? 'hidden' : ''}" id="btn_add_${subId}">
+                            <i data-lucide="plus" class="w-3 h-3"></i> Aggiungi Fascia
+                        </button>
+                    </div>`;
+                };
+
+                return `
+                <div class="special-day-card bg-white rounded-lg shadow-sm border border-purple-200 overflow-hidden" data-date="${date}">
+                    <div class="bg-purple-100 px-3 py-2 flex justify-between items-center">
+                        <span class="font-bold text-purple-900 text-sm">${new Date(date).toLocaleDateString('it-IT')}</span>
+                        <button onclick="removeSpecialHourDate('${date}')" class="text-purple-400 hover:text-red-600"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </div>
+                    <div class="p-3 grid grid-cols-1 md:grid-cols-3 gap-2 bg-purple-50/50">
+                        ${renderTypeEditor('segreteria', 'Segreteria', dayConfig.segreteria || {active:true, slots:[]})}
+                        ${renderTypeEditor('nuoto', 'Nuoto Libero', dayConfig.nuoto || {active:true, slots:[]})}
+                        ${renderTypeEditor('vascaEsterna', 'Vasca Esterna', dayConfig.vascaEsterna || {active:true, slots:[]})}
+                    </div>
+                </div>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function addSpecialHourDate() {
+            const dateVal = document.getElementById('newSpecialHourDate').value;
+            if(!dateVal) return;
+            
+            // Check conflitti
+            if(hoursConfig.specialClosures.includes(dateVal)) {
+                alert("Questa data è già presente nelle Chiusure Straordinarie. Rimuovila da lì se vuoi impostare un orario speciale.");
+                return;
+            }
+            
+            if(!hoursConfig.specialHours[dateVal]) {
+                // Init default empty structure
+                hoursConfig.specialHours[dateVal] = {
+                    segreteria: { active: true, slots: [{start:"09:00", end:"13:00"}] }, // default mezza giornata
+                    nuoto: { active: true, slots: [{start:"09:00", end:"13:00"}] },
+                    vascaEsterna: { active: false, slots: [] }
+                };
+                renderSpecialHoursEditor();
+            }
+            document.getElementById('newSpecialHourDate').value = '';
+        }
+
+        function removeSpecialHourDate(date) {
+            if(confirm("Rimuovere gli orari speciali per questa data?")) {
+                delete hoursConfig.specialHours[date];
+                renderSpecialHoursEditor();
+            }
+        }
+
 
         // --- STANDARD FUNCTIONS (UNCHANGED) ---
         function showToast(message, isError = false) {
