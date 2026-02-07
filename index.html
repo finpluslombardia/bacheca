@@ -525,7 +525,7 @@
         let editingId = null; 
         const SECRET_CLICKS_REQUIRED = 5;
 
-        // Struttura dati orari default
+        // Struttura dati orari default MULTI-SLOT
         let hoursConfig = {
             specialClosures: [],
             segreteria: {},
@@ -534,9 +534,9 @@
         };
         // Inizializza giorni vuoti
         for(let i=0; i<7; i++) {
-            hoursConfig.segreteria[i] = { start: "09:00", end: "18:00", active: true };
-            hoursConfig.nuoto[i] = { start: "07:00", end: "21:00", active: true };
-            hoursConfig.vascaEsterna[i] = { start: "10:00", end: "19:00", active: true };
+            hoursConfig.segreteria[i] = { slots: [{start: "09:00", end: "18:00"}], active: true };
+            hoursConfig.nuoto[i] = { slots: [{start: "07:00", end: "21:00"}], active: true };
+            hoursConfig.vascaEsterna[i] = { slots: [{start: "10:00", end: "19:00"}], active: true };
         }
 
         const CATEGORIES = {
@@ -585,6 +585,7 @@
             
             // NEW HOURS
             window.openHoursModal = openHoursModal; window.closeHoursModal = closeHoursModal; window.saveHoursConfig = saveHoursConfig; window.addSpecialDate = addSpecialDate; window.removeSpecialDate = removeSpecialDate;
+            window.addSlot = addSlot; window.removeSlot = removeSlot; // Funzioni per slot
         });
 
         // --- GESTIONE ORARI (DB & LOGICA) ---
@@ -594,10 +595,30 @@
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    // Merge per sicurezza
-                    if(data.segreteria) hoursConfig.segreteria = { ...hoursConfig.segreteria, ...data.segreteria };
-                    if(data.nuoto) hoursConfig.nuoto = { ...hoursConfig.nuoto, ...data.nuoto };
-                    if(data.vascaEsterna) hoursConfig.vascaEsterna = { ...hoursConfig.vascaEsterna, ...data.vascaEsterna };
+                    
+                    // Helper per normalizzare i dati (da single-slot a multi-slot)
+                    const normalizeData = (target, source) => {
+                        for(let i=0; i<7; i++) {
+                            if(source && source[i]) {
+                                // Se è il vecchio formato con start/end diretti
+                                if(source[i].start && !source[i].slots) {
+                                    target[i] = { 
+                                        active: source[i].active,
+                                        slots: [{start: source[i].start, end: source[i].end}] 
+                                    };
+                                } else if (source[i].slots) {
+                                    target[i] = source[i];
+                                }
+                            }
+                        }
+                    };
+
+                    if(data.segreteria) normalizeData(hoursConfig.segreteria, data.segreteria);
+                    if(data.nuoto) normalizeData(hoursConfig.nuoto, data.nuoto);
+                    if(data.vascaEsterna) {
+                        normalizeData(hoursConfig.vascaEsterna, data.vascaEsterna);
+                        if(typeof data.vascaEsterna.visible !== 'undefined') hoursConfig.vascaEsterna.visible = data.vascaEsterna.visible;
+                    }
                     if(data.specialClosures) hoursConfig.specialClosures = data.specialClosures;
                 }
                 updateStatusWidget();
@@ -605,29 +626,35 @@
         }
 
         async function saveHoursConfig() {
-            // Raccogli dati dal form
-            for(let i=0; i<7; i++) {
-                // Segreteria
-                const startS = document.getElementById(`seg_start_${i}`).value;
-                const endS = document.getElementById(`seg_end_${i}`).value;
-                const activeS = !document.getElementById(`seg_closed_${i}`).checked;
-                hoursConfig.segreteria[i] = { start: startS, end: endS, active: activeS };
+            // Helper per leggere i dati dal DOM
+            const readScheduleFromDOM = (prefix) => {
+                let schedule = {};
+                for(let i=0; i<7; i++) {
+                    const dayContainer = document.getElementById(`${prefix}_day_${i}`);
+                    const isActive = !document.getElementById(`${prefix}_closed_${i}`).checked;
+                    const slotRows = dayContainer.querySelectorAll('.slot-row');
+                    let slots = [];
+                    
+                    slotRows.forEach(row => {
+                        const start = row.querySelector('.slot-start').value;
+                        const end = row.querySelector('.slot-end').value;
+                        if(start && end) slots.push({start, end});
+                    });
+                    
+                    schedule[i] = { active: isActive, slots: slots };
+                }
+                return schedule;
+            };
 
-                // Nuoto
-                const startN = document.getElementById(`nuoto_start_${i}`).value;
-                const endN = document.getElementById(`nuoto_end_${i}`).value;
-                const activeN = !document.getElementById(`nuoto_closed_${i}`).checked;
-                hoursConfig.nuoto[i] = { start: startN, end: endN, active: activeN };
-                
-                // Vasca Esterna
-                const startV = document.getElementById(`vasca_start_${i}`).value;
-                const endV = document.getElementById(`vasca_end_${i}`).value;
-                const activeV = !document.getElementById(`vasca_closed_${i}`).checked;
-                hoursConfig.vascaEsterna[i] = { start: startV, end: endV, active: activeV };
-            }
+            hoursConfig.segreteria = readScheduleFromDOM('seg');
+            hoursConfig.nuoto = readScheduleFromDOM('nuoto');
             
-            // Toggle Visibilità Vasca Esterna
-            hoursConfig.vascaEsterna.visible = document.getElementById('vascaEsternaVisible').checked;
+            // Vasca Esterna
+            const vascaSchedule = readScheduleFromDOM('vasca');
+            hoursConfig.vascaEsterna = { 
+                ...vascaSchedule, 
+                visible: document.getElementById('vascaEsternaVisible').checked 
+            };
 
             try {
                 await setDoc(doc(db, CONFIG_COLLECTION, HOURS_DOC_ID), hoursConfig);
@@ -671,17 +698,19 @@
             const dayIdx = now.getDay(); // 0 Dom - 6 Sab
             const config = hoursConfig[type][dayIdx];
             
-            if (!config || !config.active) return false; // CHIUSO (Giorno riposo)
+            if (!config || !config.active || !config.slots || config.slots.length === 0) return false; // CHIUSO
 
-            // 3. Controlla Orario
+            // 3. Controlla Tutte le Fasce Orarie
             const nowMinutes = now.getHours() * 60 + now.getMinutes();
-            const [startH, startM] = config.start.split(':').map(Number);
-            const [endH, endM] = config.end.split(':').map(Number);
             
-            const startMinutes = startH * 60 + startM;
-            const endMinutes = endH * 60 + endM;
-
-            return nowMinutes >= startMinutes && nowMinutes < endMinutes;
+            // Se anche solo UNA fascia è aperta, ritorna TRUE
+            return config.slots.some(slot => {
+                const [startH, startM] = slot.start.split(':').map(Number);
+                const [endH, endM] = slot.end.split(':').map(Number);
+                const startMinutes = startH * 60 + startM;
+                const endMinutes = endH * 60 + endM;
+                return nowMinutes >= startMinutes && nowMinutes < endMinutes;
+            });
         }
 
         function renderBadge(elementId, isOpen) {
@@ -695,7 +724,7 @@
             }
         }
 
-        // --- GESTIONE UI MODALE ORARI ---
+        // --- GESTIONE UI MODALE ORARI (Nuova Logica Multi-Slot) ---
         function openHoursModal() {
             renderScheduleInputs('scheduleSegreteriaContainer', 'seg', hoursConfig.segreteria);
             renderScheduleInputs('scheduleNuotoContainer', 'nuoto', hoursConfig.nuoto);
@@ -703,32 +732,82 @@
             document.getElementById('vascaEsternaVisible').checked = !!hoursConfig.vascaEsterna.visible;
             renderSpecialDates();
             document.getElementById('hoursModal').classList.remove('hidden');
+            lucide.createIcons();
         }
         function closeHoursModal() { document.getElementById('hoursModal').classList.add('hidden'); }
 
         function renderScheduleInputs(containerId, prefix, dataObj) {
             const container = document.getElementById(containerId);
             let html = '';
-            // Ordine Lun(1) -> Dom(0). In JS Dom è 0. Facciamo array manuale per ordine visivo Lun->Dom
             const order = [1, 2, 3, 4, 5, 6, 0]; 
             
             order.forEach(dayIdx => {
-                const dayData = dataObj[dayIdx] || { start: "09:00", end: "18:00", active: true };
+                const dayData = dataObj[dayIdx] || { active: true, slots: [] };
+                
+                // Genera HTML per gli slot esistenti
+                let slotsHtml = '';
+                if (dayData.slots && dayData.slots.length > 0) {
+                    dayData.slots.forEach(slot => {
+                        slotsHtml += createSlotHtml(slot.start, slot.end);
+                    });
+                }
+
                 html += `
-                <div class="flex items-center gap-2 bg-gray-50 p-2 rounded border border-gray-200">
-                    <div class="w-20 font-semibold text-gray-700">${DAYS_MAP[dayIdx]}</div>
-                    <div class="flex items-center gap-1">
-                        <input type="time" id="${prefix}_start_${dayIdx}" value="${dayData.start}" class="border rounded px-1 text-xs w-16">
-                        <span>-</span>
-                        <input type="time" id="${prefix}_end_${dayIdx}" value="${dayData.end}" class="border rounded px-1 text-xs w-16">
+                <div class="bg-gray-50 p-2 rounded border border-gray-200 mb-2" id="${prefix}_day_${dayIdx}">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-semibold text-gray-700 text-sm w-20">${DAYS_MAP[dayIdx]}</span>
+                        <div class="flex items-center gap-1">
+                            <input type="checkbox" id="${prefix}_closed_${dayIdx}" ${!dayData.active ? 'checked' : ''} class="w-3 h-3 text-red-600 rounded" onchange="toggleDayStatus('${prefix}_day_${dayIdx}', this.checked)">
+                            <label for="${prefix}_closed_${dayIdx}" class="text-[10px] text-red-600 font-bold uppercase">Chiuso</label>
+                        </div>
                     </div>
-                    <div class="ml-auto flex items-center gap-1">
-                        <input type="checkbox" id="${prefix}_closed_${dayIdx}" ${!dayData.active ? 'checked' : ''} class="w-4 h-4 text-red-600 rounded">
-                        <label for="${prefix}_closed_${dayIdx}" class="text-xs text-red-600 font-bold hidden sm:inline">Chiuso</label>
+                    <div class="slots-container space-y-1 ${!dayData.active ? 'opacity-50 pointer-events-none' : ''}">
+                        ${slotsHtml}
                     </div>
+                    <button onclick="addSlot('${prefix}_day_${dayIdx}')" class="mt-1 text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded hover:bg-blue-200 flex items-center gap-1 w-full justify-center ${!dayData.active ? 'hidden' : ''}" id="btn_add_${prefix}_${dayIdx}">
+                        <i data-lucide="plus" class="w-3 h-3"></i> Aggiungi Fascia
+                    </button>
                 </div>`;
             });
             container.innerHTML = html;
+        }
+
+        // Funzione globale per creare HTML di un singolo slot
+        function createSlotHtml(start = '', end = '') {
+            return `
+            <div class="slot-row flex items-center gap-1">
+                <input type="time" value="${start}" class="slot-start border rounded px-1 text-xs w-[60px] bg-white">
+                <span class="text-xs">-</span>
+                <input type="time" value="${end}" class="slot-end border rounded px-1 text-xs w-[60px] bg-white">
+                <button onclick="removeSlot(this)" class="text-red-400 hover:text-red-600 ml-1"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+            </div>`;
+        }
+
+        window.addSlot = function(containerId) {
+            const container = document.querySelector(`#${containerId} .slots-container`);
+            const div = document.createElement('div');
+            div.innerHTML = createSlotHtml(); // Slot vuoto
+            // Estrai il nodo dal div wrapper
+            container.appendChild(div.firstElementChild); 
+            lucide.createIcons();
+        }
+
+        window.removeSlot = function(btn) {
+            btn.closest('.slot-row').remove();
+        }
+
+        window.toggleDayStatus = function(containerId, isClosed) {
+            const container = document.getElementById(containerId);
+            const slotsContainer = container.querySelector('.slots-container');
+            const addBtn = container.querySelector('button[id^="btn_add"]');
+            
+            if(isClosed) {
+                slotsContainer.classList.add('opacity-50', 'pointer-events-none');
+                addBtn.classList.add('hidden');
+            } else {
+                slotsContainer.classList.remove('opacity-50', 'pointer-events-none');
+                addBtn.classList.remove('hidden');
+            }
         }
 
         function renderSpecialDates() {
