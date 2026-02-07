@@ -289,7 +289,6 @@
                     </div>
                 </div>
                 <!-- Freccia indicatrice scroll (Solo Mobile) -->
-                <!-- MODIFICATO: justify-end e pr-1 per spingerla a destra -->
                 <div class="absolute right-0 top-0 bottom-0 flex items-center justify-end pr-1 w-12 bg-gradient-to-l from-slate-900 via-slate-900 to-transparent md:hidden pointer-events-none">
                     <i data-lucide="chevron-right" class="text-white w-6 h-6 animate-pulse drop-shadow-md"></i>
                 </div>
@@ -1014,20 +1013,26 @@
 
                 let hoursText = '<span class="text-red-500 font-bold">Chiuso</span>';
                 if (dayData.active && dayData.slots && dayData.slots.length > 0) {
-                    hoursText = dayData.slots.map(s => `${s.start} - ${s.end}`).join(' / ');
+                    // MODIFICA: Ora genera una lista verticale di div invece di una stringa con /
+                    hoursText = `<div class="flex flex-col items-end gap-1">
+                        ${dayData.slots.map(s => `<span>${s.start} - ${s.end}</span>`).join('')}
+                    </div>`;
                 }
 
                 // Aggiunge un badge se è un orario variato
                 const overrideBadge = isOverride ? '<span class="text-[10px] bg-purple-100 text-purple-700 px-1.5 rounded ml-2 font-bold animate-pulse">VARIAZIONE</span>' : '';
 
+                // MODIFICA: items-start per allineare in alto in caso di più righe
                 html += `
-                <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 ${isToday ? 'bg-blue-50 px-2 rounded -mx-2' : ''}">
-                    <span class="font-medium ${isToday ? 'text-blue-700 font-bold' : 'text-gray-600'}">
+                <div class="flex justify-between items-start py-3 border-b border-gray-100 last:border-0 ${isToday ? 'bg-blue-50 px-2 rounded -mx-2' : ''}">
+                    <span class="font-medium ${isToday ? 'text-blue-700 font-bold' : 'text-gray-600'} mt-0.5">
                         ${DAYS_MAP[dayIdx]} 
                         ${isToday ? '<span class="text-[10px] bg-blue-100 text-blue-600 px-1.5 rounded ml-1">OGGI</span>' : ''}
                         ${overrideBadge}
                     </span>
-                    <span class="text-sm ${dayData.active ? 'text-gray-800' : 'text-red-500'}">${hoursText}</span>
+                    <div class="text-sm ${dayData.active ? 'text-gray-800' : 'text-red-500'} text-right">
+                        ${hoursText}
+                    </div>
                 </div>`;
             });
 
@@ -1047,12 +1052,17 @@
                          hasItems = true;
                          let spText = '<span class="text-red-500 font-bold">Chiuso</span>';
                          if (spData.active && spData.slots && spData.slots.length > 0) {
-                             spText = spData.slots.map(s => `${s.start} - ${s.end}`).join(' / ');
+                             // MODIFICA: Anche qui lista verticale
+                             spText = `<div class="flex flex-col items-end gap-0.5">
+                                ${spData.slots.map(s => `<span>${s.start} - ${s.end}</span>`).join('')}
+                             </div>`;
                          }
                          specialHtml += `
-                         <div class="flex justify-between items-center py-1 text-xs">
-                            <span class="font-semibold text-gray-700">${new Date(date).toLocaleDateString('it-IT')}</span>
-                            <span class="${spData.active ? 'text-gray-800' : 'text-red-500'}">${spText}</span>
+                         <div class="flex justify-between items-start py-2 text-xs border-b border-gray-50 last:border-0">
+                            <span class="font-semibold text-gray-700 mt-0.5">${new Date(date).toLocaleDateString('it-IT')}</span>
+                            <div class="${spData.active ? 'text-gray-800' : 'text-red-500'} text-right">
+                                ${spText}
+                            </div>
                          </div>`;
                      }
                 });
