@@ -208,6 +208,9 @@
         .status-dot-red {
             width: 8px; height: 8px; background-color: #ef4444; border-radius: 50%;
         }
+        .status-dot-orange {
+            width: 8px; height: 8px; background-color: #f97316; border-radius: 50%;
+        }
 
         /* Hide scrollbar for Chrome, Safari and Opera */
         .no-scrollbar::-webkit-scrollbar {
@@ -265,6 +268,13 @@
                     <span class="font-semibold text-slate-400">Nuoto Libero:</span>
                     <div class="flex items-center gap-1.5 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700" id="badgeNuoto" onclick="openScheduleModal('nuoto')">
                         <span class="status-dot-red"></span> <span class="font-bold">CHIUSO</span>
+                    </div>
+                </div>
+                <!-- Corsi Nuoto (Nuovo) -->
+                <div class="flex items-center gap-2 shrink-0" id="statusWidgetCorsi">
+                    <span class="font-semibold text-slate-400">Corsi Nuoto:</span>
+                    <div class="flex items-center gap-1.5 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700" id="badgeCorsi" onclick="openScheduleModal('corsi')">
+                        <span class="status-dot-green"></span> <span class="font-bold">REGOLARI</span>
                     </div>
                 </div>
                 <!-- Vasca Esterna (Opzionale) -->
@@ -365,7 +375,7 @@
                 <div class="flex gap-4 items-center justify-center md:justify-start">
                     <!-- Instagram -->
                     <a href="https://www.instagram.com/cflampugnano?igsh=MWNpYm1haHY3dXRldg%3D%3D&utm_source=qr" target="_blank" class="bg-pink-600 hover:bg-pink-700 p-2.5 rounded-full transition shadow-lg transform hover:scale-110 flex items-center justify-center" title="Instagram">
-                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.069-4.85.069-3.204 0-3.584-.012-4.849-.069-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.069-4.85.069-3.204 0-3.584-.012-4.849-.069-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                     </a>
 
                     <!-- Facebook -->
@@ -472,6 +482,25 @@
                         </div>
                     </div>
                     <div id="scheduleVascaEsternaContainer" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm"></div>
+                </div>
+
+                <!-- Stato Corsi Nuoto (NUOVO) -->
+                <div class="border-t pt-4">
+                    <h4 class="font-bold text-indigo-700 mb-3 flex items-center gap-2"><i data-lucide="users" class="w-4 h-4"></i> Stato Corsi di Nuoto</h4>
+                    <div class="flex flex-col gap-2 p-4 bg-indigo-50 rounded-lg border border-indigo-100">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="corsiStatus" value="regular" class="text-indigo-600 focus:ring-indigo-500 w-4 h-4">
+                            <span class="text-sm font-medium text-gray-700">Regolari</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="corsiStatus" value="holiday" class="text-indigo-600 focus:ring-indigo-500 w-4 h-4">
+                            <span class="text-sm font-medium text-gray-700">In pausa per festività</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="corsiStatus" value="suspended" class="text-indigo-600 focus:ring-indigo-500 w-4 h-4">
+                            <span class="text-sm font-medium text-gray-700">Sospesi momentaneamente</span>
+                        </label>
+                    </div>
                 </div>
 
                 <!-- Chiusure Straordinarie -->
@@ -608,7 +637,8 @@
             specialHours: {}, // NEW: Key=YYYY-MM-DD, Value={ segreteria: {active, slots}, ... }
             segreteria: {},
             nuoto: {},
-            vascaEsterna: { visible: false } // default invisibile
+            vascaEsterna: { visible: false }, // default invisibile
+            corsi: { status: 'regular' } // Default: Regolari
         };
         // Inizializza giorni vuoti
         for(let i=0; i<7; i++) {
@@ -699,6 +729,7 @@
                         normalizeData(hoursConfig.vascaEsterna, data.vascaEsterna);
                         if(typeof data.vascaEsterna.visible !== 'undefined') hoursConfig.vascaEsterna.visible = data.vascaEsterna.visible;
                     }
+                    if(data.corsi) hoursConfig.corsi = data.corsi; // Load corsi status
                     if(data.specialClosures) hoursConfig.specialClosures = data.specialClosures;
                     if(data.specialHours) hoursConfig.specialHours = data.specialHours;
                 }
@@ -736,6 +767,12 @@
                 ...vascaSchedule, 
                 visible: document.getElementById('vascaEsternaVisible').checked 
             };
+
+            // Corsi Nuoto Status
+            const corsiStatusEl = document.querySelector('input[name="corsiStatus"]:checked');
+            if(corsiStatusEl) {
+                hoursConfig.corsi = { status: corsiStatusEl.value };
+            }
 
             // LEGGI ORARI SPECIALI DAL DOM
             const specialContainers = document.querySelectorAll('.special-day-card');
@@ -783,12 +820,38 @@
             renderBadge('badgeNuoto', statusNuoto);
             renderBadge('badgeVascaEsterna', statusVasca);
             
+            // Render Badge Corsi Nuoto (Speciale)
+            renderCorsiBadge();
+
             // Mostra/Nascondi Widget Vasca Esterna
             const widgetVasca = document.getElementById('statusWidgetVascaEsterna');
             if(hoursConfig.vascaEsterna.visible) widgetVasca.classList.remove('hidden');
             else widgetVasca.classList.add('hidden');
 
             lucide.createIcons();
+        }
+
+        function renderCorsiBadge() {
+            const el = document.getElementById('badgeCorsi');
+            const status = hoursConfig.corsi ? hoursConfig.corsi.status : 'regular';
+            const baseClasses = "flex items-center gap-1.5 px-2 py-0.5 rounded-full border cursor-pointer hover:scale-105 transition select-none";
+            
+            let html = '';
+            let classes = '';
+
+            if (status === 'regular') {
+                html = `<span class="status-dot-green"></span> <span class="font-bold text-green-400">REGOLARI</span>`;
+                classes = `${baseClasses} bg-green-900/30 border-green-700/50 text-green-400`;
+            } else if (status === 'holiday') {
+                html = `<span class="status-dot-orange"></span> <span class="font-bold text-orange-400">PAUSA FESTIVITÀ</span>`;
+                classes = `${baseClasses} bg-orange-900/30 border-orange-700/50 text-orange-400`;
+            } else { // suspended
+                html = `<span class="status-dot-red"></span> <span class="font-bold text-red-400">SOSPESI</span>`;
+                classes = `${baseClasses} bg-red-900/30 border-red-700/50 text-red-400`;
+            }
+            
+            el.innerHTML = html + `<i data-lucide="info" class="w-3 h-3 ml-1 opacity-50"></i>`;
+            el.className = classes;
         }
 
         function calculateStatus(type, now) {
@@ -850,6 +913,38 @@
 
         // --- PUBLIC SCHEDULE VIEW MODAL ---
         window.openScheduleModal = function(type) {
+            if (type === 'corsi') {
+                const status = hoursConfig.corsi ? hoursConfig.corsi.status : 'regular';
+                let title = 'Stato Corsi di Nuoto';
+                let content = '';
+                
+                if(status === 'regular') {
+                    content = `<div class="text-center py-8">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="check-circle" class="w-8 h-8 text-green-600"></i></div>
+                        <h4 class="text-xl font-bold text-green-700 mb-2">Regolari</h4>
+                        <p class="text-gray-600">I corsi si svolgono regolarmente secondo il calendario pianificato.</p>
+                    </div>`;
+                } else if(status === 'holiday') {
+                    content = `<div class="text-center py-8">
+                        <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="calendar-off" class="w-8 h-8 text-orange-600"></i></div>
+                        <h4 class="text-xl font-bold text-orange-700 mb-2">In Pausa per Festività</h4>
+                        <p class="text-gray-600">Le attività didattiche sono momentaneamente sospese per la pausa festiva.</p>
+                    </div>`;
+                } else {
+                    content = `<div class="text-center py-8">
+                        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="alert-circle" class="w-8 h-8 text-red-600"></i></div>
+                        <h4 class="text-xl font-bold text-red-700 mb-2">Sospesi Momentaneamente</h4>
+                        <p class="text-gray-600">I corsi sono sospesi fino a nuova comunicazione.</p>
+                    </div>`;
+                }
+                document.getElementById('scheduleModalTitle').innerText = title;
+                document.getElementById('scheduleModalContent').innerHTML = content;
+                document.getElementById('scheduleSpecialNote').classList.add('hidden'); // Nascondi nota
+                document.getElementById('scheduleModal').classList.remove('hidden');
+                lucide.createIcons();
+                return;
+            }
+
             const titles = { 'segreteria': 'Orari Segreteria', 'nuoto': 'Orari Nuoto Libero', 'vascaEsterna': 'Orari Vasca Esterna' };
             document.getElementById('scheduleModalTitle').innerText = titles[type];
             
@@ -957,6 +1052,12 @@
             renderScheduleInputs('scheduleNuotoContainer', 'nuoto', hoursConfig.nuoto);
             renderScheduleInputs('scheduleVascaEsternaContainer', 'vasca', hoursConfig.vascaEsterna);
             document.getElementById('vascaEsternaVisible').checked = !!hoursConfig.vascaEsterna.visible;
+            
+            // Set Radio Status Corsi
+            const status = hoursConfig.corsi ? hoursConfig.corsi.status : 'regular';
+            const radio = document.querySelector(`input[name="corsiStatus"][value="${status}"]`);
+            if(radio) radio.checked = true;
+
             renderSpecialDates();
             renderSpecialHoursEditor(); // NEW
             document.getElementById('hoursModal').classList.remove('hidden');
