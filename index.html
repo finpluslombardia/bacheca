@@ -52,7 +52,7 @@
         }
         @media (min-width: 768px) {
             .card-image-container {
-                height: 180px; /* Altezza originale su desktop */
+                height: 160px; /* Altezza ridotta per desktop più compatto (era 180px) */
             }
         }
 
@@ -168,6 +168,13 @@
         .line-clamp-4 {
             display: -webkit-box;
             -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -1215,13 +1222,14 @@
                     });
 
                     // Modifiche Mobile: ridotto padding da p-5 a p-4
-                    cardHtml += `<div class="p-4 md:p-5 flex-1">
+                    // Desktop: manteniamo p-4 per compattezza
+                    cardHtml += `<div class="p-4 flex-1">
                         <div class="flex flex-wrap items-start mb-2 gap-1 w-full justify-between">
                             <div class="flex flex-wrap gap-1">${badgesHtml}</div>
                             <div class="flex gap-2 shrink-0">${n.isPinned ? `<i data-lucide="pin" class="w-4 h-4 text-blue-500 fill-blue-500 transform rotate-45"></i>` : ''}${isAdminLoggedIn ? `<button onclick="event.stopPropagation(); editNotice('${n.id}')" class="text-slate-400 hover:text-blue-600 transition"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button onclick="event.stopPropagation(); deleteNoticePermanent('${n.id}')" class="text-slate-400 hover:text-red-600 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div>
                         </div>
-                        <h3 class="text-lg font-bold text-slate-800 mb-2 leading-tight">${n.title}</h3>
-                        <p class="text-slate-600 text-sm leading-relaxed mb-4 whitespace-pre-line line-clamp-4">${n.content}</p>
+                        <h3 class="text-lg font-bold text-slate-800 mb-1 leading-tight">${n.title}</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed mb-3 whitespace-pre-line line-clamp-3">${n.content}</p>
                     `;
 
                     // Anteprima PDF
@@ -1236,7 +1244,7 @@
 
                     // Modifiche Mobile Footer: ridotto padding
                     cardHtml += `</div>
-                        <div class="px-4 py-3 md:px-5 md:py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
+                        <div class="px-4 py-3 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
                             <div class="flex flex-col">
                                 <div class="flex items-center gap-2 mb-0.5"><i data-lucide="calendar" class="w-3.5 h-3.5"></i><span>${n.displayDate ? new Date(n.displayDate).toLocaleDateString('it-IT') : new Date(n.timestamp).toLocaleDateString('it-IT')}</span></div>
                                 ${n.expirationDate ? `<div class="flex items-center gap-2 text-red-400"><i data-lucide="clock" class="w-3.5 h-3.5"></i><span>Scade: ${new Date(n.expirationDate).toLocaleDateString('it-IT')}</span></div>` : ''}
