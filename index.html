@@ -864,55 +864,82 @@
 
         function calculateStatus(type, now) {
             const dateKey = now.toISOString().split('T')[0];
-            
+            let active = true;
+            let slots = [];
+
             // 1. Controlla Chiusure Straordinarie (PRIORITÀ MASSIMA)
             if (hoursConfig.specialClosures && hoursConfig.specialClosures.includes(dateKey)) {
-                return false; // CHIUSO (Speciale)
+                return 'CLOSED';
             }
 
-            // 2. Controlla Orari Speciali per Data Specifica (PRIORITÀ ALTA)
-            if (hoursConfig.specialHours && hoursConfig.specialHours[dateKey]) {
-                const dayData = hoursConfig.specialHours[dateKey][type];
-                // Se c'è configurazione speciale per questo tipo (es. segreteria)
-                if (dayData) {
-                    if (!dayData.active || !dayData.slots || dayData.slots.length === 0) return false;
-                    const nowMinutes = now.getHours() * 60 + now.getMinutes();
-                    return dayData.slots.some(slot => {
-                        const [startH, startM] = slot.start.split(':').map(Number);
-                        const [endH, endM] = slot.end.split(':').map(Number);
-                        const startMinutes = startH * 60 + startM;
-                        const endMinutes = endH * 60 + endM;
-                        return nowMinutes >= startMinutes && nowMinutes < endMinutes;
-                    });
-                }
+            // 2. Controlla Orari Speciali per Data Specifica (PRIORITÀ ALTA) o Standard
+            let dayData = null;
+            if (hoursConfig.specialHours && hoursConfig.specialHours[dateKey] && hoursConfig.specialHours[dateKey][type]) {
+                 dayData = hoursConfig.specialHours[dateKey][type];
+            } else {
+                 const dayIdx = now.getDay();
+                 dayData = hoursConfig[type][dayIdx];
             }
 
-            // 3. Controlla Giorno Settimana Standard (PRIORITÀ STANDARD)
-            const dayIdx = now.getDay(); // 0 Dom - 6 Sab
-            const config = hoursConfig[type][dayIdx];
-            
-            if (!config || !config.active || !config.slots || config.slots.length === 0) return false; // CHIUSO
+            if (dayData) {
+                active = dayData.active;
+                slots = dayData.slots || [];
+            } else {
+                active = false;
+            }
 
-            // 4. Controlla Tutte le Fasce Orarie
+            if (!active || slots.length === 0) return 'CLOSED';
+
             const nowMinutes = now.getHours() * 60 + now.getMinutes();
             
-            // Se anche solo UNA fascia è aperta, ritorna TRUE
-            return config.slots.some(slot => {
+            // 3. Controlla se APERTO
+            for (let slot of slots) {
                 const [startH, startM] = slot.start.split(':').map(Number);
                 const [endH, endM] = slot.end.split(':').map(Number);
                 const startMinutes = startH * 60 + startM;
                 const endMinutes = endH * 60 + endM;
-                return nowMinutes >= startMinutes && nowMinutes < endMinutes;
-            });
+
+                if (nowMinutes >= startMinutes && nowMinutes < endMinutes) {
+                    // È APERTO. Controlla se chiude entro 60 minuti
+                    if (endMinutes - nowMinutes <= 60) {
+                        return 'CLOSING_SOON';
+                    }
+                    return 'OPEN';
+                }
+            }
+
+            // 4. Controlla se APRE A BREVE (entro 30 min)
+            let minDiff = Infinity;
+            for (let slot of slots) {
+                const [startH, startM] = slot.start.split(':').map(Number);
+                const startMinutes = startH * 60 + startM;
+                
+                if (nowMinutes < startMinutes) {
+                    const diff = startMinutes - nowMinutes;
+                    if (diff < minDiff) minDiff = diff;
+                }
+            }
+
+            if (minDiff <= 30) {
+                return 'OPENING_SOON';
+            }
+
+            return 'CLOSED';
         }
 
-        function renderBadge(elementId, isOpen) {
+        function renderBadge(elementId, status) {
             const el = document.getElementById(elementId);
-            // Updated common interactive classes
             const baseClasses = "flex items-center gap-1.5 px-2 py-0.5 rounded-full border cursor-pointer hover:scale-105 transition select-none";
-            if (isOpen) {
+            
+            if (status === 'OPEN') {
                 el.innerHTML = `<span class="status-dot-green"></span> <span class="font-bold text-green-400">APERTO</span> <i data-lucide="info" class="w-3 h-3 text-green-400/50 ml-1"></i>`;
                 el.className = `${baseClasses} bg-green-900/30 border-green-700/50 text-green-400`;
+            } else if (status === 'CLOSING_SOON') {
+                el.innerHTML = `<span class="status-dot-orange"></span> <span class="font-bold text-orange-400">CHIUDE TRA POCO</span> <i data-lucide="clock" class="w-3 h-3 text-orange-400/50 ml-1"></i>`;
+                el.className = `${baseClasses} bg-orange-900/30 border-orange-700/50 text-orange-400`;
+            } else if (status === 'OPENING_SOON') {
+                el.innerHTML = `<span class="status-dot-orange"></span> <span class="font-bold text-orange-400">APRE TRA POCO</span> <i data-lucide="clock" class="w-3 h-3 text-orange-400/50 ml-1"></i>`;
+                el.className = `${baseClasses} bg-orange-900/30 border-orange-700/50 text-orange-400`;
             } else {
                 el.innerHTML = `<span class="status-dot-red"></span> <span class="font-bold text-red-400">CHIUSO</span> <i data-lucide="info" class="w-3 h-3 text-red-400/50 ml-1"></i>`;
                 el.className = `${baseClasses} bg-red-900/30 border-red-700/50 text-red-400`;
