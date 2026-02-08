@@ -242,6 +242,7 @@
             <!-- User Info -->
             <div class="flex items-center gap-3 w-full md:w-auto justify-center md:justify-end">
                 <div id="adminControls" class="hidden flex items-center gap-2">
+                    <button onclick="openCategoryOrderModal()" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1"><i data-lucide="list" class="w-3 h-3"></i> Menu</button>
                     <button onclick="openHoursModal()" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> Orari</button>
                     <span class="text-xs font-semibold bg-blue-800 px-2 py-1 rounded text-white">ADMIN</span>
                     <button onclick="handleLogout()" class="p-2 rounded-full transition bg-white/10 hover:bg-red-500/80 text-white" title="Esci"><i data-lucide="log-out" class="w-5 h-5"></i></button>
@@ -556,6 +557,25 @@
         </div>
     </div>
 
+    <!-- MODAL ORDINAMENTO CATEGORIE (NUOVO) -->
+    <div id="categoryOrderModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="text-lg font-bold text-gray-800">Ordina Menu Categorie</h3>
+                <button onclick="closeCategoryOrderModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto">
+                <p class="text-sm text-gray-500 mb-4">Usa le frecce per riordinare le categorie nel menu orizzontale.</p>
+                <div id="categoryOrderList" class="space-y-2">
+                    <!-- Generato via JS -->
+                </div>
+            </div>
+            <div class="p-5 border-t border-gray-100 bg-gray-50">
+                <button onclick="saveCategoryOrder()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg shadow">Salva Ordine</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL NUOVO AVVISO / MODIFICA -->
     <div id="noticeModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
@@ -659,7 +679,8 @@
             segreteria: {},
             nuoto: {},
             vascaEsterna: { visible: false }, // default invisibile
-            corsi: { status: 'regular' } // Default: Regolari
+            corsi: { status: 'regular' }, // Default: Regolari
+            categoryOrder: [] // NEW: Ordine categorie personalizzato
         };
         // Inizializza giorni vuoti
         for(let i=0; i<7; i++) {
@@ -693,7 +714,7 @@
             if (user) {
                 if (!user.isAnonymous) { isAdminLoggedIn = true; updateAdminUI(true); } else { isAdminLoggedIn = false; updateAdminUI(false); }
                 if (!unsubscribeSnapshot) setupRealtimeListener();
-                fetchHoursConfig(); // Carica orari
+                fetchHoursConfig(); // Carica orari e config categorie
             } else {
                 isAdminLoggedIn = false; updateAdminUI(false);
                 if (unsubscribeSnapshot) { unsubscribeSnapshot(); unsubscribeSnapshot = null; }
@@ -727,6 +748,9 @@
             window.addSlot = addSlot; window.removeSlot = removeSlot; 
             window.openScheduleModal = openScheduleModal; window.closeScheduleModal = closeScheduleModal; // Public Schedule View
             window.addSpecialHourDate = addSpecialHourDate; window.removeSpecialHourDate = removeSpecialHourDate;
+
+            // NEW CATEGORY ORDER
+            window.openCategoryOrderModal = openCategoryOrderModal; window.closeCategoryOrderModal = closeCategoryOrderModal; window.moveCategory = moveCategory; window.saveCategoryOrder = saveCategoryOrder;
         });
 
         // --- GESTIONE ORARI (DB & LOGICA) ---
@@ -763,8 +787,11 @@
                     if(data.corsi) hoursConfig.corsi = data.corsi; // Load corsi status
                     if(data.specialClosures) hoursConfig.specialClosures = data.specialClosures;
                     if(data.specialHours) hoursConfig.specialHours = data.specialHours;
+                    // Load category order if exists, otherwise empty (will use defaults in render)
+                    if(data.categoryOrder) hoursConfig.categoryOrder = data.categoryOrder;
                 }
                 updateStatusWidget();
+                renderFilters(); // Re-render filters with loaded order
             } catch(e) { console.error("Err fetch hours", e); }
         }
 
@@ -829,12 +856,91 @@
             hoursConfig.specialHours = newSpecialHours;
 
             try {
+                // Save everything, including existing categoryOrder
                 await setDoc(doc(db, CONFIG_COLLECTION, HOURS_DOC_ID), hoursConfig);
                 showToast("Orari aggiornati con successo!");
                 closeHoursModal();
                 updateStatusWidget();
             } catch(e) { console.error(e); showToast("Errore salvataggio orari", true); }
         }
+
+        // --- NEW: CATEGORY ORDER MANAGEMENT ---
+        function getEffectiveCategoryOrder() {
+            let order = hoursConfig.categoryOrder || [];
+            // Ensure all current categories are in the list
+            const allKeys = Object.keys(CATEGORIES);
+            // Add missing keys to the end
+            const missing = allKeys.filter(k => !order.includes(k));
+            return [...order, ...missing];
+        }
+
+        function openCategoryOrderModal() {
+            const order = getEffectiveCategoryOrder();
+            renderCategoryOrderEditor(order);
+            document.getElementById('categoryOrderModal').classList.remove('hidden');
+        }
+
+        function closeCategoryOrderModal() {
+            document.getElementById('categoryOrderModal').classList.add('hidden');
+        }
+
+        function renderCategoryOrderEditor(order) {
+            const list = document.getElementById('categoryOrderList');
+            list.innerHTML = order.map((key, index) => {
+                const cat = CATEGORIES[key];
+                return `
+                <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-200" data-key="${key}">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-white p-1.5 rounded-full border border-gray-200">
+                            <i data-lucide="${cat.icon}" class="w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <span class="font-medium text-gray-700">${cat.label}</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="moveCategory(${index}, -1)" class="p-1.5 hover:bg-gray-200 rounded text-gray-500 disabled:opacity-30" ${index === 0 ? 'disabled' : ''}>
+                            <i data-lucide="arrow-up" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="moveCategory(${index}, 1)" class="p-1.5 hover:bg-gray-200 rounded text-gray-500 disabled:opacity-30" ${index === order.length - 1 ? 'disabled' : ''}>
+                            <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+            
+            // Temporary storage for editing session
+            list.dataset.currentOrder = JSON.stringify(order);
+        }
+
+        window.moveCategory = function(index, direction) {
+            const list = document.getElementById('categoryOrderList');
+            const order = JSON.parse(list.dataset.currentOrder);
+            
+            if (index + direction < 0 || index + direction >= order.length) return;
+
+            // Swap
+            const temp = order[index];
+            order[index] = order[index + direction];
+            order[index + direction] = temp;
+
+            renderCategoryOrderEditor(order);
+        }
+
+        async function saveCategoryOrder() {
+            const list = document.getElementById('categoryOrderList');
+            const newOrder = JSON.parse(list.dataset.currentOrder);
+            
+            hoursConfig.categoryOrder = newOrder;
+
+            try {
+                await setDoc(doc(db, CONFIG_COLLECTION, HOURS_DOC_ID), hoursConfig);
+                showToast("Ordine menu aggiornato!");
+                closeCategoryOrderModal();
+                renderFilters(); // Update UI immediately
+            } catch(e) { console.error(e); showToast("Errore salvataggio menu", true); }
+        }
+
 
         function updateStatusWidget() {
             const now = new Date();
@@ -1345,7 +1451,10 @@
 
             const currentScroll = container.scrollLeft; // Save scroll position
             
-            const html = Object.keys(CATEGORIES).map(key => {
+            // USE CUSTOM ORDER
+            const order = getEffectiveCategoryOrder();
+
+            const html = order.map(key => {
                 const cat = CATEGORIES[key];
                 const isActive = currentFilter === key;
                 
