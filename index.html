@@ -294,31 +294,22 @@
         </div>
     </div>
 
-    <!-- NUOVO BANNER CATEGORIE EVIDENZA -->
-    <div class="bg-white border-b border-slate-200 py-2 shadow-sm">
-        <div class="max-w-6xl mx-auto px-4 flex flex-row gap-3 justify-center md:justify-start">
-            <button onclick="setFilter('nuoto_libero')" id="highlight_nuoto_libero" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-600 hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700 transition-all shadow-sm group">
-                <div class="p-1 bg-cyan-100 rounded-full text-cyan-600 group-hover:scale-110 transition-transform"><i data-lucide="waves" class="w-4 h-4"></i></div>
-                <span class="font-bold text-sm">Nuoto Libero</span>
-            </button>
-            <button onclick="setFilter('corsi')" id="highlight_corsi" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-600 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 transition-all shadow-sm group">
-                <div class="p-1 bg-indigo-100 rounded-full text-indigo-600 group-hover:scale-110 transition-transform"><i data-lucide="users" class="w-4 h-4"></i></div>
-                <span class="font-bold text-sm">Corsi</span>
-            </button>
+    <!-- BANNER CATEGORIE UNIFICATO (Scroll orizzontale su mobile) -->
+    <div class="bg-white border-b border-slate-200 py-3 shadow-sm sticky top-[72px] z-10">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex gap-3 overflow-x-auto no-scrollbar pb-1 items-center" id="categoryFiltersContainer">
+                <!-- Generato via JS: Qui finiranno tutti i box (Urgenti, Info, Corsi, Novità, ecc.) -->
+            </div>
         </div>
     </div>
 
     <!-- MAIN CONTENT -->
     <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full">
-        <!-- Controlli e Filtri -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 overflow-hidden">
-            <!-- Modifica Mobile: Scroll orizzontale per i filtri -->
-            <div class="flex gap-2 items-center overflow-x-auto w-full md:w-auto no-scrollbar pb-1 md:pb-0 md:flex-wrap md:overflow-visible" id="filterContainer"></div>
-            <div class="flex items-center gap-3 shrink-0">
-                <div id="loadingIndicator" class="hidden"><div class="loader"></div></div>
-                <button id="archiveToggleBtn" onclick="toggleArchiveView()" class="hidden flex items-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-full text-sm font-medium transition"><i data-lucide="archive" class="w-4 h-4"></i><span id="archiveBtnText">Mostra Archivio</span></button>
-                <button id="addNoticeBtn" onclick="openNoticeModal()" class="hidden flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-full shadow-md transition font-medium"><i data-lucide="plus" class="w-5 h-5"></i>Nuovo</button>
-            </div>
+        <!-- Controlli Admin (separati dal banner pubblico) -->
+        <div class="flex justify-end items-center gap-3 mb-6">
+            <div id="loadingIndicator" class="hidden"><div class="loader"></div></div>
+            <button id="archiveToggleBtn" onclick="toggleArchiveView()" class="hidden flex items-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-full text-sm font-medium transition"><i data-lucide="archive" class="w-4 h-4"></i><span id="archiveBtnText">Mostra Archivio</span></button>
+            <button id="addNoticeBtn" onclick="openNoticeModal()" class="hidden flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-full shadow-md transition font-medium"><i data-lucide="plus" class="w-5 h-5"></i>Nuovo</button>
         </div>
 
         <!-- Banner Archivio -->
@@ -677,13 +668,23 @@
             hoursConfig.vascaEsterna[i] = { slots: [{start: "10:00", end: "19:00"}], active: true };
         }
 
+        // AGGIORNATE CATEGORIE CON STILE ICONA/COLORE
         const CATEGORIES = {
-            all: { label: "Tutti", class: "bg-gray-100 text-gray-600" },
-            urgent: { label: "Urgenti", class: "bg-red-100 text-red-700 border-red-200" },
-            info: { label: "Info", class: "bg-blue-100 text-blue-700 border-blue-200" },
-            nuoto_libero: { label: "Nuoto Libero", class: "bg-cyan-100 text-cyan-700 border-cyan-200" },
-            corsi: { label: "Corsi", class: "bg-indigo-100 text-indigo-700 border-indigo-200" },
-            summer: { label: "Attività Estive", class: "bg-orange-100 text-orange-700 border-orange-200" }
+            all: { label: "Tutti", icon: "layout-grid", color: "slate", border: "border-slate-200", bg: "bg-white", text: "text-slate-600", hoverBorder: "hover:border-slate-300", hoverBg: "hover:bg-slate-50", activeBorder: "border-slate-500", activeBg: "bg-slate-100", activeRing: "ring-slate-200" },
+            
+            urgent: { label: "Urgenti", icon: "alert-triangle", color: "red", border: "border-slate-200", bg: "bg-white", text: "text-slate-600", hoverBorder: "hover:border-red-300", hoverBg: "hover:bg-red-50", hoverText: "hover:text-red-700", activeBorder: "border-red-500", activeBg: "bg-red-50", activeText: "text-red-800", activeRing: "ring-red-200", iconBg: "bg-red-100", iconColor: "text-red-600" },
+            
+            info: { label: "Info", icon: "info", color: "blue", border: "border-slate-200", bg: "bg-white", text: "text-slate-600", hoverBorder: "hover:border-blue-300", hoverBg: "hover:bg-blue-50", hoverText: "hover:text-blue-700", activeBorder: "border-blue-500", activeBg: "bg-blue-50", activeText: "text-blue-800", activeRing: "ring-blue-200", iconBg: "bg-blue-100", iconColor: "text-blue-600" },
+            
+            news: { label: "Novità", icon: "newspaper", color: "emerald", border: "border-slate-200", bg: "bg-white", text: "text-slate-600", hoverBorder: "hover:border-emerald-300", hoverBg: "hover:bg-emerald-50", hoverText: "hover:text-emerald-700", activeBorder: "border-emerald-500", activeBg: "bg-emerald-50", activeText: "text-emerald-800", activeRing: "ring-emerald-200", iconBg: "bg-emerald-100", iconColor: "text-emerald-600" },
+            
+            promo: { label: "Promozioni", icon: "tag", color: "pink", border: "border-slate-200", bg: "bg-white", text: "text-slate-600", hoverBorder: "hover:border-pink-300", hoverBg: "hover:bg-pink-50", hoverText: "hover:text-pink-700", activeBorder: "border-pink-500", activeBg: "bg-pink-50", activeText: "text-pink-800", activeRing: "ring-pink-200", iconBg: "bg-pink-100", iconColor: "text-pink-600" },
+
+            nuoto_libero: { label: "Nuoto Libero", icon: "waves", color: "cyan", border: "border-slate-200", bg: "bg-white", text: "text-slate-600", hoverBorder: "hover:border-cyan-300", hoverBg: "hover:bg-cyan-50", hoverText: "hover:text-cyan-700", activeBorder: "border-cyan-500", activeBg: "bg-cyan-50", activeText: "text-cyan-800", activeRing: "ring-cyan-200", iconBg: "bg-cyan-100", iconColor: "text-cyan-600" },
+            
+            corsi: { label: "Corsi", icon: "users", color: "indigo", border: "border-slate-200", bg: "bg-white", text: "text-slate-600", hoverBorder: "hover:border-indigo-300", hoverBg: "hover:bg-indigo-50", hoverText: "hover:text-indigo-700", activeBorder: "border-indigo-500", activeBg: "bg-indigo-50", activeText: "text-indigo-800", activeRing: "ring-indigo-200", iconBg: "bg-indigo-100", iconColor: "text-indigo-600" },
+            
+            summer: { label: "Attività Estive", icon: "sun", color: "orange", border: "border-slate-200", bg: "bg-white", text: "text-slate-600", hoverBorder: "hover:border-orange-300", hoverBg: "hover:bg-orange-50", hoverText: "hover:text-orange-700", activeBorder: "border-orange-500", activeBg: "bg-orange-50", activeText: "text-orange-800", activeRing: "ring-orange-200", iconBg: "bg-orange-100", iconColor: "text-orange-600" }
         };
 
         const DAYS_MAP = { 0: "Domenica", 1: "Lunedì", 2: "Martedì", 3: "Mercoledì", 4: "Giovedì", 5: "Venerdì", 6: "Sabato" };
@@ -1339,40 +1340,42 @@
         }
 
         function renderFilters() {
-            const container = document.getElementById('filterContainer');
+            const container = document.getElementById('categoryFiltersContainer');
             if (!container) return; // Safety Check
 
             const currentScroll = container.scrollLeft; // Save scroll position
             
-            // Keys to exclude from bottom scroll
-            const topCategories = ['nuoto_libero', 'corsi'];
-            
-            // MODIFICA MOBILE: Aggiunte classi per scroll orizzontale (whitespace-nowrap, shrink-0)
-            const html = Object.keys(CATEGORIES)
-                .filter(key => !topCategories.includes(key)) // Exclude highlighted ones
-                .map(key => `<button onclick="setFilter('${key}')" class="whitespace-nowrap shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${currentFilter === key ? 'bg-blue-600 text-white shadow-md transform scale-105' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}">${CATEGORIES[key].label}</button>`).join('');
+            const html = Object.keys(CATEGORIES).map(key => {
+                const cat = CATEGORIES[key];
+                const isActive = currentFilter === key;
+                
+                // Stile dinamico
+                let classes = `flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-all shadow-sm group whitespace-nowrap shrink-0 cursor-pointer ${cat.border} ${cat.bg} ${cat.text} ${cat.hoverBorder} ${cat.hoverBg} ${cat.hoverText}`;
+                
+                if (isActive) {
+                    classes = `flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-all shadow-md transform scale-[1.02] whitespace-nowrap shrink-0 cursor-pointer ${cat.activeBorder} ${cat.activeBg} ${cat.activeText} ring-1 ${cat.activeRing}`;
+                }
+
+                // Colore icona dinamico (più scuro se attivo)
+                let iconClasses = `p-1 rounded-full transition-transform group-hover:scale-110 ${cat.iconBg || 'bg-slate-100'} ${cat.iconColor || 'text-slate-600'}`;
+
+                return `
+                <button onclick="setFilter('${key}')" class="${classes}">
+                    <div class="${iconClasses}">
+                        <i data-lucide="${cat.icon}" class="w-4 h-4"></i>
+                    </div>
+                    <span class="font-bold text-sm">${cat.label}</span>
+                </button>
+                `;
+            }).join('');
             
             container.innerHTML = html;
             container.scrollLeft = currentScroll; // Restore scroll position
-
-            // Update Top Buttons State
-            updateHighlightButtons();
+            lucide.createIcons();
         }
 
         function updateHighlightButtons() {
-            const btnNuoto = document.getElementById('highlight_nuoto_libero');
-            const btnCorsi = document.getElementById('highlight_corsi');
-            
-            // Reset classes
-            const baseClass = "flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-all shadow-sm group";
-            const inactiveClass = "bg-white border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50";
-            
-            // Active Styles
-            const activeNuoto = "bg-cyan-50 border-cyan-500 text-cyan-800 ring-1 ring-cyan-200 shadow-md transform scale-[1.02]";
-            const activeCorsi = "bg-indigo-50 border-indigo-500 text-indigo-800 ring-1 ring-indigo-200 shadow-md transform scale-[1.02]";
-
-            if(btnNuoto) btnNuoto.className = baseClass + " " + (currentFilter === 'nuoto_libero' ? activeNuoto : inactiveClass + " hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700");
-            if(btnCorsi) btnCorsi.className = baseClass + " " + (currentFilter === 'corsi' ? activeCorsi : inactiveClass + " hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700");
+            // Deprecato con il nuovo banner unificato, ma lasciato vuoto per sicurezza
         }
         
         function renderCategoryCheckboxes() {
@@ -1400,17 +1403,15 @@
             
             // Filtro logica scadenza + archivio
             let filtered = notices.filter(n => {
-                // Normalizza le categorie: se c'è "categories" (array) usalo, altrimenti usa "category" (vecchio formato stringa)
+                // Normalizza le categorie
                 n.normalizedCategories = n.categories || (n.category ? [n.category] : ['info']);
 
                 // Controlla scadenza
                 const isExpired = n.expirationDate && new Date(n.expirationDate).setHours(23,59,59,999) < new Date().getTime();
                 
                 if (showArchived) {
-                    // In archivio mostro: Archiviati MANUALMENTE oppure SCADUTI
                     return !!n.archived || isExpired;
                 } else {
-                    // In bacheca mostro: NON archiviati E NON scaduti
                     return !n.archived && !isExpired;
                 }
             });
@@ -1422,7 +1423,16 @@
                 return matchesSearch && matchesCategory;
             });
             
-            filtered.sort((a, b) => (a.isPinned === b.isPinned) ? ((a.date && b.date) ? new Date(b.date) - new Date(a.date) : 0) : (a.isPinned ? -1 : 1));
+            // ORDINAMENTO: Prima i PINNED, poi DATA CREAZIONE/EVENTO (più recente in alto)
+            filtered.sort((a, b) => {
+                if (a.isPinned !== b.isPinned) {
+                    return a.isPinned ? -1 : 1;
+                }
+                // Se entrambi pinned o entrambi no, ordina per data (la più recente tra displayDate e timestamp)
+                const dateA = a.displayDate ? new Date(a.displayDate).getTime() : a.timestamp;
+                const dateB = b.displayDate ? new Date(b.displayDate).getTime() : b.timestamp;
+                return dateB - dateA; // Discendente (più recente in alto)
+            });
 
             if (filtered.length === 0) { grid.innerHTML = ''; empty.classList.remove('hidden'); document.getElementById('emptyStateText').innerText = showArchived ? "Nessun avviso in archivio." : "Nessun avviso trovato."; } 
             else {
@@ -1444,8 +1454,18 @@
                     // Generazione Badges Categorie
                     let badgesHtml = '';
                     n.normalizedCategories.forEach(catKey => {
-                        const catData = CATEGORIES[catKey] || { label: catKey, class: 'bg-gray-100' };
-                        badgesHtml += `<span class="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wide border ${catData.class} mr-1 mb-1">${catData.label}</span>`;
+                        const catData = CATEGORIES[catKey] || { label: catKey, class: 'bg-gray-100', text: 'text-gray-600', border: 'border-gray-200' };
+                        // Usa stili semplificati per i badge interni alla card
+                        let badgeStyle = "bg-gray-100 text-gray-600 border-gray-200";
+                        if (catKey === 'urgent') badgeStyle = "bg-red-100 text-red-700 border-red-200";
+                        else if (catKey === 'info') badgeStyle = "bg-blue-100 text-blue-700 border-blue-200";
+                        else if (catKey === 'nuoto_libero') badgeStyle = "bg-cyan-100 text-cyan-700 border-cyan-200";
+                        else if (catKey === 'corsi') badgeStyle = "bg-indigo-100 text-indigo-700 border-indigo-200";
+                        else if (catKey === 'summer') badgeStyle = "bg-orange-100 text-orange-700 border-orange-200";
+                        else if (catKey === 'news') badgeStyle = "bg-emerald-100 text-emerald-700 border-emerald-200";
+                        else if (catKey === 'promo') badgeStyle = "bg-pink-100 text-pink-700 border-pink-200";
+
+                        badgesHtml += `<span class="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wide border ${badgeStyle} mr-1 mb-1">${catData.label}</span>`;
                     });
 
                     // Modifiche Mobile: ridotto padding da p-5 a p-4
