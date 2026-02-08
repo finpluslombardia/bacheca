@@ -1588,8 +1588,8 @@
                         <p class="text-slate-600 text-sm leading-relaxed mb-2 whitespace-pre-line line-clamp-3">${n.content}</p>
                     `;
 
-                    // Anteprima PDF
-                    if (n.attachmentUrl) {
+                    // Anteprima PDF (Solo se non c'è copertina)
+                    if (n.attachmentUrl && !n.imageUrl) {
                         cardHtml += `<div class="card-preview-container" id="preview-${n.id}">
                             <div class="flex items-center justify-center w-full h-full text-slate-300">
                                 <div class="loader"></div>
@@ -1612,7 +1612,7 @@
                     card.innerHTML = cardHtml;
                     grid.appendChild(card);
 
-                    if (n.attachmentUrl) {
+                    if (n.attachmentUrl && !n.imageUrl) {
                         generatePdfThumbnail(n.attachmentUrl, `preview-${n.id}`);
                     }
                 }
