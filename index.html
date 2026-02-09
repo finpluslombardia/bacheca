@@ -611,7 +611,21 @@
                     <!-- Attachment -->
                     <div class="border-t border-slate-200 pt-3"><label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2"><i data-lucide="paperclip" class="w-4 h-4"></i>Allegato (PDF o Link Esterno)</label><div class="flex gap-2 mb-2 text-xs"><button type="button" onclick="toggleAttachType('file')" id="btnFileType" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button><button type="button" onclick="toggleAttachType('link')" id="btnLinkType" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive/Web</button></div><div id="attachFileInput"><input type="file" id="attachmentFile" accept=".pdf,image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100"><p class="text-[10px] text-gray-400 mt-1">Max 400KB. Per file grandi usa "Usa Link".</p></div><div id="attachLinkInput" class="hidden"><input type="url" id="attachmentUrlManual" placeholder="Es. https://drive.google.com/..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></div></div>
                 </div>
-                <div><label class="block text-sm font-medium text-gray-700 mb-1">Messaggio</label><textarea id="newContent" required rows="4" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none resize-none" placeholder="Dettagli dell'avviso..."></textarea></div>
+                
+                <!-- Editor Messaggio con Toolbar -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Messaggio</label>
+                    <div class="flex items-center gap-1 bg-gray-50 border border-gray-300 border-b-0 rounded-t-lg p-1.5">
+                        <button type="button" onclick="formatText('b')" class="p-1.5 hover:bg-gray-200 rounded text-gray-700 transition" title="Grassetto"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                        <button type="button" onclick="formatText('i')" class="p-1.5 hover:bg-gray-200 rounded text-gray-700 transition" title="Corsivo"><i data-lucide="italic" class="w-4 h-4"></i></button>
+                        <button type="button" onclick="formatText('u')" class="p-1.5 hover:bg-gray-200 rounded text-gray-700 transition" title="Sottolineato"><i data-lucide="underline" class="w-4 h-4"></i></button>
+                        <button type="button" onclick="formatText('s')" class="p-1.5 hover:bg-gray-200 rounded text-gray-700 transition" title="Barrato"><i data-lucide="strikethrough" class="w-4 h-4"></i></button>
+                        <div class="w-px h-4 bg-gray-300 mx-1"></div>
+                        <button type="button" onclick="addLink()" class="p-1.5 hover:bg-gray-200 rounded text-gray-700 transition" title="Inserisci Link"><i data-lucide="link" class="w-4 h-4"></i></button>
+                    </div>
+                    <textarea id="newContent" required rows="4" class="w-full border border-gray-300 rounded-b-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none resize-none" placeholder="Dettagli dell'avviso..."></textarea>
+                </div>
+
                 <div class="flex items-center gap-2 pt-2"><input type="checkbox" id="newPinned" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"><label for="newPinned" class="text-sm text-gray-700 font-medium">Metti in evidenza (Pin in alto)</label></div>
                 <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition mt-2 shadow-lg flex justify-center items-center gap-2"><span id="submitBtnText">Pubblica Avviso</span></button>
             </form>
@@ -751,7 +765,48 @@
 
             // NEW CATEGORY ORDER
             window.openCategoryOrderModal = openCategoryOrderModal; window.closeCategoryOrderModal = closeCategoryOrderModal; window.moveCategory = moveCategory; window.saveCategoryOrder = saveCategoryOrder;
+            
+            // EDITOR TEXT FUNCTIONS
+            window.formatText = formatText; window.addLink = addLink;
         });
+
+        // --- TEXT FORMATTING FUNCTIONS ---
+        function formatText(tag) {
+            const textarea = document.getElementById('newContent');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            const selected = text.substring(start, end);
+            
+            let replacement = '';
+            if (tag === 'b') replacement = `<b>${selected}</b>`;
+            else if (tag === 'i') replacement = `<i>${selected}</i>`;
+            else if (tag === 'u') replacement = `<u>${selected}</u>`;
+            else if (tag === 's') replacement = `<s>${selected}</s>`;
+            
+            const newText = text.substring(0, start) + replacement + text.substring(end);
+            textarea.value = newText;
+            textarea.focus();
+            // Riposiziona il cursore dopo il tag di chiusura o all'interno se non c'è selezione
+            const cursorBit = selected ? 0 : -(tag.length + 3); // es. </b> è lungo 4, ma vogliamo stare dentro
+            textarea.setSelectionRange(start + replacement.length + cursorBit, start + replacement.length + cursorBit);
+        }
+
+        function addLink() {
+            const textarea = document.getElementById('newContent');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            const selected = text.substring(start, end);
+            
+            const url = prompt("Inserisci l'URL del link:", "https://");
+            if (url) {
+                const replacement = `<a href="${url}" target="_blank" class="text-blue-600 underline font-medium hover:text-blue-800">${selected || url}</a>`;
+                const newText = text.substring(0, start) + replacement + text.substring(end);
+                textarea.value = newText;
+                textarea.focus();
+            }
+        }
 
         // --- GESTIONE ORARI (DB & LOGICA) ---
         async function fetchHoursConfig() {
@@ -1789,7 +1844,8 @@
             if (!notice) return;
 
             document.getElementById('viewNoticeTitle').innerText = notice.title;
-            document.getElementById('viewNoticeContent').innerText = notice.content;
+            // MODIFICATO: Usa innerHTML per renderizzare la formattazione
+            document.getElementById('viewNoticeContent').innerHTML = notice.content;
             document.getElementById('viewNoticeDate').innerText = notice.displayDate ? new Date(notice.displayDate).toLocaleDateString('it-IT') : new Date(notice.timestamp).toLocaleDateString('it-IT');
             
             // Render Categorie in View Modal
