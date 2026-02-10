@@ -783,11 +783,8 @@
             if (!openedNoticeId) return;
             const url = `${window.location.origin}${window.location.pathname}?id=${openedNoticeId}`;
             
-            // Fallback per clipboard
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(url).then(() => showToast("Link copiato negli appunti!"));
-            } else {
-                // Metodo legacy
+            // Funzione helper per copia legacy (fallback sicuro)
+            const copyLegacy = () => {
                 const textArea = document.createElement("textarea");
                 textArea.value = url;
                 textArea.style.position = "fixed";
@@ -796,12 +793,25 @@
                 textArea.focus();
                 textArea.select();
                 try {
-                    document.execCommand('copy');
-                    showToast("Link copiato negli appunti!");
+                    const successful = document.execCommand('copy');
+                    if (successful) showToast("Link copiato negli appunti!");
+                    else showToast("Impossibile copiare il link", true);
                 } catch (err) {
                     showToast("Impossibile copiare il link", true);
                 }
                 document.body.removeChild(textArea);
+            };
+
+            // Tenta prima con Clipboard API moderna
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(url)
+                    .then(() => showToast("Link copiato negli appunti!"))
+                    .catch((err) => {
+                        console.warn("Clipboard API failed, retrying with legacy...", err);
+                        copyLegacy(); // Fallback in caso di errore (es. permessi)
+                    });
+            } else {
+                copyLegacy();
             }
         }
 
