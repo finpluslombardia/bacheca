@@ -701,7 +701,8 @@
             nuoto: {},
             vascaEsterna: { visible: false }, // default invisibile
             corsi: { status: 'regular' }, // Default: Regolari
-            categoryOrder: [] // NEW: Ordine categorie personalizzato
+            categoryOrder: [], // NEW: Ordine categorie personalizzato
+            summerEmptyMessage: '' // NEW: Messaggio personalizzato vuoto estivo
         };
         // Inizializza giorni vuoti
         for(let i=0; i<7; i++) {
@@ -778,7 +779,24 @@
 
             // SHARE FUNCTION
             window.shareCurrentNotice = shareCurrentNotice;
+
+            // SUMMER MESSAGE
+            window.editSummerMessage = editSummerMessage;
         });
+
+        // --- CUSTOM SUMMER MESSAGE ---
+        async function editSummerMessage() {
+            const current = hoursConfig.summerEmptyMessage || "";
+            const newText = prompt("Inserisci il testo da mostrare quando non ci sono avvisi estivi:", current);
+            if (newText !== null) {
+                hoursConfig.summerEmptyMessage = newText;
+                try {
+                    await setDoc(doc(db, CONFIG_COLLECTION, HOURS_DOC_ID), hoursConfig);
+                    showToast("Messaggio aggiornato!");
+                    renderNotices();
+                } catch(e) { console.error(e); showToast("Errore salvataggio", true); }
+            }
+        }
 
         // --- SHARE FUNCTIONALITY ---
         function shareCurrentNotice() {
@@ -891,6 +909,7 @@
                     if(data.specialHours) hoursConfig.specialHours = data.specialHours;
                     // Load category order if exists, otherwise empty (will use defaults in render)
                     if(data.categoryOrder) hoursConfig.categoryOrder = data.categoryOrder;
+                    if(data.summerEmptyMessage) hoursConfig.summerEmptyMessage = data.summerEmptyMessage;
                 }
                 updateStatusWidget();
                 renderFilters(); // Re-render filters with loaded order
@@ -1663,7 +1682,32 @@
                 return dateB - dateA; // Discendente (più recente in alto)
             });
 
-            if (filtered.length === 0) { grid.innerHTML = ''; empty.classList.remove('hidden'); document.getElementById('emptyStateText').innerText = showArchived ? "Nessun avviso in archivio." : "Nessun avviso trovato."; } 
+            if (filtered.length === 0) { 
+                grid.innerHTML = ''; 
+                empty.classList.remove('hidden'); 
+                
+                let msg = showArchived ? "Nessun avviso in archivio." : "Nessun avviso trovato.";
+                
+                // CUSTOM SUMMER MESSAGE LOGIC
+                const editBtnId = 'editSummerMsgBtn';
+                const existingBtn = document.getElementById(editBtnId);
+                if(existingBtn) existingBtn.remove();
+
+                if (currentFilter === 'summer' && !showArchived) {
+                    msg = hoursConfig.summerEmptyMessage || "Nessuna attività estiva in programma al momento.";
+                    if (isAdminLoggedIn) {
+                        const btn = document.createElement('button');
+                        btn.id = editBtnId;
+                        btn.className = "mt-4 text-blue-600 font-bold text-sm hover:underline flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full";
+                        btn.innerHTML = '<i data-lucide="edit-3" class="w-4 h-4"></i> Modifica Messaggio';
+                        btn.onclick = editSummerMessage;
+                        empty.appendChild(btn);
+                        lucide.createIcons();
+                    }
+                }
+                
+                document.getElementById('emptyStateText').innerText = msg;
+            } 
             else {
                 empty.classList.add('hidden');
                 grid.innerHTML = ''; 
