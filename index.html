@@ -1978,7 +1978,46 @@
             const attachContainer = document.getElementById('viewNoticeAttachmentContainer');
             if (notice.attachmentUrl) {
                 attachContainer.classList.remove('hidden');
-                document.getElementById('viewNoticeDownloadBtn').href = notice.attachmentUrl;
+                
+                const downloadBtn = document.getElementById('viewNoticeDownloadBtn');
+                
+                // FIX: Gestione corretta dei PDF Base64 caricati dal PC per evitare blocchi del browser
+                if (notice.attachmentUrl.startsWith('data:')) {
+                    downloadBtn.removeAttribute('href');
+                    downloadBtn.onclick = (e) => {
+                        e.preventDefault();
+                        try {
+                            // Conversione sincrona da Base64 a Blob per evitare i blocchi dei popup
+                            const arr = notice.attachmentUrl.split(',');
+                            const mime = arr[0].match(/:(.*?);/)[1];
+                            const bstr = atob(arr[1]);
+                            let n = bstr.length;
+                            const u8arr = new Uint8Array(n);
+                            while(n--){
+                                u8arr[n] = bstr.charCodeAt(n);
+                            }
+                            const blob = new Blob([u8arr], {type: mime});
+                            const blobUrl = URL.createObjectURL(blob);
+                            
+                            // Crea un link temporaneo per forzare il download ed evitare la pagina bianca
+                            const link = document.createElement('a');
+                            link.href = blobUrl;
+                            link.download = 'Documento_Allegato.pdf'; 
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            
+                            setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+                        } catch (err) {
+                            console.error("Errore estrazione PDF", err);
+                            showToast("Errore durante il download del documento", true);
+                        }
+                    };
+                } else {
+                    downloadBtn.href = notice.attachmentUrl;
+                    downloadBtn.onclick = null;
+                }
+
                 const previewBox = document.getElementById('viewNoticePreviewBox');
                 // Usa iframe nel modal per permettere lettura
                 let previewHtml = '';
@@ -1997,11 +2036,13 @@
             }
 
             document.getElementById('viewNoticeModal').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
             lucide.createIcons();
         }
 
         function closeViewModal() { 
             document.getElementById('viewNoticeModal').classList.add('hidden'); 
+            document.body.classList.remove('overflow-hidden');
             openedNoticeId = null;
             // Opzionale: Pulisce l'URL quando si chiude il modale se è stato aperto via link diretto
             // window.history.replaceState({}, document.title, window.location.pathname);
