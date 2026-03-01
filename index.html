@@ -1741,16 +1741,9 @@
                         badgesHtml += `<span class="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wide border ${badgeStyle} mr-1 mb-1">${catData.label}</span>`;
                     });
 
-                    // Rimuove tag HTML per avere un'anteprima pulita
+                    // Calcolo euristico per "Leggi di più": se testo lungo (>130 car) o più di 3 a capo
                     const plainText = n.content.replace(/<[^>]+>/g, '');
-                    // Calcolo euristico per "Leggi di più"
-                    const showReadMore = plainText.length > 110 || n.content.split('\n').length > 3;
-
-                    let displayContent = n.content;
-                    if (showReadMore) {
-                        // Tronca e inserisce il tasto "Leggi di più" INLINE alla fine del testo
-                        displayContent = plainText.replace(/\n/g, ' ').substring(0, 95).trim() + '... <span class="text-blue-600 font-bold hover:underline ml-1">Leggi di più</span>';
-                    }
+                    const showReadMore = plainText.length > 130 || n.content.split('\n').length > 3;
 
                     // Modifiche Mobile: ridotto padding da p-5 a p-4
                     // Desktop: ridotto a p-3 e testo contenuto
@@ -1760,7 +1753,10 @@
                             <div class="flex gap-2 shrink-0">${n.isPinned ? `<i data-lucide="pin" class="w-4 h-4 text-blue-500 fill-blue-500 transform rotate-45"></i>` : ''}${isAdminLoggedIn ? `<button onclick="event.stopPropagation(); editNotice('${n.id}')" class="text-slate-400 hover:text-blue-600 transition"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button onclick="event.stopPropagation(); deleteNoticePermanent('${n.id}')" class="text-slate-400 hover:text-red-600 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div>
                         </div>
                         <h3 class="text-base font-bold text-slate-800 mb-1 leading-tight line-clamp-1">${n.title}</h3>
-                        <p class="text-slate-600 text-sm leading-relaxed mb-2 line-clamp-3 whitespace-pre-line">${displayContent}</p>
+                        <div class="relative mb-2">
+                            <p class="text-slate-600 text-sm leading-relaxed line-clamp-3 whitespace-pre-line">${n.content}</p>
+                            ${showReadMore ? `<div class="absolute bottom-0 right-0 bg-white pl-3 text-sm leading-relaxed"><span class="text-blue-600 font-bold hover:underline cursor-pointer">... Leggi di più</span></div>` : ''}
+                        </div>
                     `;
 
                     // Anteprima PDF (Solo se non c'è copertina)
