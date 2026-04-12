@@ -713,7 +713,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, deleteDoc, updateDoc, setDoc, doc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, deleteDoc, updateDoc, setDoc, doc, onSnapshot, getDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
         // CONFIGURAZIONE 
@@ -1831,6 +1831,10 @@
                         </div>`;
                     }
 
+                    // Badge per le visualizzazioni (visibile solo admin)
+                    const viewsCount = n.views || 0;
+                    const viewsBadge = isAdminLoggedIn ? `<div class="flex items-center gap-1 text-slate-500 bg-white border border-slate-200 px-1.5 py-1 rounded" title="${viewsCount} visualizzazioni"><i data-lucide="eye" class="w-3.5 h-3.5"></i><span class="font-semibold">${viewsCount}</span></div>` : '';
+
                     // Modifiche Mobile Footer: ridotto padding
                     cardHtml += `</div>
                         <div class="px-4 py-3 md:py-2 md:px-3 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
@@ -1838,7 +1842,10 @@
                                 <div class="flex items-center gap-2 mb-0.5"><i data-lucide="calendar" class="w-3.5 h-3.5"></i><span>${n.displayDate ? new Date(n.displayDate).toLocaleDateString('it-IT') : new Date(n.timestamp).toLocaleDateString('it-IT')}</span></div>
                                 ${n.expirationDate ? `<div class="flex items-center gap-2 text-red-400"><i data-lucide="clock" class="w-3.5 h-3.5"></i><span>Scade: ${new Date(n.expirationDate).toLocaleDateString('it-IT')}</span></div>` : ''}
                             </div>
-                            <div class="${isAdminLoggedIn ? 'flex' : 'hidden'} gap-2"><button onclick="event.stopPropagation(); togglePin('${n.id}', ${n.isPinned})" class="p-1.5 rounded hover:bg-blue-100 ${n.isPinned ? 'text-blue-600' : 'text-slate-400'}" title="Evidenza"><i data-lucide="pin" class="w-4 h-4"></i></button>${showArchived ? `<button onclick="event.stopPropagation(); restoreNotice('${n.id}')" class="p-1.5 rounded hover:bg-green-100 text-slate-400 hover:text-green-600 transition" title="Ripristina (Rimuove scadenza)"><i data-lucide="refresh-ccw" class="w-4 h-4"></i></button>` : `<button onclick="event.stopPropagation(); archiveNotice('${n.id}')" class="p-1.5 rounded hover:bg-yellow-100 text-slate-400 hover:text-yellow-600 transition" title="Archivia"><i data-lucide="archive" class="w-4 h-4"></i></button>`}</div>
+                            <div class="flex items-center gap-2">
+                                ${viewsBadge}
+                                <div class="${isAdminLoggedIn ? 'flex' : 'hidden'} gap-2"><button onclick="event.stopPropagation(); togglePin('${n.id}', ${n.isPinned})" class="p-1.5 rounded hover:bg-blue-100 ${n.isPinned ? 'text-blue-600' : 'text-slate-400'}" title="Evidenza"><i data-lucide="pin" class="w-4 h-4"></i></button>${showArchived ? `<button onclick="event.stopPropagation(); restoreNotice('${n.id}')" class="p-1.5 rounded hover:bg-green-100 text-slate-400 hover:text-green-600 transition" title="Ripristina (Rimuove scadenza)"><i data-lucide="refresh-ccw" class="w-4 h-4"></i></button>` : `<button onclick="event.stopPropagation(); archiveNotice('${n.id}')" class="p-1.5 rounded hover:bg-yellow-100 text-slate-400 hover:text-yellow-600 transition" title="Archivia"><i data-lucide="archive" class="w-4 h-4"></i></button>`}</div>
+                            </div>
                         </div>
                     `;
 
@@ -2034,8 +2041,16 @@
                 const noticeData = { title, content, categories, isPinned, isPopup, displayDate, expirationDate, scheduledDate, timestamp: Date.now() };
                 if (imageUrl) noticeData.imageUrl = imageUrl; if (contentImageUrl) noticeData.contentImageUrl = contentImageUrl; if (attachmentUrl) noticeData.attachmentUrl = attachmentUrl;
 
-                if (editingId) { await updateDoc(doc(db, NOTICES_COLLECTION, editingId), noticeData); showToast("Modificato con successo!"); } 
-                else { noticeData.archived = false; await addDoc(collection(db, NOTICES_COLLECTION), noticeData); showToast("Pubblicato con successo!"); }
+                if (editingId) { 
+                    await updateDoc(doc(db, NOTICES_COLLECTION, editingId), noticeData); 
+                    showToast("Modificato con successo!"); 
+                } 
+                else { 
+                    noticeData.archived = false; 
+                    noticeData.views = 0; // Inizializza il contatore visualizzazioni a 0
+                    await addDoc(collection(db, NOTICES_COLLECTION), noticeData); 
+                    showToast("Pubblicato con successo!"); 
+                }
                 closeNoticeModal();
             } catch (err) { console.error(err); showToast("Errore: " + err.message, true); } finally { btn.disabled = false; btn.innerHTML = originalBtnContent; }
         }
@@ -2068,6 +2083,11 @@
         function viewNotice(id, isAutoPopup = false) {
             const notice = notices.find(n => n.id === id);
             if (!notice) return;
+
+            // Incrementa views se l'utente non è admin
+            if (!isAdminLoggedIn) {
+                updateDoc(doc(db, NOTICES_COLLECTION, id), { views: increment(1) }).catch(e => console.error("Errore aggiornamento views:", e));
+            }
 
             openedNoticeId = id; // Set global current ID for sharing
 
