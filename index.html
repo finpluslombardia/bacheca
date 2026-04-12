@@ -253,6 +253,7 @@
         .html-content-view li { margin-bottom: 0.25em; }
         .html-content-view a { color: #2563eb; text-decoration: underline; font-weight: 500; }
         .html-content-view a:hover { color: #1e40af; }
+        .html-content-view img { max-width: 100%; height: auto; border-radius: 0.5rem; margin: 1rem 0; display: block; } /* Supporto immagini inline */
         
         .card .html-content-view p { margin-bottom: 0; } /* Compattezza nelle cards */
 
@@ -712,6 +713,7 @@
                         </span>
                         <span class="ql-formats">
                             <button class="ql-link" title="Inserisci Link"></button>
+                            <button class="ql-image" title="Inserisci Immagine"></button>
                             <button class="ql-clean" title="Rimuovi Formattazione"></button>
                         </span>
                     </div>
@@ -858,6 +860,30 @@
                     toolbar: '#quillToolbar'
                 },
                 placeholder: 'Dettagli dell\'avviso...'
+            });
+
+            // Gestione custom per upload immagini inline su Firebase Storage (evita base64 enormi nel DB)
+            quill.getModule('toolbar').addHandler('image', () => {
+                const input = document.createElement('input');
+                input.setAttribute('type', 'file');
+                input.setAttribute('accept', 'image/*');
+                input.click();
+                
+                input.onchange = async () => {
+                    const file = input.files[0];
+                    if (file) {
+                        showToast("Caricamento immagine in corso...");
+                        try {
+                            const url = await handleImageUpload(file, 'inline_images');
+                            const range = quill.getSelection(true);
+                            quill.insertEmbed(range.index, 'image', url);
+                            quill.setSelection(range.index + 1);
+                        } catch(err) {
+                            console.error("Errore caricamento immagine inline", err);
+                            showToast("Errore caricamento immagine", true);
+                        }
+                    }
+                };
             });
 
             // Aggiorna orologio e stato ogni minuto
