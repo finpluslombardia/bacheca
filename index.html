@@ -864,6 +864,12 @@
 
             // Gestione custom per upload immagini inline su Firebase Storage (evita base64 enormi nel DB)
             quill.getModule('toolbar').addHandler('image', () => {
+                // SALVA IL RANGE PRIMA DI APRIRE IL FILE PICKER (Fix perdita di focus e bug inserimento)
+                let range = quill.getSelection();
+                if (!range) {
+                    range = { index: quill.getLength() };
+                }
+
                 const input = document.createElement('input');
                 input.setAttribute('type', 'file');
                 input.setAttribute('accept', 'image/*');
@@ -875,7 +881,6 @@
                         showToast("Caricamento immagine in corso...");
                         try {
                             const url = await handleImageUpload(file, 'inline_images');
-                            const range = quill.getSelection(true);
                             quill.insertEmbed(range.index, 'image', url);
                             quill.setSelection(range.index + 1);
                         } catch(err) {
