@@ -243,13 +243,15 @@
             min-height: 140px;
             font-size: 1rem;
             color: #374151;
+            line-height: 1.3;
         }
-        .ql-editor p { margin-bottom: 0.5em; }
+        .ql-editor p { margin-bottom: 0.25em; }
 
         /* Ripristino Stili Tailwind per Contenuto Generato (View Modal & Cards) */
+        .html-content-view { line-height: 1.3; }
         .html-content-view h1, .html-content-view h2 { font-size: 1.5rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; line-height: 1.2; }
         .html-content-view h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; line-height: 1.3; }
-        .html-content-view p { margin-bottom: 0.75em; }
+        .html-content-view p { margin-bottom: 0.25em; }
         .html-content-view ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75em; }
         .html-content-view ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75em; }
         .html-content-view li { margin-bottom: 0.25em; }
@@ -258,6 +260,29 @@
         .html-content-view img { max-width: 100%; height: auto; border-radius: 0.5rem; margin: 1rem 0; display: block; } /* Supporto immagini inline */
         
         .card .html-content-view p { margin-bottom: 0; } /* Compattezza nelle cards */
+
+        /* Quill Custom Pickers per Spaziatura */
+        .ql-snow .ql-picker.ql-lineHeight { width: 140px; }
+        .ql-snow .ql-picker.ql-lineHeight .ql-picker-label::before,
+        .ql-snow .ql-picker.ql-lineHeight .ql-picker-item::before { content: 'Interlinea: Normale'; }
+        .ql-snow .ql-picker.ql-lineHeight .ql-picker-label[data-value="1"]::before,
+        .ql-snow .ql-picker.ql-lineHeight .ql-picker-item[data-value="1"]::before { content: 'Interlinea: Singola'; }
+        .ql-snow .ql-picker.ql-lineHeight .ql-picker-label[data-value="1.2"]::before,
+        .ql-snow .ql-picker.ql-lineHeight .ql-picker-item[data-value="1.2"]::before { content: 'Interlinea: 1.2'; }
+        .ql-snow .ql-picker.ql-lineHeight .ql-picker-label[data-value="1.5"]::before,
+        .ql-snow .ql-picker.ql-lineHeight .ql-picker-item[data-value="1.5"]::before { content: 'Interlinea: 1.5'; }
+        .ql-snow .ql-picker.ql-lineHeight .ql-picker-label[data-value="2"]::before,
+        .ql-snow .ql-picker.ql-lineHeight .ql-picker-item[data-value="2"]::before { content: 'Interlinea: Doppia'; }
+
+        .ql-snow .ql-picker.ql-marginBottom { width: 145px; }
+        .ql-snow .ql-picker.ql-marginBottom .ql-picker-label::before,
+        .ql-snow .ql-picker.ql-marginBottom .ql-picker-item::before { content: 'Paragrafo: Normale'; }
+        .ql-snow .ql-picker.ql-marginBottom .ql-picker-label[data-value="0em"]::before,
+        .ql-snow .ql-picker.ql-marginBottom .ql-picker-item[data-value="0em"]::before { content: 'Paragrafo: Nessuno'; }
+        .ql-snow .ql-picker.ql-marginBottom .ql-picker-label[data-value="0.75em"]::before,
+        .ql-snow .ql-picker.ql-marginBottom .ql-picker-item[data-value="0.75em"]::before { content: 'Paragrafo: Medio'; }
+        .ql-snow .ql-picker.ql-marginBottom .ql-picker-label[data-value="1.5em"]::before,
+        .ql-snow .ql-picker.ql-marginBottom .ql-picker-item[data-value="1.5em"]::before { content: 'Paragrafo: Largo'; }
 
         /* Dark Mode Overrides (Impatto minimo sulle classi Tailwind esistenti) */
         html.dark body { background-color: #0f172a; color: #f8fafc; }
@@ -711,6 +736,21 @@
                             </select>
                         </span>
                         <span class="ql-formats">
+                            <select class="ql-lineHeight" title="Spazio tra le righe">
+                                <option value="1">Interlinea: Singola</option>
+                                <option value="1.2">Interlinea: 1.2</option>
+                                <option selected>Interlinea: Normale</option>
+                                <option value="1.5">Interlinea: 1.5</option>
+                                <option value="2">Interlinea: Doppia</option>
+                            </select>
+                            <select class="ql-marginBottom" title="Spazio dopo paragrafo">
+                                <option value="0em">Paragrafo: Nessuno</option>
+                                <option selected>Paragrafo: Normale</option>
+                                <option value="0.75em">Paragrafo: Medio</option>
+                                <option value="1.5em">Paragrafo: Largo</option>
+                            </select>
+                        </span>
+                        <span class="ql-formats">
                             <button class="ql-bold" title="Grassetto"></button>
                             <button class="ql-italic" title="Corsivo"></button>
                             <button class="ql-underline" title="Sottolineato"></button>
@@ -862,6 +902,19 @@
             renderCategoryCheckboxes(); 
             lucide.createIcons();
             
+            // Registrazione nuovi attributi per spaziatura Quill
+            const Parchment = Quill.import('parchment');
+            const LineHeightClass = new Parchment.Attributor.Style('lineHeight', 'line-height', {
+                scope: Parchment.Scope.BLOCK,
+                whitelist: ['1', '1.2', '1.5', '2']
+            });
+            const MarginBottomClass = new Parchment.Attributor.Style('marginBottom', 'margin-bottom', {
+                scope: Parchment.Scope.BLOCK,
+                whitelist: ['0em', '0.75em', '1.5em']
+            });
+            Quill.register(LineHeightClass, true);
+            Quill.register(MarginBottomClass, true);
+
             // Inizializza Quill Editor
             quill = new Quill('#quillEditor', {
                 theme: 'snow',
