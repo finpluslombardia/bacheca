@@ -591,7 +591,7 @@
 
     <!-- MODAL NUOVO AVVISO / MODIFICA -->
     <div id="noticeModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden flex flex-col max-h-[90vh]">
             <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                 <h3 class="text-xl font-bold text-gray-800" id="modalTitle">Pubblica Avviso</h3>
                 <button onclick="closeNoticeModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -608,9 +608,10 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div><label class="block text-sm font-medium text-gray-700 mb-1">Data Evento (Opz)</label><input type="date" id="newDate" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"></div>
-                    <div><label class="block text-sm font-medium text-gray-700 mb-1 text-red-600">Data Scadenza (Opz)</label><input type="date" id="newExpirationDate" class="w-full border border-red-200 rounded-lg p-2.5 focus:ring-2 focus:ring-red-500 outline-none" title="Se impostata, l'avviso verrà nascosto automaticamente dopo questa data"></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1 text-yellow-600" title="Data e ora in cui l'avviso diventerà pubblico">Pubblicazione (Opz)</label><input type="datetime-local" id="newScheduledDate" class="w-full border border-yellow-200 rounded-lg p-2.5 focus:ring-2 focus:ring-yellow-500 outline-none"></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1 text-red-600">Scadenza (Opz)</label><input type="date" id="newExpirationDate" class="w-full border border-red-200 rounded-lg p-2.5 focus:ring-2 focus:ring-red-500 outline-none" title="Se impostata, l'avviso verrà nascosto automaticamente dopo questa data"></div>
                 </div>
 
                 <!-- FILE SECTIONS -->
@@ -1597,8 +1598,13 @@
                             window.history.replaceState({}, document.title, window.location.pathname);
                         }
                     } else if (!hasShownPopup) {
-                        // Cerca una notizia attiva impostata come popup
-                        const popupNotice = notices.find(n => n.isPopup && !n.archived && (!n.expirationDate || new Date(n.expirationDate).setHours(23,59,59,999) >= new Date().getTime()));
+                        // Cerca una notizia attiva impostata come popup, che NON sia programmata in futuro
+                        const popupNotice = notices.find(n => 
+                            n.isPopup && 
+                            !n.archived && 
+                            (!n.expirationDate || new Date(n.expirationDate).setHours(23,59,59,999) >= new Date().getTime()) &&
+                            (!n.scheduledDate || new Date(n.scheduledDate).getTime() <= new Date().getTime())
+                        );
                         if (popupNotice) {
                             viewNotice(popupNotice.id, true);
                         }
@@ -1678,14 +1684,20 @@
         async function renderNotices() {
             const grid = document.getElementById('noticesGrid'); const empty = document.getElementById('emptyState');
             
-            // Filtro logica scadenza + archivio
+            // Filtro logica scadenza + archivio + Programmazione
             let filtered = notices.filter(n => {
                 // Normalizza le categorie
                 n.normalizedCategories = n.categories || (n.category ? [n.category] : ['info']);
 
-                // Controlla scadenza
+                // Controlla scadenza e programmazione
                 const isExpired = n.expirationDate && new Date(n.expirationDate).setHours(23,59,59,999) < new Date().getTime();
+                const isScheduled = n.scheduledDate && new Date(n.scheduledDate).getTime() > new Date().getTime();
                 
+                // Se non è admin e la notizia è programmata nel futuro, nascondila sempre
+                if (!isAdminLoggedIn && isScheduled) {
+                    return false;
+                }
+
                 if (showArchived) {
                     return !!n.archived || isExpired;
                 } else {
@@ -1755,6 +1767,15 @@
 
                     // Generazione Badges Categorie
                     let badgesHtml = '';
+                    
+                    // CONTROLLO BADGE PROGRAMMAZIONE (solo admin lo vede)
+                    const isScheduled = n.scheduledDate && new Date(n.scheduledDate).getTime() > new Date().getTime();
+                    if (isAdminLoggedIn && isScheduled) {
+                        const dateObj = new Date(n.scheduledDate);
+                        const formatOpts = { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' };
+                        badgesHtml += `<span class="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wide border bg-yellow-100 text-yellow-800 border-yellow-300 mr-1 mb-1" title="Visibile al pubblico dal ${dateObj.toLocaleString('it-IT', formatOpts)}"><i data-lucide="clock" class="w-3 h-3 inline mr-1"></i>PROGRAMMATA</span>`;
+                    }
+
                     n.normalizedCategories.forEach(catKey => {
                         const catData = CATEGORIES[catKey] || { label: catKey, class: 'bg-gray-100', text: 'text-gray-600', border: 'border-gray-200' };
                         // Usa stili semplificati per i badge interni alla card
@@ -1937,6 +1958,7 @@
             document.getElementById('newPinned').checked = notice.isPinned; 
             document.getElementById('newPopup').checked = notice.isPopup || false;
             document.getElementById('newDate').value = notice.displayDate || '';
+            document.getElementById('newScheduledDate').value = notice.scheduledDate || ''; // Popola programmazione
             document.getElementById('newExpirationDate').value = notice.expirationDate || ''; // Popola scadenza
             
             openNoticeModal();
@@ -1957,6 +1979,7 @@
                 const isPinned = document.getElementById('newPinned').checked; 
                 const isPopup = document.getElementById('newPopup').checked;
                 const displayDate = document.getElementById('newDate').value;
+                const scheduledDate = document.getElementById('newScheduledDate').value; // Leggi il campo
                 const expirationDate = document.getElementById('newExpirationDate').value;
 
                 let imageUrl = null; let contentImageUrl = null; let attachmentUrl = null;
@@ -1977,7 +2000,8 @@
                     else attachmentUrl = attachmentUrlManual;
                 }
 
-                const noticeData = { title, content, categories, isPinned, isPopup, displayDate, expirationDate, timestamp: Date.now() };
+                // Includi scheduledDate nei dati passati
+                const noticeData = { title, content, categories, isPinned, isPopup, displayDate, expirationDate, scheduledDate, timestamp: Date.now() };
                 if (imageUrl) noticeData.imageUrl = imageUrl; if (contentImageUrl) noticeData.contentImageUrl = contentImageUrl; if (attachmentUrl) noticeData.attachmentUrl = attachmentUrl;
 
                 if (editingId) { await updateDoc(doc(db, NOTICES_COLLECTION, editingId), noticeData); showToast("Modificato con successo!"); } 
@@ -2148,6 +2172,7 @@
             document.getElementById('newPinned').checked = false; 
             document.getElementById('newPopup').checked = false;
             document.getElementById('newDate').value = ''; 
+            document.getElementById('newScheduledDate').value = ''; // Reset programmazione
             document.getElementById('newExpirationDate').value = ''; // Reset scadenza
             document.getElementById('coverFile').value = ''; 
             document.getElementById('coverUrlManual').value = ''; 
