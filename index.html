@@ -447,7 +447,7 @@
                 <!-- Ridotto padding su mobile da p-8 a p-5 -->
                 <div class="p-5 md:p-8">
                     <div class="flex flex-wrap items-center gap-3 mb-4" id="viewNoticeCategoriesContainer"></div>
-                    <div class="flex items-center gap-1 text-slate-400 text-xs mb-2"><i data-lucide="calendar" class="w-3 h-3"></i><span id="viewNoticeDate"></span></div>
+                    <div id="viewNoticeDateContainer" class="flex items-center gap-1 text-slate-400 text-xs mb-2"><i data-lucide="calendar" class="w-3 h-3"></i><span id="viewNoticeDate"></span></div>
                     <!-- Ridotto testo titolo su mobile da 3xl a xl -->
                     <h2 id="viewNoticeTitle" class="text-xl md:text-3xl font-bold text-slate-900 mb-6 leading-tight"></h2>
                     <!-- Ridotto testo contenuto su mobile da lg a base -->
@@ -1981,6 +1981,7 @@
             const popupBanner = document.getElementById('viewNoticePopupBanner');
             const shareBtn = document.getElementById('viewNoticeShareBtn');
             const catsContainer = document.getElementById('viewNoticeCategoriesContainer');
+            const dateContainer = document.getElementById('viewNoticeDateContainer');
 
             if (isAutoPopup) {
                 modalWrapper.classList.remove('bg-black/70', 'backdrop-blur-md');
@@ -1988,12 +1989,14 @@
                 popupBanner.classList.remove('hidden');
                 shareBtn.classList.add('hidden');
                 catsContainer.classList.add('hidden');
+                if (dateContainer) dateContainer.classList.add('hidden');
             } else {
                 modalWrapper.classList.remove('bg-black/40', 'backdrop-blur-sm');
                 modalWrapper.classList.add('bg-black/70', 'backdrop-blur-md');
                 popupBanner.classList.add('hidden');
                 shareBtn.classList.remove('hidden');
                 catsContainer.classList.remove('hidden');
+                if (dateContainer) dateContainer.classList.remove('hidden');
             }
 
             document.getElementById('viewNoticeTitle').innerText = notice.title;
