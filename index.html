@@ -558,6 +558,8 @@
             </button>
             <!-- Pulsante Condividi (Copia Link) -->
             <button id="viewNoticeShareBtn" onclick="shareCurrentNotice()" class="absolute top-4 right-28 bg-white/90 p-2 rounded-full hover:bg-gray-100 z-30 transition shadow-sm" title="Copia Link Notizia"><i data-lucide="share-2" class="w-6 h-6 text-slate-700"></i></button>
+            <!-- Pulsante QR Code (Admin) -->
+            <button id="viewNoticeQrBtn" onclick="showQrCodeFromView()" class="hidden absolute top-4 right-40 bg-white/90 p-2 rounded-full hover:bg-gray-100 z-30 transition shadow-sm" title="Genera QR Code da Stampare"><i data-lucide="qr-code" class="w-6 h-6 text-purple-700"></i></button>
             
             <div class="overflow-y-auto custom-scrollbar">
                 <div id="viewNoticeCover" class="w-full h-64 bg-slate-100 hidden"><img id="viewNoticeCoverImg" class="w-full h-full object-cover"></div>
@@ -795,6 +797,22 @@
         </div>
     </div>
     
+    <!-- MODAL QR CODE (ADMIN) -->
+    <div id="qrModal" class="hidden fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4 backdrop-blur-sm fade-in">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col p-6 text-center relative">
+            <button onclick="closeQrModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <h3 class="text-xl font-bold text-gray-800 mb-4 pr-6 text-left">QR Code Avviso</h3>
+            <div id="printQrArea" class="flex flex-col items-center bg-white p-4 rounded-xl border border-dashed border-gray-300">
+                <img id="qrCodeImg" src="" alt="QR Code" class="w-48 h-48 mb-4 border border-gray-200 p-2 rounded-lg shadow-sm">
+                <p id="qrNoticeTitle" class="font-bold text-gray-800 text-lg mb-1 leading-tight"></p>
+                <p class="text-xs text-gray-500">Inquadra per leggere l'avviso completo</p>
+            </div>
+            <button onclick="printQrCode()" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg flex items-center justify-center gap-2 transition">
+                <i data-lucide="printer" class="w-5 h-5"></i> Stampa Tabellone
+            </button>
+        </div>
+    </div>
+
     <!-- MODAL LOGIN (AGGIUNTO per funzionalità Admin) -->
     <div id="loginModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden p-6">
@@ -988,6 +1006,10 @@
             // SHARE FUNCTION
             window.shareCurrentNotice = shareCurrentNotice;
             window.shareOnWhatsApp = shareOnWhatsApp;
+            window.showQrCode = showQrCode;
+            window.showQrCodeFromView = showQrCodeFromView;
+            window.closeQrModal = closeQrModal;
+            window.printQrCode = printQrCode;
 
             // SUMMER MESSAGE
             window.editSummerMessage = editSummerMessage;
@@ -2038,7 +2060,7 @@
                     cardHtml += `<div class="p-4 md:p-3 flex-1">
                         <div class="flex flex-wrap items-start mb-2 gap-1 w-full justify-between">
                             <div class="flex flex-wrap gap-1">${badgesHtml}</div>
-                            <div class="flex gap-2 shrink-0">${n.isPinned ? `<i data-lucide="pin" class="w-4 h-4 text-blue-500 fill-blue-500 transform rotate-45"></i>` : ''}${isAdminLoggedIn ? `<button onclick="event.stopPropagation(); editNotice('${n.id}')" class="text-slate-400 hover:text-blue-600 transition"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button onclick="event.stopPropagation(); deleteNoticePermanent('${n.id}')" class="text-slate-400 hover:text-red-600 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div>
+                            <div class="flex gap-2 shrink-0">${n.isPinned ? `<i data-lucide="pin" class="w-4 h-4 text-blue-500 fill-blue-500 transform rotate-45"></i>` : ''}${isAdminLoggedIn ? `<button onclick="event.stopPropagation(); showQrCode('${n.id}', this.dataset.title)" data-title="${n.title.replace(/"/g, '&quot;')}" class="text-slate-400 hover:text-purple-600 transition" title="Genera QR Code"><i data-lucide="qr-code" class="w-4 h-4"></i></button><button onclick="event.stopPropagation(); editNotice('${n.id}')" class="text-slate-400 hover:text-blue-600 transition"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button onclick="event.stopPropagation(); deleteNoticePermanent('${n.id}')" class="text-slate-400 hover:text-red-600 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div>
                         </div>
                         <h3 class="text-base font-bold text-slate-800 mb-1 leading-tight line-clamp-1">${n.title}</h3>
                         <div class="relative mb-2 html-content-view">
@@ -2288,6 +2310,7 @@
             const popupBanner = document.getElementById('viewNoticePopupBanner');
             const shareBtn = document.getElementById('viewNoticeShareBtn');
             const waShareBtn = document.getElementById('viewNoticeWaShareBtn');
+            const qrBtn = document.getElementById('viewNoticeQrBtn');
             const catsContainer = document.getElementById('viewNoticeCategoriesContainer');
             const dateContainer = document.getElementById('viewNoticeDateContainer');
 
@@ -2297,6 +2320,7 @@
                 popupBanner.classList.remove('hidden');
                 shareBtn.classList.add('hidden');
                 waShareBtn.classList.add('hidden');
+                if(qrBtn) qrBtn.classList.add('hidden');
                 catsContainer.classList.add('hidden');
                 if (dateContainer) dateContainer.classList.add('hidden');
             } else {
@@ -2305,6 +2329,10 @@
                 popupBanner.classList.add('hidden');
                 shareBtn.classList.remove('hidden');
                 waShareBtn.classList.remove('hidden');
+                if(qrBtn) {
+                    if (isAdminLoggedIn) qrBtn.classList.remove('hidden');
+                    else qrBtn.classList.add('hidden');
+                }
                 catsContainer.classList.remove('hidden');
                 if (dateContainer) dateContainer.classList.remove('hidden');
             }
@@ -2394,12 +2422,70 @@
             lucide.createIcons();
         }
 
+        // --- QR CODE FUNCTIONALITY ---
+        function showQrCode(id, title) {
+            const url = `${window.location.origin}${window.location.pathname}?id=${id}`;
+            // Usa api.qrserver.com per generare il QR Code istantaneamente
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(url)}&margin=10`;
+            document.getElementById('qrCodeImg').src = qrUrl;
+            document.getElementById('qrNoticeTitle').innerText = title;
+            document.getElementById('qrModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function showQrCodeFromView() {
+            if (!openedNoticeId) return;
+            const notice = notices.find(n => n.id === openedNoticeId);
+            if (notice) {
+                showQrCode(notice.id, notice.title);
+            }
+        }
+
+        function closeQrModal() {
+            document.getElementById('qrModal').classList.add('hidden');
+            document.getElementById('qrCodeImg').src = ''; // resetta l'immagine
+        }
+
+        function printQrCode() {
+            const printContent = document.getElementById('printQrArea').innerHTML;
+            const printWindow = window.open('', '', 'width=800,height=900');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Stampa QR Code</title>
+                        <style>
+                            @page { size: A4; margin: 0; }
+                            body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; text-align: center; padding: 40px; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fff; }
+                            #printQrArea { display: flex; flex-direction: column; align-items: center; justify-content: center; max-width: 80%; }
+                            img { max-width: 400px; margin-bottom: 30px; border: 2px solid #eee; padding: 10px; border-radius: 16px; }
+                            p { margin: 5px 0; color: #333; }
+                            .text-lg { font-size: 32px; font-weight: bold; margin-bottom: 15px; }
+                            .text-xs { font-size: 18px; color: #666; border-top: 1px solid #ccc; padding-top: 15px; margin-top: 10px; }
+                        </style>
+                    </head>
+                    <body>
+                        ${printContent.replace('id="qrNoticeTitle" class="', 'id="qrNoticeTitle" class="text-lg ').replace('class="text-xs text-gray-500"', 'class="text-xs"')}
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.focus();
+            
+            // Attendi che l'immagine sia caricata prima di stampare per non avere buchi bianchi
+            const img = printWindow.document.querySelector('img');
+            if (img) {
+                img.onload = () => {
+                    setTimeout(() => { printWindow.print(); printWindow.close(); }, 200);
+                };
+            } else {
+                setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
+            }
+        }
+
         function closeViewModal() { 
             document.getElementById('viewNoticeModal').classList.add('hidden'); 
             document.body.classList.remove('overflow-hidden');
             openedNoticeId = null;
-            // Opzionale: Pulisce l'URL quando si chiude il modale se è stato aperto via link diretto
-            // window.history.replaceState({}, document.title, window.location.pathname);
         }
 
         function openNoticeModal(notice = null) { 
