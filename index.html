@@ -232,6 +232,15 @@
             border-top-left-radius: 0.5rem;
             border-top-right-radius: 0.5rem;
             font-family: inherit;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 12px;
+            padding: 10px 12px;
+        }
+        .ql-toolbar.ql-snow .ql-formats {
+            margin-right: 0 !important;
+            display: flex;
+            align-items: center;
         }
         .ql-container.ql-snow {
             border-color: #d1d5db !important;
@@ -262,7 +271,15 @@
         .card .html-content-view p { margin-bottom: 0; } /* Compattezza nelle cards */
 
         /* Quill Custom Pickers per Spaziatura */
-        .ql-snow .ql-picker.ql-lineHeight { width: 140px; }
+        .ql-snow .ql-picker.ql-header { width: 155px; }
+        .ql-snow .ql-picker.ql-header .ql-picker-label::before,
+        .ql-snow .ql-picker.ql-header .ql-picker-item::before { content: 'Testo Normale'; }
+        .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="2"]::before,
+        .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="2"]::before { content: 'Sottotitolo Grande'; }
+        .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="3"]::before,
+        .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="3"]::before { content: 'Sottotitolo Piccolo'; }
+
+        .ql-snow .ql-picker.ql-lineHeight { width: 155px; }
         .ql-snow .ql-picker.ql-lineHeight .ql-picker-label::before,
         .ql-snow .ql-picker.ql-lineHeight .ql-picker-item::before { content: 'Interlinea: Normale'; }
         .ql-snow .ql-picker.ql-lineHeight .ql-picker-label[data-value="1"]::before,
@@ -274,7 +291,7 @@
         .ql-snow .ql-picker.ql-lineHeight .ql-picker-label[data-value="2"]::before,
         .ql-snow .ql-picker.ql-lineHeight .ql-picker-item[data-value="2"]::before { content: 'Interlinea: Doppia'; }
 
-        .ql-snow .ql-picker.ql-marginBottom { width: 145px; }
+        .ql-snow .ql-picker.ql-marginBottom { width: 155px; }
         .ql-snow .ql-picker.ql-marginBottom .ql-picker-label::before,
         .ql-snow .ql-picker.ql-marginBottom .ql-picker-item::before { content: 'Paragrafo: Normale'; }
         .ql-snow .ql-picker.ql-marginBottom .ql-picker-label[data-value="0em"]::before,
