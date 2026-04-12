@@ -631,7 +631,10 @@
                     <textarea id="newContent" required rows="4" class="w-full border border-gray-300 rounded-b-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none resize-none" placeholder="Dettagli dell'avviso..."></textarea>
                 </div>
 
-                <div class="flex items-center gap-2 pt-2"><input type="checkbox" id="newPinned" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"><label for="newPinned" class="text-sm text-gray-700 font-medium">Metti in evidenza (Pin in alto)</label></div>
+                <div class="flex items-center gap-4 pt-2">
+                    <div class="flex items-center gap-2"><input type="checkbox" id="newPinned" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"><label for="newPinned" class="text-sm text-gray-700 font-medium">Metti in evidenza</label></div>
+                    <div class="flex items-center gap-2"><input type="checkbox" id="newPopup" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"><label for="newPopup" class="text-sm text-gray-700 font-medium">Mostra come Pop-up all'apertura</label></div>
+                </div>
                 <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition mt-2 shadow-lg flex justify-center items-center gap-2"><span id="submitBtnText">Pubblica Avviso</span></button>
             </form>
         </div>
@@ -691,6 +694,7 @@
         let editingId = null; 
         let openedNoticeId = null; // NEW: Traccia la notizia aperta
         let initialLoadHandled = false; // NEW: Flag per apertura automatica link
+        let hasShownPopup = false; // NEW: Flag per pop-up
         const SECRET_CLICKS_REQUIRED = 5;
 
         // Struttura dati orari default MULTI-SLOT
@@ -937,7 +941,7 @@
                 return schedule;
             };
 
-            hoursConfig.segreteria = readScheduleFromDOM('seg');
+            hoursConfig.segreteria = readScheduleFromDOM('segreteria');
             hoursConfig.nuoto = readScheduleFromDOM('nuoto');
             
             // Vasca Esterna
@@ -1561,7 +1565,7 @@
                 notices = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 loading.classList.add('hidden'); renderNotices();
 
-                // CHECK URL PARAM FOR SHARED NOTICE
+                // CHECK URL PARAM FOR SHARED NOTICE OR POPUP
                 if (!initialLoadHandled) {
                     const urlParams = new URLSearchParams(window.location.search);
                     const sharedId = urlParams.get('id');
@@ -1571,9 +1575,15 @@
                             viewNotice(sharedId);
                         } else {
                             showToast("La notizia cercata non esiste o è stata rimossa.", true);
-                            // Pulisci URL
                             window.history.replaceState({}, document.title, window.location.pathname);
                         }
+                    } else if (!hasShownPopup) {
+                        // Cerca una notizia attiva impostata come popup
+                        const popupNotice = notices.find(n => n.isPopup && !n.archived && (!n.expirationDate || new Date(n.expirationDate).setHours(23,59,59,999) >= new Date().getTime()));
+                        if (popupNotice) {
+                            viewNotice(popupNotice.id);
+                        }
+                        hasShownPopup = true;
                     }
                     initialLoadHandled = true;
                 }
@@ -1881,6 +1891,7 @@
             });
 
             document.getElementById('newPinned').checked = notice.isPinned; 
+            document.getElementById('newPopup').checked = notice.isPopup || false;
             document.getElementById('newDate').value = notice.displayDate || '';
             document.getElementById('newExpirationDate').value = notice.expirationDate || ''; // Popola scadenza
             
@@ -1899,7 +1910,9 @@
                 // Fallback se nessuna selezionata
                 if (categories.length === 0) categories.push('info');
 
-                const isPinned = document.getElementById('newPinned').checked; const displayDate = document.getElementById('newDate').value;
+                const isPinned = document.getElementById('newPinned').checked; 
+                const isPopup = document.getElementById('newPopup').checked;
+                const displayDate = document.getElementById('newDate').value;
                 const expirationDate = document.getElementById('newExpirationDate').value;
 
                 let imageUrl = null; let contentImageUrl = null; let attachmentUrl = null;
@@ -1920,7 +1933,7 @@
                     else attachmentUrl = attachmentUrlManual;
                 }
 
-                const noticeData = { title, content, categories, isPinned, displayDate, expirationDate, timestamp: Date.now() };
+                const noticeData = { title, content, categories, isPinned, isPopup, displayDate, expirationDate, timestamp: Date.now() };
                 if (imageUrl) noticeData.imageUrl = imageUrl; if (contentImageUrl) noticeData.contentImageUrl = contentImageUrl; if (attachmentUrl) noticeData.attachmentUrl = attachmentUrl;
 
                 if (editingId) { await updateDoc(doc(db, NOTICES_COLLECTION, editingId), noticeData); showToast("Modificato con successo!"); } 
@@ -2065,6 +2078,7 @@
             // Default select info if none (visual reset handled by rendering)
             
             document.getElementById('newPinned').checked = false; 
+            document.getElementById('newPopup').checked = false;
             document.getElementById('newDate').value = ''; 
             document.getElementById('newExpirationDate').value = ''; // Reset scadenza
             document.getElementById('coverFile').value = ''; 
