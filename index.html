@@ -434,9 +434,13 @@
     <!-- MODAL VIEW NOTICE (Aggiornato Mobile) -->
     <div id="viewNoticeModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-md fade-in">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] relative">
-            <button onclick="closeViewModal()" class="absolute top-4 right-4 bg-white/80 p-2 rounded-full hover:bg-gray-100 z-10 transition" title="Chiudi"><i data-lucide="x" class="w-6 h-6 text-slate-700"></i></button>
+            
+            <!-- POPUP BANNER (NEW) -->
+            <div id="viewNoticePopupBanner" class="hidden bg-blue-500 text-white text-center py-2.5 font-bold uppercase tracking-wider text-sm w-full shrink-0 z-20">In Evidenza</div>
+
+            <button onclick="closeViewModal()" class="absolute top-4 right-4 bg-white/90 p-2 rounded-full hover:bg-gray-100 z-30 transition shadow-sm" title="Chiudi"><i data-lucide="x" class="w-6 h-6 text-slate-700"></i></button>
             <!-- Pulsante Condividi -->
-            <button onclick="shareCurrentNotice()" class="absolute top-4 right-16 bg-white/80 p-2 rounded-full hover:bg-gray-100 z-10 transition" title="Copia Link Notizia"><i data-lucide="share-2" class="w-6 h-6 text-slate-700"></i></button>
+            <button id="viewNoticeShareBtn" onclick="shareCurrentNotice()" class="absolute top-4 right-16 bg-white/90 p-2 rounded-full hover:bg-gray-100 z-30 transition shadow-sm" title="Copia Link Notizia"><i data-lucide="share-2" class="w-6 h-6 text-slate-700"></i></button>
             
             <div class="overflow-y-auto custom-scrollbar">
                 <div id="viewNoticeCover" class="w-full h-64 bg-slate-100 hidden"><img id="viewNoticeCoverImg" class="w-full h-full object-cover"></div>
@@ -1572,7 +1576,7 @@
                     if (sharedId) {
                         const exists = notices.find(n => n.id === sharedId);
                         if (exists) {
-                            viewNotice(sharedId);
+                            viewNotice(sharedId, false);
                         } else {
                             showToast("La notizia cercata non esiste o è stata rimossa.", true);
                             window.history.replaceState({}, document.title, window.location.pathname);
@@ -1581,7 +1585,7 @@
                         // Cerca una notizia attiva impostata come popup
                         const popupNotice = notices.find(n => n.isPopup && !n.archived && (!n.expirationDate || new Date(n.expirationDate).setHours(23,59,59,999) >= new Date().getTime()));
                         if (popupNotice) {
-                            viewNotice(popupNotice.id);
+                            viewNotice(popupNotice.id, true);
                         }
                         hasShownPopup = true;
                     }
@@ -1967,11 +1971,30 @@
         async function togglePin(id, currentStatus) { await updateDoc(doc(db, NOTICES_COLLECTION, id), { isPinned: !currentStatus }); }
 
         // NEW: View Notice Logic (MODAL) - Usa ancora IFRAME per lettura
-        function viewNotice(id) {
+        function viewNotice(id, isAutoPopup = false) {
             const notice = notices.find(n => n.id === id);
             if (!notice) return;
 
             openedNoticeId = id; // Set global current ID for sharing
+
+            const modalWrapper = document.getElementById('viewNoticeModal');
+            const popupBanner = document.getElementById('viewNoticePopupBanner');
+            const shareBtn = document.getElementById('viewNoticeShareBtn');
+            const catsContainer = document.getElementById('viewNoticeCategoriesContainer');
+
+            if (isAutoPopup) {
+                modalWrapper.classList.remove('bg-black/70', 'backdrop-blur-md');
+                modalWrapper.classList.add('bg-black/40', 'backdrop-blur-sm');
+                popupBanner.classList.remove('hidden');
+                shareBtn.classList.add('hidden');
+                catsContainer.classList.add('hidden');
+            } else {
+                modalWrapper.classList.remove('bg-black/40', 'backdrop-blur-sm');
+                modalWrapper.classList.add('bg-black/70', 'backdrop-blur-md');
+                popupBanner.classList.add('hidden');
+                shareBtn.classList.remove('hidden');
+                catsContainer.classList.remove('hidden');
+            }
 
             document.getElementById('viewNoticeTitle').innerText = notice.title;
             // MODIFICATO: Usa innerHTML per renderizzare la formattazione
@@ -1979,7 +2002,6 @@
             document.getElementById('viewNoticeDate').innerText = notice.displayDate ? new Date(notice.displayDate).toLocaleDateString('it-IT') : new Date(notice.timestamp).toLocaleDateString('it-IT');
             
             // Render Categorie in View Modal
-            const catsContainer = document.getElementById('viewNoticeCategoriesContainer');
             const normalizedCats = notice.categories || (notice.category ? [notice.category] : ['info']);
             catsContainer.innerHTML = normalizedCats.map(catKey => {
                 const cat = CATEGORIES[catKey] || { label: catKey, class: 'bg-gray-100' };
