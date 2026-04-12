@@ -21,7 +21,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f8fafc; /* Mantiene il colore di base slate-50 */
+            /* Aggiunta pattern onde azzurre stile cartelli FIN Lampugnano */
+            background-image: url("data:image/svg+xml,%3Csvg width='600' height='300' viewBox='0 0 600 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%230284c7' stroke-width='1.5' stroke-opacity='0.12'%3E%3Cpath d='M0,150 Q150,0 300,150 T600,150'/%3E%3Cpath d='M0,165 Q150,15 300,165 T600,165'/%3E%3Cpath d='M0,180 Q150,30 300,180 T600,180'/%3E%3Cpath d='M0,135 Q150,285 300,135 T600,135'/%3E%3Cpath d='M0,120 Q150,270 300,120 T600,120'/%3E%3Cpath d='M0,105 Q150,255 300,105 T600,105'/%3E%3C/g%3E%3C/svg%3E");
+            background-attachment: fixed;
+            background-size: 500px;
+        }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
@@ -296,7 +303,7 @@
     </div>
 
     <!-- BANNER CATEGORIE UNIFICATO (Scroll orizzontale su mobile) -->
-    <div class="bg-white border-b border-slate-200 py-3 shadow-sm">
+    <div class="bg-white border-b border-slate-200 py-3 shadow-sm relative z-10">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex gap-3 overflow-x-auto no-scrollbar pb-1 items-center" id="categoryFiltersContainer">
                 <!-- Generato via JS: Qui finiranno tutti i box (Urgenti, Info, Corsi, Novità, ecc.) -->
@@ -305,7 +312,7 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full">
+    <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full relative z-10">
         <!-- Controlli Admin (separati dal banner pubblico) -->
         <div class="flex justify-end items-center gap-3 mb-6">
             <div id="loadingIndicator" class="hidden"><div class="loader"></div></div>
@@ -326,7 +333,7 @@
     </main>
     
     <!-- FASCIA CONTATTI & SOCIAL -->
-    <div class="bg-slate-800 text-white py-12 border-t border-slate-700">
+    <div class="bg-slate-800 text-white py-12 border-t border-slate-700 relative z-10">
         <div class="max-w-6xl mx-auto px-4">
             
             <!-- Search Bar in fondo (Visibile su tutti i dispositivi) -->
@@ -418,7 +425,7 @@
     </div>
     
     <!-- FOOTER ISTITUZIONALE -->
-    <footer class="bg-slate-100 border-t border-slate-200 py-8 text-center text-slate-500 text-xs leading-relaxed">
+    <footer class="bg-slate-100 border-t border-slate-200 py-8 text-center text-slate-500 text-xs leading-relaxed relative z-10">
         <div class="max-w-4xl mx-auto px-4">
             <p class="font-bold text-slate-700 mb-1">Fin Plus Lombardia S.S.D. a r.l. — FIN Centro Federale Milano Piscina Lampugnano</p>
             <p class="mb-1">P.IVA/CF 14296840961 — SL: Via Piranesi 46, 20137 Milano (MI) - SO: Via Lampugnano 76, 20151 Milano (MI)</p>
