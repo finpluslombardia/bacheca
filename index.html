@@ -301,6 +301,22 @@
         .ql-snow .ql-picker.ql-marginBottom .ql-picker-label[data-value="1.5em"]::before,
         .ql-snow .ql-picker.ql-marginBottom .ql-picker-item[data-value="1.5em"]::before { content: 'Paragrafo: Largo'; }
 
+        /* Banner Urgente (Ticker) */
+        @keyframes ticker-marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-ticker {
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+            padding-left: 100%;
+            animation: ticker-marquee 25s linear infinite;
+        }
+        .animate-ticker:hover {
+            animation-play-state: paused;
+        }
+
         /* Dark Mode Overrides (Impatto minimo sulle classi Tailwind esistenti) */
         html.dark body { background-color: #0f172a; color: #f8fafc; }
         html.dark .bg-white { background-color: #1e293b !important; }
@@ -357,6 +373,13 @@
             </div>
         </div>
     </header>
+
+    <!-- TICKER AVVISI URGENTI (NEW) -->
+    <div id="urgentTickerContainer" class="hidden w-full overflow-hidden bg-red-600 text-white py-2 z-20 relative shadow-md border-b border-red-700">
+        <div id="urgentTickerContent" class="animate-ticker text-sm font-bold tracking-wide">
+            <!-- Generato via JS -->
+        </div>
+    </div>
 
     <!-- STATUS BAR (NEW) -->
     <div class="bg-blue-950 text-slate-200 text-xs md:text-sm py-2 px-4 shadow-md border-b border-blue-900">
@@ -1942,6 +1965,33 @@
 
         // Funzione asincrona per renderizzare la griglia
         async function renderNotices() {
+            // --- GESTIONE TICKER URGENTI ---
+            const tickerContainer = document.getElementById('urgentTickerContainer');
+            const tickerContent = document.getElementById('urgentTickerContent');
+            
+            // Filtra solo gli avvisi urgenti attivi e pubblici
+            const urgentNotices = notices.filter(n => {
+                const cats = n.categories || (n.category ? [n.category] : ['info']);
+                const isExpired = n.expirationDate && new Date(n.expirationDate).setHours(23,59,59,999) < new Date().getTime();
+                const isScheduled = n.scheduledDate && new Date(n.scheduledDate).getTime() > new Date().getTime();
+                
+                return cats.includes('urgent') && !n.archived && !isExpired && !isScheduled;
+            });
+
+            if (urgentNotices.length > 0) {
+                const tickerItems = urgentNotices.map(n => 
+                    `<span class="cursor-pointer hover:underline flex items-center gap-1.5" onclick="viewNotice('${n.id}')">
+                        <i data-lucide="alert-triangle" class="w-4 h-4"></i> ${n.title.toUpperCase()}
+                     </span>`
+                ).join('<span class="opacity-50 px-6 font-normal">|</span>');
+                
+                tickerContent.innerHTML = tickerItems;
+                tickerContainer.classList.remove('hidden');
+            } else {
+                tickerContainer.classList.add('hidden');
+            }
+            // --- FINE GESTIONE TICKER URGENTI ---
+
             const grid = document.getElementById('noticesGrid'); const empty = document.getElementById('emptyState');
             
             // Filtro logica scadenza + archivio + Programmazione
