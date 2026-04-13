@@ -851,9 +851,14 @@
                 <p id="qrNoticeTitle" class="font-bold text-gray-800 text-lg mb-1 leading-tight"></p>
                 <p class="text-xs text-gray-500">Inquadra per leggere l'avviso completo</p>
             </div>
-            <button onclick="printQrCode()" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg flex items-center justify-center gap-2 transition">
-                <i data-lucide="printer" class="w-5 h-5"></i> Stampa Tabellone
-            </button>
+            <div class="flex gap-2 mt-4">
+                <button onclick="downloadQrCode()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg shadow-lg flex items-center justify-center gap-2 transition">
+                    <i data-lucide="download" class="w-5 h-5"></i> Salva PNG
+                </button>
+                <button onclick="printQrCode()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg flex items-center justify-center gap-2 transition">
+                    <i data-lucide="printer" class="w-5 h-5"></i> Stampa
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1101,6 +1106,7 @@
             window.showQrCodeFromView = showQrCodeFromView;
             window.closeQrModal = closeQrModal;
             window.printQrCode = printQrCode;
+            window.downloadQrCode = downloadQrCode;
 
             // POLL FUNCTION
             window.togglePollSection = togglePollSection;
@@ -2778,6 +2784,32 @@
                 };
             } else {
                 setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
+            }
+        }
+
+        async function downloadQrCode() {
+            const imgSrc = document.getElementById('qrCodeImg').src;
+            const title = document.getElementById('qrNoticeTitle').innerText;
+            if (!imgSrc) return;
+
+            try {
+                showToast("Preparazione download in corso...");
+                const response = await fetch(imgSrc);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                // Crea un nome file pulito senza spazi o caratteri speciali
+                const safeTitle = title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'qrcode';
+                a.download = `QR_${safeTitle}.png`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (err) {
+                console.error("Errore download QR:", err);
+                showToast("Errore durante il download del QR Code", true);
             }
         }
 
