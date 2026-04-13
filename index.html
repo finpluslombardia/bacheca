@@ -1003,6 +1003,37 @@
                 placeholder: 'Dettagli dell\'avviso...'
             });
 
+            // FIX: Evita che la formattazione (sottotitoli, interlinea) si espanda 
+            // al paragrafo successivo se si seleziona accidentalmente l'a capo invisibile.
+            const safeBlockFormat = (formatName, value) => {
+                let range = quill.getSelection();
+                if (range) {
+                    let len = range.length;
+                    if (len > 0) {
+                        let text = quill.getText(range.index, len);
+                        while (text.length > 0 && text.endsWith('\n')) {
+                            len -= 1;
+                            text = text.substring(0, len);
+                        }
+                        quill.setSelection(range.index, len);
+                    }
+                    
+                    let finalValue = value;
+                    if (formatName === 'header') {
+                        finalValue = false;
+                        if (value === '2' || value === 2) finalValue = 2;
+                        else if (value === '3' || value === 3) finalValue = 3;
+                    } else if (!value || (typeof value === 'string' && value.includes('Normale'))) {
+                        finalValue = false;
+                    }
+                    quill.format(formatName, finalValue);
+                }
+            };
+
+            quill.getModule('toolbar').addHandler('header', (val) => safeBlockFormat('header', val));
+            quill.getModule('toolbar').addHandler('lineHeight', (val) => safeBlockFormat('lineHeight', val));
+            quill.getModule('toolbar').addHandler('marginBottom', (val) => safeBlockFormat('marginBottom', val));
+
             // Gestione custom per upload immagini inline su Firebase Storage (evita base64 enormi nel DB)
             quill.getModule('toolbar').addHandler('image', () => {
                 // SALVA IL RANGE PRIMA DI APRIRE IL FILE PICKER (Fix perdita di focus e bug inserimento)
