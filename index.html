@@ -301,22 +301,6 @@
         .ql-snow .ql-picker.ql-marginBottom .ql-picker-label[data-value="1.5em"]::before,
         .ql-snow .ql-picker.ql-marginBottom .ql-picker-item[data-value="1.5em"]::before { content: 'Paragrafo: Largo'; }
 
-        /* Banner Urgente (Ticker) */
-        @keyframes ticker-marquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
-        }
-        .animate-ticker {
-            display: inline-flex;
-            align-items: center;
-            white-space: nowrap;
-            padding-left: 100%;
-            animation: ticker-marquee 25s linear infinite;
-        }
-        .animate-ticker:hover {
-            animation-play-state: paused;
-        }
-
         /* Dark Mode Overrides (Impatto minimo sulle classi Tailwind esistenti) */
         html.dark body { background-color: #0f172a; color: #f8fafc; }
         html.dark .bg-white { background-color: #1e293b !important; }
@@ -374,9 +358,9 @@
         </div>
     </header>
 
-    <!-- TICKER AVVISI URGENTI (NEW) -->
-    <div id="urgentTickerContainer" class="hidden w-full overflow-hidden bg-red-600 text-white py-2 z-20 relative shadow-md border-b border-red-700">
-        <div id="urgentTickerContent" class="animate-ticker text-sm font-bold tracking-wide">
+    <!-- BANNER AVVISI URGENTI (FISSO) -->
+    <div id="urgentTickerContainer" class="hidden w-full bg-red-600 text-white py-2.5 z-20 relative shadow-md border-b border-red-700">
+        <div id="urgentTickerContent" class="max-w-6xl mx-auto px-4 flex flex-wrap justify-center items-center gap-x-4 gap-y-2 text-sm font-bold tracking-wide text-center">
             <!-- Generato via JS -->
         </div>
     </div>
@@ -1965,7 +1949,7 @@
 
         // Funzione asincrona per renderizzare la griglia
         async function renderNotices() {
-            // --- GESTIONE TICKER URGENTI ---
+            // --- GESTIONE BANNER URGENTI ---
             const tickerContainer = document.getElementById('urgentTickerContainer');
             const tickerContent = document.getElementById('urgentTickerContent');
             
@@ -1981,16 +1965,16 @@
             if (urgentNotices.length > 0) {
                 const tickerItems = urgentNotices.map(n => 
                     `<span class="cursor-pointer hover:underline flex items-center gap-1.5" onclick="viewNotice('${n.id}')">
-                        <i data-lucide="alert-triangle" class="w-4 h-4"></i> ${n.title.toUpperCase()}
+                        <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0"></i> <span>${n.title.toUpperCase()}</span>
                      </span>`
-                ).join('<span class="opacity-50 px-6 font-normal">|</span>');
+                ).join('<span class="opacity-50 hidden md:inline">|</span>');
                 
                 tickerContent.innerHTML = tickerItems;
                 tickerContainer.classList.remove('hidden');
             } else {
                 tickerContainer.classList.add('hidden');
             }
-            // --- FINE GESTIONE TICKER URGENTI ---
+            // --- FINE GESTIONE BANNER URGENTI ---
 
             const grid = document.getElementById('noticesGrid'); const empty = document.getElementById('emptyState');
             
