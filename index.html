@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AquaBoard - Centro Federale Lampugnano</title>
+    <title id="page-title">AquaBoard - Centro Federale Lampugnano</title>
+    
+    <!-- Open Graph / Social Meta Tags (NEW) -->
+    <meta property="og:type" content="article" />
+    <meta property="og:title" id="meta-og-title" content="AquaBoard - Centro Federale Lampugnano" />
+    <meta property="og:description" id="meta-og-description" content="Bacheca Digitale Ufficiale del Centro Federale Lampugnano. Avvisi, orari e novità." />
+    <meta property="og:image" id="meta-og-image" content="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/droplets.svg" />
+    <meta property="og:url" id="meta-og-url" content="" />
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1100,6 +1107,33 @@
             }
         }
 
+        // --- OG META TAGS UPDATER (NEW) ---
+        function updateDynamicMetaTags(notice) {
+            if (!notice) return;
+            
+            // Pulisci il contenuto HTML per avere una descrizione pulita
+            const plainText = notice.content.replace(/<[^>]+>/g, '').trim();
+            const shortDesc = plainText.length > 150 ? plainText.substring(0, 150) + '...' : (plainText || 'Nuovo avviso dal Centro Federale Lampugnano');
+
+            // Aggiorna Titolo Pagina Browser
+            document.getElementById('page-title').innerText = `${notice.title} | AquaBoard`;
+            
+            // Aggiorna Meta Tags
+            const ogTitle = document.getElementById('meta-og-title');
+            if(ogTitle) ogTitle.setAttribute('content', notice.title);
+            
+            const ogDesc = document.getElementById('meta-og-description');
+            if(ogDesc) ogDesc.setAttribute('content', shortDesc);
+            
+            const ogImage = document.getElementById('meta-og-image');
+            if(ogImage && notice.imageUrl) {
+                ogImage.setAttribute('content', notice.imageUrl);
+            }
+            
+            const ogUrl = document.getElementById('meta-og-url');
+            if(ogUrl) ogUrl.setAttribute('content', `${window.location.origin}${window.location.pathname}?id=${notice.id}`);
+        }
+
         // --- SHARE FUNCTIONALITY ---
         function shareCurrentNotice() {
             if (!openedNoticeId) return;
@@ -1896,6 +1930,7 @@
                     if (sharedId) {
                         const exists = notices.find(n => n.id === sharedId);
                         if (exists) {
+                            updateDynamicMetaTags(exists); // AGGIORNA I META TAG AL CARICAMENTO
                             viewNotice(sharedId, false);
                         } else {
                             showToast("La notizia cercata non esiste o è stata rimossa.", true);
