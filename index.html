@@ -1003,19 +1003,21 @@
                 placeholder: 'Dettagli dell\'avviso...'
             });
 
-            // FIX: Evita che la formattazione (sottotitoli, interlinea) si espanda 
-            // al paragrafo successivo se si seleziona accidentalmente l'a capo invisibile.
+            // FIX: Evita che la formattazione si espanda ai paragrafi successivi.
+            // Pulisce la selezione e, per i sottotitoli, la limita tassativamente alla prima riga.
             const safeBlockFormat = (formatName, value) => {
-                let range = quill.getSelection();
+                let range = quill.getSelection(true); // true forza il mantenimento del focus
                 if (range) {
-                    let len = range.length;
-                    if (len > 0) {
-                        let text = quill.getText(range.index, len);
-                        while (text.length > 0 && text.endsWith('\n')) {
-                            len -= 1;
-                            text = text.substring(0, len);
+                    let index = range.index;
+                    let length = range.length;
+
+                    // 1. Rimuove eventuali spazi vuoti o a capo "invisibili" presi alla fine
+                    if (length > 0) {
+                        let text = quill.getText(index, length);
+                        while (length > 0 && /\s$/.test(text)) {
+                            length--;
+                            text = text.substring(0, length);
                         }
-                        quill.setSelection(range.index, len);
                     }
                     
                     let finalValue = value;
@@ -1023,10 +1025,22 @@
                         finalValue = false;
                         if (value === '2' || value === 2) finalValue = 2;
                         else if (value === '3' || value === 3) finalValue = 3;
+                        
+                        // 2. Se è un sottotitolo, impedisce che venga applicato a più righe 
+                        // tagliando la selezione alla prima occorrenza di un a capo (se l'utente ha sbordato col mouse)
+                        if (length > 0) {
+                            let text = quill.getText(index, length);
+                            if (text.includes('\n')) {
+                                length = text.indexOf('\n'); 
+                            }
+                        }
                     } else if (!value || (typeof value === 'string' && value.includes('Normale'))) {
                         finalValue = false;
                     }
-                    quill.format(formatName, finalValue);
+                    
+                    // 3. Applica il formato SOLO al testo purificato tramite formatLine
+                    quill.setSelection(index, length);
+                    quill.formatLine(index, length, formatName, finalValue);
                 }
             };
 
