@@ -757,11 +757,32 @@
                     <p class="text-xs text-orange-600 font-semibold mb-2"><i data-lucide="info" class="w-3 h-3 inline"></i> Puoi caricare file dal PC o usare Link Pubblici (Google Drive).</p>
                     
                     <!-- Cover -->
-                    <div><label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2"><i data-lucide="image" class="w-4 h-4"></i>Immagine Copertina</label><div class="flex gap-2 mb-2 text-xs"><button type="button" onclick="toggleCoverType('file')" id="btnCoverFile" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button><button type="button" onclick="toggleCoverType('link')" id="btnCoverLink" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive</button></div><div id="coverFileInput"><input type="file" id="coverFile" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"></div><div id="coverLinkInput" class="hidden"><input type="url" id="coverUrlManual" placeholder="Incolla link Google Drive..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></div></div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2"><i data-lucide="image" class="w-4 h-4"></i>Immagine Copertina</label>
+                        <div id="currentCoverBadge" class="hidden mb-2 flex items-center justify-between bg-blue-100/50 border border-blue-200 px-3 py-2 rounded-lg">
+                            <span class="text-xs font-bold text-blue-800 flex items-center gap-1.5"><i data-lucide="check-circle" class="w-4 h-4 text-blue-600"></i> Copertina salvata nel database</span>
+                            <button type="button" onclick="markMediaForRemoval('cover')" class="text-xs bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:text-red-800 font-bold py-1 px-2 rounded-md shadow-sm transition flex items-center gap-1"><i data-lucide="trash-2" class="w-3 h-3"></i> Rimuovi</button>
+                        </div>
+                        <div class="flex gap-2 mb-2 text-xs"><button type="button" onclick="toggleCoverType('file')" id="btnCoverFile" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button><button type="button" onclick="toggleCoverType('link')" id="btnCoverLink" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive</button></div><div id="coverFileInput"><input type="file" id="coverFile" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"></div><div id="coverLinkInput" class="hidden"><input type="url" id="coverUrlManual" placeholder="Incolla link Google Drive..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                    </div>
                     <!-- Content Image -->
-                    <div class="border-t border-slate-200 pt-3"><label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2"><i data-lucide="image-plus" class="w-4 h-4"></i>Immagine nel Testo (Opzionale)</label><div class="flex gap-2 mb-2 text-xs"><button type="button" onclick="toggleContentType('file')" id="btnContentFile" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button><button type="button" onclick="toggleContentType('link')" id="btnContentLink" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive</button></div><div id="contentFileInput"><input type="file" id="contentImageFile" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"></div><div id="contentLinkInput" class="hidden"><input type="url" id="contentUrlManual" placeholder="Incolla link Google Drive..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></div></div>
+                    <div class="border-t border-slate-200 pt-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2"><i data-lucide="image-plus" class="w-4 h-4"></i>Immagine nel Testo (Opzionale)</label>
+                        <div id="currentContentImgBadge" class="hidden mb-2 flex items-center justify-between bg-blue-100/50 border border-blue-200 px-3 py-2 rounded-lg">
+                            <span class="text-xs font-bold text-blue-800 flex items-center gap-1.5"><i data-lucide="check-circle" class="w-4 h-4 text-blue-600"></i> Immagine salvata nel database</span>
+                            <button type="button" onclick="markMediaForRemoval('content')" class="text-xs bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:text-red-800 font-bold py-1 px-2 rounded-md shadow-sm transition flex items-center gap-1"><i data-lucide="trash-2" class="w-3 h-3"></i> Rimuovi</button>
+                        </div>
+                        <div class="flex gap-2 mb-2 text-xs"><button type="button" onclick="toggleContentType('file')" id="btnContentFile" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button><button type="button" onclick="toggleContentType('link')" id="btnContentLink" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive</button></div><div id="contentFileInput"><input type="file" id="contentImageFile" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"></div><div id="contentLinkInput" class="hidden"><input type="url" id="contentUrlManual" placeholder="Incolla link Google Drive..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                    </div>
                     <!-- Attachment -->
-                    <div class="border-t border-slate-200 pt-3"><label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2"><i data-lucide="paperclip" class="w-4 h-4"></i>Allegato (PDF o Link Esterno)</label><div class="flex gap-2 mb-2 text-xs"><button type="button" onclick="toggleAttachType('file')" id="btnFileType" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button><button type="button" onclick="toggleAttachType('link')" id="btnLinkType" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive/Web</button></div><div id="attachFileInput"><input type="file" id="attachmentFile" accept=".pdf,image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100"><p class="text-[10px] text-gray-400 mt-1">Nessun limite di dimensione (Archiviazione Cloud attiva).</p></div><div id="attachLinkInput" class="hidden"><input type="url" id="attachmentUrlManual" placeholder="Es. https://drive.google.com/..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></div></div>
+                    <div class="border-t border-slate-200 pt-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2"><i data-lucide="paperclip" class="w-4 h-4"></i>Allegato (PDF o Link Esterno)</label>
+                        <div id="currentAttachmentBadge" class="hidden mb-2 flex items-center justify-between bg-blue-100/50 border border-blue-200 px-3 py-2 rounded-lg">
+                            <span class="text-xs font-bold text-blue-800 flex items-center gap-1.5"><i data-lucide="check-circle" class="w-4 h-4 text-blue-600"></i> Allegato salvato nel database</span>
+                            <button type="button" onclick="markMediaForRemoval('attachment')" class="text-xs bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:text-red-800 font-bold py-1 px-2 rounded-md shadow-sm transition flex items-center gap-1"><i data-lucide="trash-2" class="w-3 h-3"></i> Rimuovi</button>
+                        </div>
+                        <div class="flex gap-2 mb-2 text-xs"><button type="button" onclick="toggleAttachType('file')" id="btnFileType" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button><button type="button" onclick="toggleAttachType('link')" id="btnLinkType" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive/Web</button></div><div id="attachFileInput"><input type="file" id="attachmentFile" accept=".pdf,image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100"><p class="text-[10px] text-gray-400 mt-1">Nessun limite di dimensione (Archiviazione Cloud attiva).</p></div><div id="attachLinkInput" class="hidden"><input type="url" id="attachmentUrlManual" placeholder="Es. https://drive.google.com/..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                    </div>
                 </div>
                 
                 <!-- Editor Messaggio con Quill -->
@@ -922,6 +943,7 @@
         let openedNoticeId = null; // NEW: Traccia la notizia aperta
         let initialLoadHandled = false; // NEW: Flag per apertura automatica link
         let hasShownPopup = false; // NEW: Flag per pop-up
+        let removeMediaFlags = { cover: false, content: false, attachment: false }; // NEW
         const SECRET_CLICKS_REQUIRED = 5;
 
         // Struttura dati orari default MULTI-SLOT
@@ -1119,6 +1141,9 @@
 
             // SUMMER MESSAGE
             window.editSummerMessage = editSummerMessage;
+
+            // MEDIA REMOVAL
+            window.markMediaForRemoval = markMediaForRemoval;
 
             // DARK MODE UI INIT
             updateDarkModeUI(document.documentElement.classList.contains('dark'));
@@ -2342,6 +2367,14 @@
         function updateSearch(val) { currentSearch = val; renderNotices(); }
         function toggleArchiveView() { showArchived = !showArchived; document.getElementById('archiveBtnText').innerText = showArchived ? "Torna alla Bacheca" : "Mostra Archivio"; const banner = document.getElementById('archiveBanner'); showArchived ? banner.classList.remove('hidden') : banner.classList.add('hidden'); renderNotices(); }
 
+        function markMediaForRemoval(type) {
+            removeMediaFlags[type] = true;
+            if (type === 'cover') document.getElementById('currentCoverBadge').classList.add('hidden');
+            if (type === 'content') document.getElementById('currentContentImgBadge').classList.add('hidden');
+            if (type === 'attachment') document.getElementById('currentAttachmentBadge').classList.add('hidden');
+            showToast("Elemento rimosso. Salva l'avviso per confermare.");
+        }
+
         window.toggleAttachType = function(type) {
             if(type === 'file') { document.getElementById('attachFileInput').classList.remove('hidden'); document.getElementById('attachLinkInput').classList.add('hidden'); document.getElementById('btnFileType').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnFileType').classList.replace('border','font-medium'); document.getElementById('btnLinkType').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnLinkType').classList.add('border'); } 
             else { document.getElementById('attachFileInput').classList.add('hidden'); document.getElementById('attachLinkInput').classList.remove('hidden'); document.getElementById('btnLinkType').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnLinkType').classList.remove('border'); document.getElementById('btnFileType').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnFileType').classList.add('border'); }
@@ -2369,6 +2402,12 @@
             document.getElementById('newDate').value = notice.displayDate || '';
             document.getElementById('newScheduledDate').value = notice.scheduledDate || ''; // Popola programmazione
             document.getElementById('newExpirationDate').value = notice.expirationDate || ''; // Popola scadenza
+            
+            // Gestione visiva media esistenti
+            removeMediaFlags = { cover: false, content: false, attachment: false };
+            if (notice.imageUrl) document.getElementById('currentCoverBadge').classList.remove('hidden'); else document.getElementById('currentCoverBadge').classList.add('hidden');
+            if (notice.contentImageUrl) document.getElementById('currentContentImgBadge').classList.remove('hidden'); else document.getElementById('currentContentImgBadge').classList.add('hidden');
+            if (notice.attachmentUrl) document.getElementById('currentAttachmentBadge').classList.remove('hidden'); else document.getElementById('currentAttachmentBadge').classList.add('hidden');
             
             // Popola Sondaggio
             const pollToggle = document.getElementById('newPollToggle');
@@ -2456,7 +2495,15 @@
 
                 // Includi scheduledDate nei dati passati
                 const noticeData = { title, content, categories, isPinned, isPopup, bannerColor, displayDate, expirationDate, scheduledDate, timestamp: Date.now() };
-                if (imageUrl) noticeData.imageUrl = imageUrl; if (contentImageUrl) noticeData.contentImageUrl = contentImageUrl; if (attachmentUrl) noticeData.attachmentUrl = attachmentUrl;
+                
+                if (imageUrl) noticeData.imageUrl = imageUrl;
+                else if (removeMediaFlags.cover) noticeData.imageUrl = null;
+                
+                if (contentImageUrl) noticeData.contentImageUrl = contentImageUrl;
+                else if (removeMediaFlags.content) noticeData.contentImageUrl = null;
+                
+                if (attachmentUrl) noticeData.attachmentUrl = attachmentUrl;
+                else if (removeMediaFlags.attachment) noticeData.attachmentUrl = null;
 
                 // Gestione Sondaggio
                 if (document.getElementById('newPollToggle').checked) {
@@ -2857,6 +2904,12 @@
                 <div class="flex items-center gap-2"><input type="text" class="poll-option-input w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Opzione 1"></div>
                 <div class="flex items-center gap-2"><input type="text" class="poll-option-input w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Opzione 2"></div>
             `;
+
+            // Reset Media Badges
+            removeMediaFlags = { cover: false, content: false, attachment: false };
+            document.getElementById('currentCoverBadge').classList.add('hidden');
+            document.getElementById('currentContentImgBadge').classList.add('hidden');
+            document.getElementById('currentAttachmentBadge').classList.add('hidden');
 
             document.getElementById('coverFile').value = ''; 
             document.getElementById('coverUrlManual').value = ''; 
