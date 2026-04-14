@@ -564,7 +564,7 @@
 
     <!-- MODAL VIEW NOTICE (Aggiornato Mobile) -->
     <div id="viewNoticeModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-md fade-in">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] relative">
+        <div id="viewNoticeInnerContainer" class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] relative transition-all duration-300">
             
             <!-- POPUP BANNER (NEW) -->
             <div id="viewNoticePopupBanner" class="hidden bg-blue-500 text-white text-center py-2.5 font-bold uppercase tracking-wider text-sm w-full shrink-0 z-20">In Evidenza</div>
@@ -2575,6 +2575,7 @@
             openedNoticeId = id; // Set global current ID for sharing
 
             const modalWrapper = document.getElementById('viewNoticeModal');
+            const innerContainer = document.getElementById('viewNoticeInnerContainer');
             const popupBanner = document.getElementById('viewNoticePopupBanner');
             const shareBtn = document.getElementById('viewNoticeShareBtn');
             const waShareBtn = document.getElementById('viewNoticeWaShareBtn');
@@ -2585,6 +2586,7 @@
             if (isAutoPopup) {
                 modalWrapper.classList.remove('bg-black/70', 'backdrop-blur-md');
                 modalWrapper.classList.add('bg-black/40', 'backdrop-blur-sm');
+                innerContainer.classList.add('border-4', 'border-blue-500'); // Aggiunge il bordo blu
                 popupBanner.classList.remove('hidden');
                 shareBtn.classList.add('hidden');
                 waShareBtn.classList.add('hidden');
@@ -2594,6 +2596,7 @@
             } else {
                 modalWrapper.classList.remove('bg-black/40', 'backdrop-blur-sm');
                 modalWrapper.classList.add('bg-black/70', 'backdrop-blur-md');
+                innerContainer.classList.remove('border-4', 'border-blue-500'); // Rimuove il bordo blu
                 popupBanner.classList.add('hidden');
                 shareBtn.classList.remove('hidden');
                 waShareBtn.classList.remove('hidden');
