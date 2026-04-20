@@ -850,6 +850,11 @@
                             <option value="blue">Banner Blu</option>
                             <option value="green">Banner Verde</option>
                             <option value="yellow">Banner Giallo</option>
+                            <option value="orange">Banner Arancione</option>
+                            <option value="purple">Banner Viola</option>
+                            <option value="pink">Banner Rosa</option>
+                            <option value="cyan">Banner Ciano</option>
+                            <option value="slate">Banner Grigio Scuro</option>
                         </select>
                     </div>
                 </div>
@@ -2168,6 +2173,11 @@
                 if (theme === 'blue') { themeClasses = 'bg-blue-600 text-white border-blue-700'; iconName = 'info'; }
                 else if (theme === 'green') { themeClasses = 'bg-emerald-600 text-white border-emerald-700'; iconName = 'check-circle'; }
                 else if (theme === 'yellow') { themeClasses = 'bg-yellow-400 text-slate-900 border-yellow-500'; iconName = 'alert-circle'; }
+                else if (theme === 'orange') { themeClasses = 'bg-orange-500 text-white border-orange-600'; iconName = 'alert-octagon'; }
+                else if (theme === 'purple') { themeClasses = 'bg-purple-600 text-white border-purple-700'; iconName = 'bell'; }
+                else if (theme === 'pink') { themeClasses = 'bg-pink-600 text-white border-pink-700'; iconName = 'heart'; }
+                else if (theme === 'cyan') { themeClasses = 'bg-cyan-500 text-slate-900 border-cyan-600'; iconName = 'droplets'; }
+                else if (theme === 'slate') { themeClasses = 'bg-slate-800 text-white border-slate-900'; iconName = 'megaphone'; }
                 
                 tickerContainer.className = `w-full py-2.5 z-20 relative shadow-md border-b ${themeClasses}`;
 
