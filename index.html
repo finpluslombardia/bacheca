@@ -2054,6 +2054,7 @@
 
         function renderFilters() {
             const container = document.getElementById('categoryFiltersContainer');
+            const subContainer = document.getElementById('subCategoryFiltersContainer');
             if (!container) return; // Safety Check
 
             const currentScroll = container.scrollLeft; // Save scroll position
@@ -2063,7 +2064,8 @@
 
             const html = order.map(key => {
                 const cat = CATEGORIES[key];
-                const isActive = currentFilter === key;
+                // MODIFICA: Mantiene "Corsi" attivo nel menu principale anche se si naviga nelle sue sottocategorie
+                const isActive = currentFilter === key || (key === 'corsi' && currentFilter.startsWith('corsi_'));
                 
                 // Stile dinamico
                 let classes = `flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-all shadow-sm group whitespace-nowrap shrink-0 cursor-pointer ${cat.border} ${cat.bg} ${cat.text} ${cat.hoverBorder} ${cat.hoverBg} ${cat.hoverText}`;
@@ -2087,6 +2089,30 @@
             
             container.innerHTML = html;
             container.scrollLeft = currentScroll; // Restore scroll position
+
+            // --- RENDER SOTTOCATEGORIE CORSI ---
+            if (subContainer) {
+                if (currentFilter.startsWith('corsi')) {
+                    const subCats = ['corsi', 'corsi_scuola', 'corsi_artistico', 'corsi_aquagol', 'corsi_propaganda', 'corsi_master'];
+                    const subHtml = subCats.map(key => {
+                        const isSubActive = currentFilter === key;
+                        const label = key === 'corsi' ? "Tutti i Corsi" : CATEGORIES[key].label;
+                        
+                        let subClasses = "px-4 py-1.5 rounded-full border border-indigo-200 bg-white text-indigo-600 hover:bg-indigo-50 text-xs font-semibold whitespace-nowrap shrink-0 transition-colors shadow-sm";
+                        if (isSubActive) {
+                            subClasses = "px-4 py-1.5 rounded-full border border-indigo-500 bg-indigo-100 text-indigo-800 text-xs font-bold whitespace-nowrap shrink-0 shadow-md ring-1 ring-indigo-200";
+                        }
+                        
+                        return `<button onclick="setFilter('${key}')" class="${subClasses}">${label}</button>`;
+                    }).join('');
+                    
+                    subContainer.innerHTML = subHtml;
+                    subContainer.classList.remove('hidden');
+                } else {
+                    subContainer.classList.add('hidden');
+                }
+            }
+
             lucide.createIcons();
         }
 
