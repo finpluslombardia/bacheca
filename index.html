@@ -983,7 +983,12 @@
             nuoto_libero: { label: "Nuoto Libero", icon: "waves", color: "cyan", border: "border-slate-200", bg: "bg-white", text: "text-slate-600", hoverBorder: "hover:border-cyan-300", hoverBg: "hover:bg-cyan-50", hoverText: "hover:text-cyan-700", activeBorder: "border-cyan-500", activeBg: "bg-cyan-50", activeText: "text-cyan-800", activeRing: "ring-cyan-200", iconBg: "bg-cyan-100", iconColor: "text-cyan-600" },
             
             corsi: { label: "Corsi", icon: "users", color: "indigo", border: "border-slate-200", bg: "bg-white", text: "text-slate-600", hoverBorder: "hover:border-indigo-300", hoverBg: "hover:bg-indigo-50", hoverText: "hover:text-indigo-700", activeBorder: "border-indigo-500", activeBg: "bg-indigo-50", activeText: "text-indigo-800", activeRing: "ring-indigo-200", iconBg: "bg-indigo-100", iconColor: "text-indigo-600" },
-            
+            corsi_scuola: { label: "Scuola Nuoto", icon: "user", color: "indigo", border: "border-slate-200", bg: "bg-white", text: "text-slate-600", hoverBorder: "hover:border-indigo-300", hoverBg: "hover:bg-indigo-50", hoverText: "hover:text-indigo-700", activeBorder: "border-indigo-500", activeBg: "bg-indigo-50", activeText: "text-indigo-800", activeRing: "ring-indigo-200", iconBg: "bg-indigo-100", iconColor: "text-indigo-600" },
+            corsi_artistico: { label: "Artistico", icon: "star", color: "indigo", border: "border-slate-200", bg: "bg-white", text: "text-slate-600", hoverBorder: "hover:border-indigo-300", hoverBg: "hover:bg-indigo-50", hoverText: "hover:text-indigo-700", activeBorder: "border-indigo-500", activeBg: "bg-indigo-50", activeText: "text-indigo-800", activeRing: "ring-indigo-200", iconBg: "bg-indigo-100", iconColor: "text-indigo-600" },
+            corsi_aquagol: { label: "Aquagol", icon: "target", color: "indigo", border: "border-slate-200", bg: "bg-white", text: "text-slate-600", hoverBorder: "hover:border-indigo-300", hoverBg: "hover:bg-indigo-50", hoverText: "hover:text-indigo-700", activeBorder: "border-indigo-500", activeBg: "bg-indigo-50", activeText: "text-indigo-800", activeRing: "ring-indigo-200", iconBg: "bg-indigo-100", iconColor: "text-indigo-600" },
+            corsi_propaganda: { label: "Propaganda", icon: "megaphone", color: "indigo", border: "border-slate-200", bg: "bg-white", text: "text-slate-600", hoverBorder: "hover:border-indigo-300", hoverBg: "hover:bg-indigo-50", hoverText: "hover:text-indigo-700", activeBorder: "border-indigo-500", activeBg: "bg-indigo-50", activeText: "text-indigo-800", activeRing: "ring-indigo-200", iconBg: "bg-indigo-100", iconColor: "text-indigo-600" },
+            corsi_master: { label: "Master", icon: "award", color: "indigo", border: "border-slate-200", bg: "bg-white", text: "text-slate-600", hoverBorder: "hover:border-indigo-300", hoverBg: "hover:bg-indigo-50", hoverText: "hover:text-indigo-700", activeBorder: "border-indigo-500", activeBg: "bg-indigo-50", activeText: "text-indigo-800", activeRing: "ring-indigo-200", iconBg: "bg-indigo-100", iconColor: "text-indigo-600" },
+
             summer: { label: "Attività Estive", icon: "sun", color: "orange", border: "border-slate-200", bg: "bg-white", text: "text-slate-600", hoverBorder: "hover:border-orange-300", hoverBg: "hover:bg-orange-50", hoverText: "hover:text-orange-700", activeBorder: "border-orange-500", activeBg: "bg-orange-50", activeText: "text-orange-800", activeRing: "ring-orange-200", iconBg: "bg-orange-100", iconColor: "text-orange-600" }
         };
 
@@ -2243,7 +2248,7 @@
                         if (catKey === 'urgent') badgeStyle = "bg-red-100 text-red-700 border-red-200";
                         else if (catKey === 'info') badgeStyle = "bg-blue-100 text-blue-700 border-blue-200";
                         else if (catKey === 'nuoto_libero') badgeStyle = "bg-cyan-100 text-cyan-700 border-cyan-200";
-                        else if (catKey === 'corsi') badgeStyle = "bg-indigo-100 text-indigo-700 border-indigo-200";
+                        else if (catKey.startsWith('corsi')) badgeStyle = "bg-indigo-100 text-indigo-700 border-indigo-200";
                         else if (catKey === 'summer') badgeStyle = "bg-orange-100 text-orange-700 border-orange-200";
                         else if (catKey === 'news') badgeStyle = "bg-emerald-100 text-emerald-700 border-emerald-200";
                         else if (catKey === 'promo') badgeStyle = "bg-pink-100 text-pink-700 border-pink-200";
