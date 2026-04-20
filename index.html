@@ -2173,7 +2173,12 @@
             // Filtro ricerca e categoria
             filtered = filtered.filter(n => {
                 const matchesSearch = (n.title || '').toLowerCase().includes(currentSearch.toLowerCase()) || (n.content || '').toLowerCase().includes(currentSearch.toLowerCase());
-                const matchesCategory = currentFilter === 'all' || n.normalizedCategories.includes(currentFilter);
+                
+                // Se il filtro è "corsi", includi anche tutte le sottocategorie (che iniziano per corsi_)
+                const matchesCategory = currentFilter === 'all' || 
+                                        n.normalizedCategories.includes(currentFilter) ||
+                                        (currentFilter === 'corsi' && n.normalizedCategories.some(cat => cat.startsWith('corsi_')));
+                                        
                 return matchesSearch && matchesCategory;
             });
             
