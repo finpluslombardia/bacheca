@@ -2211,34 +2211,38 @@
 
         // Funzione asincrona per renderizzare la griglia
         async function renderNotices() {
-            // --- GESTIONE HEADER CATEGORIE SPECIFICHE ---
-            const artisticoHeader = document.getElementById('artisticoCategoryHeader');
-            if (artisticoHeader) {
-                if (currentFilter === 'corsi_artistico' && !showArchived && currentSearch === '') {
-                    artisticoHeader.classList.remove('hidden');
-                    
-                    // Popola con i dati salvati
-                    document.getElementById('artisticoDescText').innerText = hoursConfig.artisticoDesc || "";
-                    const accContainer = document.getElementById('artisticoAccordionContainer');
-                    const accData = hoursConfig.artisticoAccordion || [];
-                    
-                    accContainer.innerHTML = accData.map(item => {
-                        if(!item.title && !item.content) return ''; // Salta se la tendina è completamente vuota
-                        return `
-                        <details class="group border border-slate-200 rounded-lg bg-slate-50 [&_summary::-webkit-details-marker]:hidden">
-                            <summary class="flex items-center justify-between p-4 cursor-pointer font-semibold text-slate-800 hover:bg-slate-100 transition-colors">
-                                ${item.title}
-                                <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform group-open:-rotate-180"></i>
-                            </summary>
-                            <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed whitespace-pre-line">${item.content}</div>
-                        </details>
-                        `;
-                    }).join('');
-                    
-                    lucide.createIcons();
-                } else {
-                    artisticoHeader.classList.add('hidden');
+            // --- GESTIONE HEADER CATEGORIE SPECIFICHE (Con blocco Try-Catch antierrore) ---
+            try {
+                const artisticoHeader = document.getElementById('artisticoCategoryHeader');
+                if (artisticoHeader) {
+                    if (currentFilter === 'corsi_artistico' && !showArchived && currentSearch === '') {
+                        artisticoHeader.classList.remove('hidden');
+                        
+                        // Popola con i dati salvati
+                        document.getElementById('artisticoDescText').innerText = hoursConfig.artisticoDesc || "";
+                        const accContainer = document.getElementById('artisticoAccordionContainer');
+                        const accData = hoursConfig.artisticoAccordion || [];
+                        
+                        accContainer.innerHTML = accData.map(item => {
+                            if(!item || (!item.title && !item.content)) return ''; // Salta se la tendina è completamente vuota
+                            return `
+                            <details class="group border border-slate-200 rounded-lg bg-slate-50 [&_summary::-webkit-details-marker]:hidden">
+                                <summary class="flex items-center justify-between p-4 cursor-pointer font-semibold text-slate-800 hover:bg-slate-100 transition-colors">
+                                    ${item.title || ''}
+                                    <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform group-open:-rotate-180"></i>
+                                </summary>
+                                <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed whitespace-pre-line">${item.content || ''}</div>
+                            </details>
+                            `;
+                        }).join('');
+                        
+                        lucide.createIcons();
+                    } else {
+                        artisticoHeader.classList.add('hidden');
+                    }
                 }
+            } catch (err) {
+                console.error("Errore rendering header Artistico:", err);
             }
 
             // --- GESTIONE BANNER AVVISI ---
@@ -2286,10 +2290,20 @@
 
             const grid = document.getElementById('noticesGrid'); const empty = document.getElementById('emptyState');
             
-            // Filtro logica scadenza + archivio + Programmazione
+            // Filtro logica scadenza + archivio + Programmazione (REVISIONE SICUREZZA DATI)
             let filtered = notices.filter(n => {
-                // Normalizza le categorie
-                n.normalizedCategories = n.categories || (n.category ? [n.category] : ['info']);
+                // Normalizza le categorie assicurando che sia SEMPRE un array (previene crash su vecchi dati)
+                let cats = [];
+                if (Array.isArray(n.categories)) {
+                    cats = n.categories;
+                } else if (typeof n.categories === 'string') {
+                    cats = [n.categories];
+                } else if (typeof n.category === 'string') {
+                    cats = [n.category];
+                } else {
+                    cats = ['info'];
+                }
+                n.normalizedCategories = cats;
 
                 // Controlla scadenza e programmazione
                 const isExpired = n.expirationDate && new Date(n.expirationDate).setHours(23,59,59,999) < new Date().getTime();
@@ -2307,20 +2321,24 @@
                 }
             });
 
-            // FIX PER L'ISOLAMENTO DELLE SOTTOCATEGORIE: Logica riscritta per essere 100% esatta
+            // FIX PER L'ISOLAMENTO DELLE SOTTOCATEGORIE: Logica a prova di bomba
             filtered = filtered.filter(n => {
-                const matchesSearch = (n.title || '').toLowerCase().includes(currentSearch.toLowerCase()) || (n.content || '').toLowerCase().includes(currentSearch.toLowerCase());
+                const searchLower = currentSearch.toLowerCase();
+                const titleMatch = (n.title || '').toLowerCase().includes(searchLower);
+                const contentMatch = (n.content || '').toLowerCase().includes(searchLower);
+                const matchesSearch = titleMatch || contentMatch;
                 
                 let matchesCategory = false;
+                const cats = n.normalizedCategories;
                 
                 if (currentFilter === 'all') {
                     matchesCategory = true;
                 } else if (currentFilter === 'corsi') {
-                    // Quando l'utente clicca "Tutti i Corsi", mostro i corsi generici e le sottocategorie
-                    matchesCategory = n.normalizedCategories.includes('corsi') || n.normalizedCategories.some(cat => cat.startsWith('corsi_'));
+                    // Mostra sia 'corsi' generici che tutte le sottocategorie in modo sicuro
+                    matchesCategory = cats.includes('corsi') || cats.some(c => typeof c === 'string' && c.startsWith('corsi_'));
                 } else {
-                    // Quando l'utente clicca una sottocategoria specifica (es. "Artistico"), il match deve essere ESATTO
-                    matchesCategory = n.normalizedCategories.includes(currentFilter);
+                    // Match ESATTO per le sottocategorie (es. 'corsi_artistico')
+                    matchesCategory = cats.includes(currentFilter);
                 }
                                         
                 return matchesSearch && matchesCategory;
