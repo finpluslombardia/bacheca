@@ -2681,7 +2681,7 @@
             // --- RENDER SOTTOCATEGORIE CORSI ---
             if (subContainer) {
                 if (currentFilter.startsWith('corsi')) {
-                    const subCats = ['corsi', 'corsi_scuola', 'corsi_aquafitness', 'corsi_artistico', 'corsi_aquagol', 'corsi_propaganda', 'corsi_master'];
+                    const subCats = ['corsi', 'corsi_scuola', 'corsi_aquafitness', 'corsi_propaganda', 'corsi_artistico', 'corsi_aquagol', 'corsi_master'];
                     const subHtml = subCats.map(key => {
                         const isSubActive = currentFilter === key;
                         const label = key === 'corsi' ? "Tutti i Corsi" : CATEGORIES[key].label;
