@@ -2182,23 +2182,31 @@
                     if (currentFilter === 'corsi_artistico' && !showArchived && currentSearch === '') {
                         artisticoHeader.classList.remove('hidden');
                         
-                        // Popola con i dati salvati
-                        document.getElementById('artisticoDescText').innerText = hoursConfig.artisticoDesc || "";
+                        // Popola con i dati salvati SOLO SE ESISTONO E NON SONO VUOTI, altrimenti mantiene i testi predefiniti
+                        if (hoursConfig.artisticoDesc && hoursConfig.artisticoDesc.trim() !== '') {
+                            document.getElementById('artisticoDescText').innerText = hoursConfig.artisticoDesc;
+                        }
+                        
                         const accContainer = document.getElementById('artisticoAccordionContainer');
                         const accData = hoursConfig.artisticoAccordion || [];
                         
-                        accContainer.innerHTML = accData.map(item => {
-                            if(!item || (!item.title && !item.content)) return ''; // Salta se la tendina è completamente vuota
-                            return `
-                            <details class="group border border-slate-200 rounded-lg bg-slate-50 [&_summary::-webkit-details-marker]:hidden">
-                                <summary class="flex items-center justify-between p-4 cursor-pointer font-semibold text-slate-800 hover:bg-slate-100 transition-colors">
-                                    ${item.title || ''}
-                                    <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform group-open:-rotate-180"></i>
-                                </summary>
-                                <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed whitespace-pre-line">${item.content || ''}</div>
-                            </details>
-                            `;
-                        }).join('');
+                        // Controlla che ci sia almeno un menu a tendina compilato con un titolo
+                        const hasValidData = accData.some(item => item && item.title && item.title.trim() !== '');
+                        
+                        if (hasValidData) {
+                            accContainer.innerHTML = accData.map(item => {
+                                if(!item || (!item.title && !item.content)) return ''; // Salta se la tendina è completamente vuota
+                                return `
+                                <details class="group border border-slate-200 rounded-lg bg-slate-50 [&_summary::-webkit-details-marker]:hidden">
+                                    <summary class="flex items-center justify-between p-4 cursor-pointer font-semibold text-slate-800 hover:bg-slate-100 transition-colors">
+                                        ${item.title || ''}
+                                        <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform group-open:-rotate-180"></i>
+                                    </summary>
+                                    <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed whitespace-pre-line">${item.content || ''}</div>
+                                </details>
+                                `;
+                            }).join('');
+                        }
                         
                         lucide.createIcons();
                     } else {
