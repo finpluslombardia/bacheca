@@ -460,6 +460,19 @@
             </div>
         </div>
 
+        <!-- HEADER CATEGORIA: AQUAGOL (NEW) -->
+        <div id="aquagolCategoryHeader" class="hidden mb-8 fade-in relative">
+            <button id="editAquagolBtn" onclick="openAquagolModal()" class="hidden absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 z-10 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+            <div class="bg-white rounded-2xl shadow-sm border border-indigo-100 overflow-hidden">
+                <div class="bg-indigo-50/50 p-5 md:p-6 border-b border-indigo-100">
+                    <p id="aquagolDescText" class="text-slate-700 leading-relaxed text-sm md:text-base whitespace-pre-line"></p>
+                </div>
+                <div class="p-4 space-y-2" id="aquagolAccordionContainer">
+                    <!-- I menu a tendina verranno caricati qui tramite Javascript -->
+                </div>
+            </div>
+        </div>
+
         <!-- Griglia Avvisi (items-start aggiunto per evitare stiramento verticale) -->
         <div id="noticesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start"></div>
 
@@ -976,6 +989,40 @@
         </div>
     </div>
 
+    <!-- MODAL AQUAGOL CONFIG (ADMIN) -->
+    <div id="aquagolModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-6 border-b border-indigo-100 flex justify-between items-center bg-indigo-50">
+                <h3 class="text-xl font-bold text-indigo-900 flex items-center gap-2"><i data-lucide="target" class="w-5 h-5 text-indigo-600"></i> Modifica Testi Aquagol</h3>
+                <button onclick="closeAquagolModal()" class="text-indigo-400 hover:text-indigo-600"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-6 bg-slate-50">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Descrizione Principale</label>
+                    <textarea id="aquaDescInput" rows="4" class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+                <div class="border-t border-slate-200 pt-4">
+                    <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 1</h4>
+                    <input type="text" id="aquaTitle1" placeholder="Titolo (es. Stagione 2025/26)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
+                    <textarea id="aquaContent1" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+                <div class="border-t border-slate-200 pt-4">
+                    <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 2</h4>
+                    <input type="text" id="aquaTitle2" placeholder="Titolo (es. Giorni e orari)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
+                    <textarea id="aquaContent2" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+                <div class="border-t border-slate-200 pt-4">
+                    <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 3</h4>
+                    <input type="text" id="aquaTitle3" placeholder="Titolo (es. Tariffe)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
+                    <textarea id="aquaContent3" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+            </div>
+            <div class="p-6 border-t border-slate-100 bg-white">
+                <button onclick="saveAquagolConfig()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-md transition">Salva Impostazioni</button>
+            </div>
+        </div>
+    </div>
+
     <!-- APP LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -1079,17 +1126,20 @@
             const addBtn = document.getElementById('addNoticeBtn');
             const archiveBtn = document.getElementById('archiveToggleBtn');
             const editArtBtn = document.getElementById('editArtisticoBtn'); // Tasto Edit Artistico
+            const editAquaBtn = document.getElementById('editAquagolBtn'); // Tasto Edit Aquagol
             
             if (isAdmin) { 
                 adminControls.classList.remove('hidden'); 
                 addBtn.classList.remove('hidden'); 
                 archiveBtn.classList.remove('hidden'); 
                 if (editArtBtn) editArtBtn.classList.remove('hidden');
+                if (editAquaBtn) editAquaBtn.classList.remove('hidden');
             } else { 
                 adminControls.classList.add('hidden'); 
                 addBtn.classList.add('hidden'); 
                 archiveBtn.classList.add('hidden'); 
                 if (editArtBtn) editArtBtn.classList.add('hidden');
+                if (editAquaBtn) editAquaBtn.classList.add('hidden');
                 if (showArchived) toggleArchiveView(); 
             }
             renderNotices(); 
@@ -1228,11 +1278,15 @@
             window.removePollOption = removePollOption;
             window.submitVote = submitVote;
 
-            // SUMMER MESSAGE & ARTISTICO
+            // SUMMER MESSAGE & ARTISTICO & AQUAGOL
             window.editSummerMessage = editSummerMessage;
             window.openArtisticoModal = openArtisticoModal;
             window.closeArtisticoModal = closeArtisticoModal;
             window.saveArtisticoConfig = saveArtisticoConfig;
+            
+            window.openAquagolModal = openAquagolModal;
+            window.closeAquagolModal = closeAquagolModal;
+            window.saveAquagolConfig = saveAquagolConfig;
 
             // MEDIA REMOVAL
             window.markMediaForRemoval = markMediaForRemoval;
@@ -1319,6 +1373,53 @@
                 await setDoc(doc(db, CONFIG_COLLECTION, HOURS_DOC_ID), hoursConfig);
                 showToast("Sezione Artistico aggiornata!");
                 closeArtisticoModal();
+                renderNotices(); // Ridisegna istantaneamente
+            } catch(e) {
+                console.error(e);
+                showToast("Errore salvataggio", true);
+            }
+        };
+
+        // --- AQUAGOL CONFIGURATOR ---
+        window.openAquagolModal = function() {
+            // Default texts per Aquagol
+            const defDesc = "L'Aquagol è l'attività propedeutica alla Pallanuoto. Un gioco di squadra in acqua che sviluppa le capacità natatorie unendole al divertimento con la palla. Impara a fare passaggi, tiri e a giocare insieme ai tuoi compagni!";
+            const defAcc = [
+                { title: "Stagione 2025/26", content: "Dettagli della stagione in via di definizione..." },
+                { title: "Giorni e orari 2025/26", content: "Giorni e orari in via di definizione..." },
+                { title: "Tariffe 2025/26", content: "Tariffe in via di definizione..." }
+            ];
+
+            const currentDesc = (hoursConfig.aquagolDesc && hoursConfig.aquagolDesc.trim() !== '') ? hoursConfig.aquagolDesc : defDesc;
+            document.getElementById('aquaDescInput').value = currentDesc;
+            
+            const currentAcc = (hoursConfig.aquagolAccordion && hoursConfig.aquagolAccordion.some(item => item && item.title && item.title.trim() !== '')) ? hoursConfig.aquagolAccordion : defAcc;
+
+            for(let i=0; i<3; i++) {
+                const item = currentAcc[i] || {title:'', content:''};
+                document.getElementById(`aquaTitle${i+1}`).value = item.title;
+                document.getElementById(`aquaContent${i+1}`).value = item.content;
+            }
+            document.getElementById('aquagolModal').classList.remove('hidden');
+        };
+
+        window.closeAquagolModal = function() {
+            document.getElementById('aquagolModal').classList.add('hidden');
+        };
+
+        window.saveAquagolConfig = async function() {
+            hoursConfig.aquagolDesc = document.getElementById('aquaDescInput').value;
+            hoursConfig.aquagolAccordion = [];
+            for(let i=0; i<3; i++) {
+                hoursConfig.aquagolAccordion.push({
+                    title: document.getElementById(`aquaTitle${i+1}`).value,
+                    content: document.getElementById(`aquaContent${i+1}`).value
+                });
+            }
+            try {
+                await setDoc(doc(db, CONFIG_COLLECTION, HOURS_DOC_ID), hoursConfig);
+                showToast("Sezione Aquagol aggiornata!");
+                closeAquagolModal();
                 renderNotices(); // Ridisegna istantaneamente
             } catch(e) {
                 console.error(e);
@@ -1440,6 +1541,10 @@
                     // Caricamento Dati Artistico
                     if(data.artisticoDesc !== undefined) hoursConfig.artisticoDesc = data.artisticoDesc;
                     if(data.artisticoAccordion) hoursConfig.artisticoAccordion = data.artisticoAccordion;
+                    
+                    // Caricamento Dati Aquagol
+                    if(data.aquagolDesc !== undefined) hoursConfig.aquagolDesc = data.aquagolDesc;
+                    if(data.aquagolAccordion) hoursConfig.aquagolAccordion = data.aquagolAccordion;
                 }
                 updateStatusWidget();
                 renderFilters(); // Re-render filters with loaded order
@@ -2318,8 +2423,51 @@
                         artisticoHeader.classList.add('hidden');
                     }
                 }
+
+                // --- GESTIONE HEADER CATEGORIA: AQUAGOL ---
+                const aquagolHeader = document.getElementById('aquagolCategoryHeader');
+                if (aquagolHeader) {
+                    if (currentFilter === 'corsi_aquagol' && !showArchived && currentSearch === '') {
+                        aquagolHeader.classList.remove('hidden');
+                        
+                        // Default Fallback
+                        const defDescAqua = "L'Aquagol è l'attività propedeutica alla Pallanuoto. Un gioco di squadra in acqua che sviluppa le capacità natatorie unendole al divertimento con la palla. Impara a fare passaggi, tiri e a giocare insieme ai tuoi compagni!";
+                        const defAccAqua = [
+                            { title: "Stagione 2025/26", content: "Dettagli della stagione in via di definizione..." },
+                            { title: "Giorni e orari 2025/26", content: "Giorni e orari in via di definizione..." },
+                            { title: "Tariffe 2025/26", content: "Tariffe in via di definizione..." }
+                        ];
+
+                        // Set Descrizione (usa fallback se vuota)
+                        const currentDescAqua = (hoursConfig.aquagolDesc && hoursConfig.aquagolDesc.trim() !== '') ? hoursConfig.aquagolDesc : defDescAqua;
+                        document.getElementById('aquagolDescText').innerText = currentDescAqua;
+                        
+                        // Set Menu a Fisarmonica (usa fallback se vuoti)
+                        const accContainerAqua = document.getElementById('aquagolAccordionContainer');
+                        let currentAccAqua = hoursConfig.aquagolAccordion || [];
+                        const hasValidDataAqua = currentAccAqua.some(item => item && item.title && item.title.trim() !== '');
+                        if (!hasValidDataAqua) currentAccAqua = defAccAqua;
+                        
+                        accContainerAqua.innerHTML = currentAccAqua.map(item => {
+                            if(!item || (!item.title && !item.content)) return '';
+                            return `
+                            <details class="group border border-slate-200 rounded-lg bg-slate-50 [&_summary::-webkit-details-marker]:hidden">
+                                <summary class="flex items-center justify-between p-4 cursor-pointer font-semibold text-slate-800 hover:bg-slate-100 transition-colors">
+                                    ${item.title || ''}
+                                    <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform group-open:-rotate-180"></i>
+                                </summary>
+                                <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed whitespace-pre-line">${item.content || ''}</div>
+                            </details>
+                            `;
+                        }).join('');
+                        
+                        lucide.createIcons();
+                    } else {
+                        aquagolHeader.classList.add('hidden');
+                    }
+                }
             } catch (err) {
-                console.error("Errore rendering header Artistico:", err);
+                console.error("Errore rendering header categorie specifiche:", err);
             }
 
             // --- GESTIONE BANNER AVVISI ---
