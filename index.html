@@ -486,6 +486,19 @@
             </div>
         </div>
 
+        <!-- HEADER CATEGORIA: MASTER (NEW) -->
+        <div id="masterCategoryHeader" class="hidden mb-8 fade-in relative">
+            <button id="editMasterBtn" onclick="openMasterModal()" class="hidden absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 z-10 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+            <div class="bg-white rounded-2xl shadow-sm border border-indigo-100 overflow-hidden">
+                <div class="bg-indigo-50/50 p-5 md:p-6 border-b border-indigo-100">
+                    <p id="masterDescText" class="text-slate-700 leading-relaxed text-sm md:text-base whitespace-pre-line"></p>
+                </div>
+                <div class="p-4 space-y-2" id="masterAccordionContainer">
+                    <!-- I menu a tendina verranno caricati qui tramite Javascript -->
+                </div>
+            </div>
+        </div>
+
         <!-- Griglia Avvisi (items-start aggiunto per evitare stiramento verticale) -->
         <div id="noticesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start"></div>
 
@@ -1070,6 +1083,40 @@
         </div>
     </div>
 
+    <!-- MODAL MASTER CONFIG (ADMIN) -->
+    <div id="masterModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-6 border-b border-indigo-100 flex justify-between items-center bg-indigo-50">
+                <h3 class="text-xl font-bold text-indigo-900 flex items-center gap-2"><i data-lucide="award" class="w-5 h-5 text-indigo-600"></i> Modifica Testi Master</h3>
+                <button onclick="closeMasterModal()" class="text-indigo-400 hover:text-indigo-600"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-6 bg-slate-50">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Descrizione Principale</label>
+                    <textarea id="masterDescInput" rows="4" class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+                <div class="border-t border-slate-200 pt-4">
+                    <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 1</h4>
+                    <input type="text" id="masterTitle1" placeholder="Titolo (es. Stagione 2025/26)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
+                    <textarea id="masterContent1" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+                <div class="border-t border-slate-200 pt-4">
+                    <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 2</h4>
+                    <input type="text" id="masterTitle2" placeholder="Titolo (es. Giorni e orari)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
+                    <textarea id="masterContent2" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+                <div class="border-t border-slate-200 pt-4">
+                    <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 3</h4>
+                    <input type="text" id="masterTitle3" placeholder="Titolo (es. Tariffe)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
+                    <textarea id="masterContent3" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+            </div>
+            <div class="p-6 border-t border-slate-100 bg-white">
+                <button onclick="saveMasterConfig()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-md transition">Salva Impostazioni</button>
+            </div>
+        </div>
+    </div>
+
     <!-- APP LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -1175,6 +1222,7 @@
             const editArtBtn = document.getElementById('editArtisticoBtn'); // Tasto Edit Artistico
             const editAquaBtn = document.getElementById('editAquagolBtn'); // Tasto Edit Aquagol
             const editPropBtn = document.getElementById('editPropagandaBtn'); // Tasto Edit Propaganda
+            const editMasterBtn = document.getElementById('editMasterBtn'); // Tasto Edit Master
             
             if (isAdmin) { 
                 adminControls.classList.remove('hidden'); 
@@ -1183,6 +1231,7 @@
                 if (editArtBtn) editArtBtn.classList.remove('hidden');
                 if (editAquaBtn) editAquaBtn.classList.remove('hidden');
                 if (editPropBtn) editPropBtn.classList.remove('hidden');
+                if (editMasterBtn) editMasterBtn.classList.remove('hidden');
             } else { 
                 adminControls.classList.add('hidden'); 
                 addBtn.classList.add('hidden'); 
@@ -1190,6 +1239,7 @@
                 if (editArtBtn) editArtBtn.classList.add('hidden');
                 if (editAquaBtn) editAquaBtn.classList.add('hidden');
                 if (editPropBtn) editPropBtn.classList.add('hidden');
+                if (editMasterBtn) editMasterBtn.classList.add('hidden');
                 if (showArchived) toggleArchiveView(); 
             }
             renderNotices(); 
@@ -1328,7 +1378,7 @@
             window.removePollOption = removePollOption;
             window.submitVote = submitVote;
 
-            // SUMMER MESSAGE & ARTISTICO & AQUAGOL & PROPAGANDA
+            // SUMMER MESSAGE & ARTISTICO & AQUAGOL & PROPAGANDA & MASTER
             window.editSummerMessage = editSummerMessage;
             window.openArtisticoModal = openArtisticoModal;
             window.closeArtisticoModal = closeArtisticoModal;
@@ -1341,6 +1391,10 @@
             window.openPropagandaModal = openPropagandaModal;
             window.closePropagandaModal = closePropagandaModal;
             window.savePropagandaConfig = savePropagandaConfig;
+
+            window.openMasterModal = openMasterModal;
+            window.closeMasterModal = closeMasterModal;
+            window.saveMasterConfig = saveMasterConfig;
 
             // MEDIA REMOVAL
             window.markMediaForRemoval = markMediaForRemoval;
@@ -1528,6 +1582,53 @@
             }
         };
 
+        // --- MASTER CONFIGURATOR ---
+        window.openMasterModal = function() {
+            // Default texts per Master
+            const defDesc = "Il nuoto Master è dedicato a chi desidera continuare a nuotare e competere, unendo la passione per questo sport all'allenamento in un gruppo affiatato. Se vuoi metterti alla prova e partecipare alle gare, questo è il tuo posto!";
+            const defAcc = [
+                { title: "Stagione 2025/26", content: "Dettagli della stagione in via di definizione..." },
+                { title: "Giorni e orari 2025/26", content: "Giorni e orari in via di definizione..." },
+                { title: "Tariffe 2025/26", content: "Tariffe in via di definizione..." }
+            ];
+
+            const currentDesc = (hoursConfig.masterDesc && hoursConfig.masterDesc.trim() !== '') ? hoursConfig.masterDesc : defDesc;
+            document.getElementById('masterDescInput').value = currentDesc;
+            
+            const currentAcc = (hoursConfig.masterAccordion && hoursConfig.masterAccordion.some(item => item && item.title && item.title.trim() !== '')) ? hoursConfig.masterAccordion : defAcc;
+
+            for(let i=0; i<3; i++) {
+                const item = currentAcc[i] || {title:'', content:''};
+                document.getElementById(`masterTitle${i+1}`).value = item.title;
+                document.getElementById(`masterContent${i+1}`).value = item.content;
+            }
+            document.getElementById('masterModal').classList.remove('hidden');
+        };
+
+        window.closeMasterModal = function() {
+            document.getElementById('masterModal').classList.add('hidden');
+        };
+
+        window.saveMasterConfig = async function() {
+            hoursConfig.masterDesc = document.getElementById('masterDescInput').value;
+            hoursConfig.masterAccordion = [];
+            for(let i=0; i<3; i++) {
+                hoursConfig.masterAccordion.push({
+                    title: document.getElementById(`masterTitle${i+1}`).value,
+                    content: document.getElementById(`masterContent${i+1}`).value
+                });
+            }
+            try {
+                await setDoc(doc(db, CONFIG_COLLECTION, HOURS_DOC_ID), hoursConfig);
+                showToast("Sezione Master aggiornata!");
+                closeMasterModal();
+                renderNotices(); // Ridisegna istantaneamente
+            } catch(e) {
+                console.error(e);
+                showToast("Errore salvataggio", true);
+            }
+        };
+
         // --- OG META TAGS UPDATER (NEW) ---
         function updateDynamicMetaTags(notice) {
             if (!notice) return;
@@ -1650,6 +1751,10 @@
                     // Caricamento Dati Propaganda
                     if(data.propagandaDesc !== undefined) hoursConfig.propagandaDesc = data.propagandaDesc;
                     if(data.propagandaAccordion) hoursConfig.propagandaAccordion = data.propagandaAccordion;
+
+                    // Caricamento Dati Master
+                    if(data.masterDesc !== undefined) hoursConfig.masterDesc = data.masterDesc;
+                    if(data.masterAccordion) hoursConfig.masterAccordion = data.masterAccordion;
                 }
                 updateStatusWidget();
                 renderFilters(); // Re-render filters with loaded order
@@ -2612,6 +2717,49 @@
                         lucide.createIcons();
                     } else {
                         propagandaHeader.classList.add('hidden');
+                    }
+                }
+
+                // --- GESTIONE HEADER CATEGORIA: MASTER ---
+                const masterHeader = document.getElementById('masterCategoryHeader');
+                if (masterHeader) {
+                    if (currentFilter === 'corsi_master' && !showArchived && currentSearch === '') {
+                        masterHeader.classList.remove('hidden');
+                        
+                        // Default Fallback
+                        const defDescMaster = "Il nuoto Master è dedicato a chi desidera continuare a nuotare e competere, unendo la passione per questo sport all'allenamento in un gruppo affiatato. Se vuoi metterti alla prova e partecipare alle gare, questo è il tuo posto!";
+                        const defAccMaster = [
+                            { title: "Stagione 2025/26", content: "Dettagli della stagione in via di definizione..." },
+                            { title: "Giorni e orari 2025/26", content: "Giorni e orari in via di definizione..." },
+                            { title: "Tariffe 2025/26", content: "Tariffe in via di definizione..." }
+                        ];
+
+                        // Set Descrizione (usa fallback se vuota)
+                        const currentDescMaster = (hoursConfig.masterDesc && hoursConfig.masterDesc.trim() !== '') ? hoursConfig.masterDesc : defDescMaster;
+                        document.getElementById('masterDescText').innerText = currentDescMaster;
+                        
+                        // Set Menu a Fisarmonica (usa fallback se vuoti)
+                        const accContainerMaster = document.getElementById('masterAccordionContainer');
+                        let currentAccMaster = hoursConfig.masterAccordion || [];
+                        const hasValidDataMaster = currentAccMaster.some(item => item && item.title && item.title.trim() !== '');
+                        if (!hasValidDataMaster) currentAccMaster = defAccMaster;
+                        
+                        accContainerMaster.innerHTML = currentAccMaster.map(item => {
+                            if(!item || (!item.title && !item.content)) return '';
+                            return `
+                            <details class="group border border-slate-200 rounded-lg bg-slate-50 [&_summary::-webkit-details-marker]:hidden">
+                                <summary class="flex items-center justify-between p-4 cursor-pointer font-semibold text-slate-800 hover:bg-slate-100 transition-colors">
+                                    ${item.title || ''}
+                                    <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform group-open:-rotate-180"></i>
+                                </summary>
+                                <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed whitespace-pre-line">${item.content || ''}</div>
+                            </details>
+                            `;
+                        }).join('');
+                        
+                        lucide.createIcons();
+                    } else {
+                        masterHeader.classList.add('hidden');
                     }
                 }
             } catch (err) {
