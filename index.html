@@ -447,25 +447,25 @@
             <div class="flex items-center"><i data-lucide="archive" class="w-5 h-5 text-yellow-500 mr-2"></i><p class="text-sm text-yellow-700 font-bold">Stai visualizzando l'archivio storico o gli avvisi scaduti</p></div>
         </div>
 
-        <!-- HEADER CATEGORIA: ARTISTICO -->
-        <div id="artisticoCategoryHeader" class="hidden mb-8 fade-in relative">
-            <button id="editArtisticoBtn" onclick="openArtisticoModal()" class="hidden absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 z-10 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+        <!-- HEADER CATEGORIA: AQUAFITNESS (NEW) -->
+        <div id="aquafitnessCategoryHeader" class="hidden mb-8 fade-in relative">
+            <div class="absolute top-4 right-4 flex items-center gap-2 z-10">
+                <button onclick="shareCategory('corsi_aquafitness')" class="bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 transition text-indigo-600" title="Condividi Sezione"><i data-lucide="share-2" class="w-5 h-5"></i></button>
+                <button id="editAquafitnessBtn" onclick="openAquafitnessModal()" class="hidden bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+            </div>
             <div class="bg-white rounded-2xl shadow-sm border border-indigo-100 overflow-hidden">
                 <div class="bg-indigo-50/50 p-5 md:p-6 border-b border-indigo-100">
-                    <p id="artisticoDescText" class="text-slate-700 leading-relaxed text-sm md:text-base whitespace-pre-line"></p>
+                    <p id="aquafitnessDescText" class="text-slate-700 leading-relaxed text-sm md:text-base whitespace-pre-line"></p>
                 </div>
-                <div class="p-4 space-y-2" id="artisticoAccordionContainer">
+                <div class="p-4 space-y-2" id="aquafitnessAccordionContainer">
                     <!-- I menu a tendina verranno caricati qui tramite Javascript -->
                 </div>
             </div>
         </div>
 
-        <!-- HEADER CATEGORIA: AQUAGOL (NEW) -->
-        <div id="aquagolCategoryHeader" class="hidden mb-8 fade-in relative">
-            <button id="editAquagolBtn" onclick="openAquagolModal()" class="hidden absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 z-10 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
-            <div class="bg-white rounded-2xl shadow-sm border border-indigo-100 overflow-hidden">
-                <div class="bg-indigo-50/50 p-5 md:p-6 border-b border-indigo-100">
-                    <p id="aquagolDescText" class="text-slate-700 leading-relaxed text-sm md:text-base whitespace-pre-line"></p>
+        <!-- HEADER CATEGORIA: ARTISTICO -->
+        <div id="artisticoCategoryHeader" class="hidden mb-8 fade-in relative">
+            <div class="absolute top-4 right-4 flex items-center gap-2 z-10">
                 </div>
                 <div class="p-4 space-y-2" id="aquagolAccordionContainer">
                     <!-- I menu a tendina verranno caricati qui tramite Javascript -->
@@ -985,6 +985,40 @@
         </div>
     </div>
 
+    <!-- MODAL AQUAFITNESS CONFIG (ADMIN) -->
+    <div id="aquafitnessModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-6 border-b border-indigo-100 flex justify-between items-center bg-indigo-50">
+                <h3 class="text-xl font-bold text-indigo-900 flex items-center gap-2"><i data-lucide="activity" class="w-5 h-5 text-indigo-600"></i> Modifica Testi Aquafitness</h3>
+                <button onclick="closeAquafitnessModal()" class="text-indigo-400 hover:text-indigo-600"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-6 bg-slate-50">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Descrizione Principale</label>
+                    <textarea id="aquaFitDescInput" rows="4" class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+                <div class="border-t border-slate-200 pt-4">
+                    <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 1</h4>
+                    <input type="text" id="aquaFitTitle1" placeholder="Titolo (es. Stagione 2025/26)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
+                    <textarea id="aquaFitContent1" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+                <div class="border-t border-slate-200 pt-4">
+                    <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 2</h4>
+                    <input type="text" id="aquaFitTitle2" placeholder="Titolo (es. Giorni e orari)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
+                    <textarea id="aquaFitContent2" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+                <div class="border-t border-slate-200 pt-4">
+                    <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 3</h4>
+                    <input type="text" id="aquaFitTitle3" placeholder="Titolo (es. Tariffe)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
+                    <textarea id="aquaFitContent3" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+            </div>
+            <div class="p-6 border-t border-slate-100 bg-white">
+                <button onclick="saveAquafitnessConfig()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-md transition">Salva Impostazioni</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL ARTISTICO CONFIG (ADMIN) -->
     <div id="artisticoModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
@@ -1249,6 +1283,7 @@
             const adminControls = document.getElementById('adminControls');
             const addBtn = document.getElementById('addNoticeBtn');
             const archiveBtn = document.getElementById('archiveToggleBtn');
+            const editAquaFitBtn = document.getElementById('editAquafitnessBtn'); // Tasto Edit Aquafitness
             const editArtBtn = document.getElementById('editArtisticoBtn'); // Tasto Edit Artistico
             const editAquaBtn = document.getElementById('editAquagolBtn'); // Tasto Edit Aquagol
             const editPropBtn = document.getElementById('editPropagandaBtn'); // Tasto Edit Propaganda
@@ -1258,6 +1293,7 @@
                 adminControls.classList.remove('hidden'); 
                 addBtn.classList.remove('hidden'); 
                 archiveBtn.classList.remove('hidden'); 
+                if (editAquaFitBtn) editAquaFitBtn.classList.remove('hidden');
                 if (editArtBtn) editArtBtn.classList.remove('hidden');
                 if (editAquaBtn) editAquaBtn.classList.remove('hidden');
                 if (editPropBtn) editPropBtn.classList.remove('hidden');
@@ -1266,6 +1302,7 @@
                 adminControls.classList.add('hidden'); 
                 addBtn.classList.add('hidden'); 
                 archiveBtn.classList.add('hidden'); 
+                if (editAquaFitBtn) editAquaFitBtn.classList.add('hidden');
                 if (editArtBtn) editArtBtn.classList.add('hidden');
                 if (editAquaBtn) editAquaBtn.classList.add('hidden');
                 if (editPropBtn) editPropBtn.classList.add('hidden');
@@ -1410,6 +1447,11 @@
 
             // SUMMER MESSAGE & ARTISTICO & AQUAGOL & PROPAGANDA & MASTER
             window.editSummerMessage = editSummerMessage;
+
+            window.openAquafitnessModal = openAquafitnessModal;
+            window.closeAquafitnessModal = closeAquafitnessModal;
+            window.saveAquafitnessConfig = saveAquafitnessConfig;
+
             window.openArtisticoModal = openArtisticoModal;
             window.closeArtisticoModal = closeArtisticoModal;
             window.saveArtisticoConfig = saveArtisticoConfig;
@@ -1473,6 +1515,53 @@
                 } catch(e) { console.error(e); showToast("Errore salvataggio", true); }
             }
         }
+
+        // --- AQUAFITNESS CONFIGURATOR ---
+        window.openAquafitnessModal = function() {
+            // Default texts per Aquafitness
+            const defDesc = "L'Aquafitness unisce i benefici dell'acqua a un allenamento cardiovascolare e tonificante. Ideale per tenersi in forma divertendosi a tempo di musica, senza stressare le articolazioni.";
+            const defAcc = [
+                { title: "Stagione 2025/26", content: "Dettagli della stagione in via di definizione..." },
+                { title: "Giorni e orari 2025/26", content: "Giorni e orari in via di definizione..." },
+                { title: "Tariffe 2025/26", content: "Tariffe in via di definizione..." }
+            ];
+
+            const currentDesc = (hoursConfig.aquafitnessDesc && hoursConfig.aquafitnessDesc.trim() !== '') ? hoursConfig.aquafitnessDesc : defDesc;
+            document.getElementById('aquaFitDescInput').value = currentDesc;
+            
+            const currentAcc = (hoursConfig.aquafitnessAccordion && hoursConfig.aquafitnessAccordion.some(item => item && item.title && item.title.trim() !== '')) ? hoursConfig.aquafitnessAccordion : defAcc;
+
+            for(let i=0; i<3; i++) {
+                const item = currentAcc[i] || {title:'', content:''};
+                document.getElementById(`aquaFitTitle${i+1}`).value = item.title;
+                document.getElementById(`aquaFitContent${i+1}`).value = item.content;
+            }
+            document.getElementById('aquafitnessModal').classList.remove('hidden');
+        };
+
+        window.closeAquafitnessModal = function() {
+            document.getElementById('aquafitnessModal').classList.add('hidden');
+        };
+
+        window.saveAquafitnessConfig = async function() {
+            hoursConfig.aquafitnessDesc = document.getElementById('aquaFitDescInput').value;
+            hoursConfig.aquafitnessAccordion = [];
+            for(let i=0; i<3; i++) {
+                hoursConfig.aquafitnessAccordion.push({
+                    title: document.getElementById(`aquaFitTitle${i+1}`).value,
+                    content: document.getElementById(`aquaFitContent${i+1}`).value
+                });
+            }
+            try {
+                await setDoc(doc(db, CONFIG_COLLECTION, HOURS_DOC_ID), hoursConfig);
+                showToast("Sezione Aquafitness aggiornata!");
+                closeAquafitnessModal();
+                renderNotices(); // Ridisegna istantaneamente
+            } catch(e) {
+                console.error(e);
+                showToast("Errore salvataggio", true);
+            }
+        };
 
         // --- ARTISTICO CONFIGURATOR ---
         window.openArtisticoModal = function() {
@@ -1773,6 +1862,10 @@
                     if(data.categoryOrder) hoursConfig.categoryOrder = data.categoryOrder;
                     if(data.summerEmptyMessage) hoursConfig.summerEmptyMessage = data.summerEmptyMessage;
                     
+                    // Caricamento Dati Aquafitness
+                    if(data.aquafitnessDesc !== undefined) hoursConfig.aquafitnessDesc = data.aquafitnessDesc;
+                    if(data.aquafitnessAccordion) hoursConfig.aquafitnessAccordion = data.aquafitnessAccordion;
+
                     // Caricamento Dati Artistico
                     if(data.artisticoDesc !== undefined) hoursConfig.artisticoDesc = data.artisticoDesc;
                     if(data.artisticoAccordion) hoursConfig.artisticoAccordion = data.artisticoAccordion;
