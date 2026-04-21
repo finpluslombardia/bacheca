@@ -2307,14 +2307,21 @@
                 }
             });
 
-            // Filtro ricerca e categoria
+            // FIX PER L'ISOLAMENTO DELLE SOTTOCATEGORIE: Logica riscritta per essere 100% esatta
             filtered = filtered.filter(n => {
                 const matchesSearch = (n.title || '').toLowerCase().includes(currentSearch.toLowerCase()) || (n.content || '').toLowerCase().includes(currentSearch.toLowerCase());
                 
-                // Se il filtro è "corsi", includi anche tutte le sottocategorie (che iniziano per corsi_)
-                const matchesCategory = currentFilter === 'all' || 
-                                        n.normalizedCategories.includes(currentFilter) ||
-                                        (currentFilter === 'corsi' && n.normalizedCategories.some(cat => cat.startsWith('corsi_')));
+                let matchesCategory = false;
+                
+                if (currentFilter === 'all') {
+                    matchesCategory = true;
+                } else if (currentFilter === 'corsi') {
+                    // Quando l'utente clicca "Tutti i Corsi", mostro i corsi generici e le sottocategorie
+                    matchesCategory = n.normalizedCategories.includes('corsi') || n.normalizedCategories.some(cat => cat.startsWith('corsi_'));
+                } else {
+                    // Quando l'utente clicca una sottocategoria specifica (es. "Artistico"), il match deve essere ESATTO
+                    matchesCategory = n.normalizedCategories.includes(currentFilter);
+                }
                                         
                 return matchesSearch && matchesCategory;
             });
