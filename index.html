@@ -1921,7 +1921,8 @@
                 return schedule;
             };
 
-            hoursConfig.segreteria = readScheduleFromDOM('segreteria');
+            // FIX ERROR: Usare 'seg' come prefisso per leggere correttamente i dati dal DOM
+            hoursConfig.segreteria = readScheduleFromDOM('seg');
             hoursConfig.nuoto = readScheduleFromDOM('nuoto');
             
             // Vasca Esterna
