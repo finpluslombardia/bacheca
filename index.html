@@ -2574,7 +2574,7 @@
             // --- RENDER SOTTOCATEGORIE CORSI ---
             if (subContainer) {
                 if (currentFilter.startsWith('corsi')) {
-                    const subCats = ['corsi', 'corsi_scuola', 'corsi_artistico', 'corsi_aquagol', 'corsi_propaganda', 'corsi_master'];
+                    const subCats = ['corsi', 'corsi_scuola', 'corsi_aquafitness', 'corsi_artistico', 'corsi_aquagol', 'corsi_propaganda', 'corsi_master'];
                     const subHtml = subCats.map(key => {
                         const isSubActive = currentFilter === key;
                         const label = key === 'corsi' ? "Tutti i Corsi" : CATEGORIES[key].label;
@@ -2624,6 +2624,47 @@
         async function renderNotices() {
             // --- GESTIONE HEADER CATEGORIE SPECIFICHE (Antierrore e con Fallback forzato) ---
             try {
+                // --- GESTIONE HEADER CATEGORIA: AQUAFITNESS ---
+                const aquafitnessHeader = document.getElementById('aquafitnessCategoryHeader');
+                if (aquafitnessHeader) {
+                    if (currentFilter === 'corsi_aquafitness' && !showArchived && currentSearch === '') {
+                        aquafitnessHeader.classList.remove('hidden');
+                        
+                        const defDescAquaFit = "L'Aquafitness unisce i benefici dell'acqua a un allenamento cardiovascolare e tonificante. Ideale per tenersi in forma divertendosi a tempo di musica, senza stressare le articolazioni.";
+                        const defAccAquaFit = [
+                            { title: "Stagione 2025/26", content: "Dettagli della stagione in via di definizione..." },
+                            { title: "Giorni e orari 2025/26", content: "Giorni e orari in via di definizione..." },
+                            { title: "Tariffe 2025/26", content: "Tariffe in via di definizione..." }
+                        ];
+
+                        const currentDescAquaFit = (hoursConfig.aquafitnessDesc && hoursConfig.aquafitnessDesc.trim() !== '') ? hoursConfig.aquafitnessDesc : defDescAquaFit;
+                        document.getElementById('aquafitnessDescText').innerText = currentDescAquaFit;
+                        
+                        const accContainerAquaFit = document.getElementById('aquafitnessAccordionContainer');
+                        let currentAccAquaFit = hoursConfig.aquafitnessAccordion || [];
+                        const hasValidDataAquaFit = currentAccAquaFit.some(item => item && item.title && item.title.trim() !== '');
+                        if (!hasValidDataAquaFit) currentAccAquaFit = defAccAquaFit;
+                        
+                        accContainerAquaFit.innerHTML = currentAccAquaFit.map(item => {
+                            if(!item || (!item.title && !item.content)) return '';
+                            return `
+                            <details class="group border border-slate-200 rounded-lg bg-slate-50 [&_summary::-webkit-details-marker]:hidden">
+                                <summary class="flex items-center justify-between p-4 cursor-pointer font-semibold text-slate-800 hover:bg-slate-100 transition-colors">
+                                    ${item.title || ''}
+                                    <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform group-open:-rotate-180"></i>
+                                </summary>
+                                <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed whitespace-pre-line">${item.content || ''}</div>
+                            </details>
+                            `;
+                        }).join('');
+                        
+                        lucide.createIcons();
+                    } else {
+                        aquafitnessHeader.classList.add('hidden');
+                    }
+                }
+
+                // --- GESTIONE HEADER CATEGORIA: ARTISTICO ---
                 const artisticoHeader = document.getElementById('artisticoCategoryHeader');
                 if (artisticoHeader) {
                     if (currentFilter === 'corsi_artistico' && !showArchived && currentSearch === '') {
