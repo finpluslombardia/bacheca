@@ -1203,6 +1203,31 @@
 
         const DAYS_MAP = { 0: "Domenica", 1: "Lunedì", 2: "Martedì", 3: "Mercoledì", 4: "Giovedì", 5: "Venerdì", 6: "Sabato" };
 
+        // CHECK CATEGORY IN URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlCat = urlParams.get('cat');
+        if (urlCat && CATEGORIES[urlCat]) {
+            currentFilter = urlCat;
+        }
+
+        // LISTEN TO BROWSER BACK/FORWARD
+        window.addEventListener('popstate', () => {
+            const params = new URLSearchParams(window.location.search);
+            const cat = params.get('cat');
+            currentFilter = (cat && CATEGORIES[cat]) ? cat : 'all';
+            
+            // Check for shared notice ID on popstate as well
+            const id = params.get('id');
+            if (!id && openedNoticeId) {
+                closeViewModal();
+            } else if (id && id !== openedNoticeId && notices.length > 0) {
+                viewNotice(id, false);
+            }
+
+            renderNotices();
+            renderFilters();
+        });
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 if (!user.isAnonymous) { isAdminLoggedIn = true; updateAdminUI(true); } else { isAdminLoggedIn = false; updateAdminUI(false); }
@@ -1398,6 +1423,9 @@
 
             // MEDIA REMOVAL
             window.markMediaForRemoval = markMediaForRemoval;
+
+            // CONDIVISIONE CATEGORIA
+            window.shareCategory = shareCategory;
 
             // DARK MODE UI INIT
             updateDarkModeUI(document.documentElement.classList.contains('dark'));
@@ -3062,7 +3090,59 @@
         async function handleLogout() { await signOut(auth); showToast("Disconnessione effettuata. Modalità pubblica."); }
 
         // --- ACTIONS ---
-        function setFilter(filter) { currentFilter = filter; renderNotices(); renderFilters(); }
+        function setFilter(filter) { 
+            currentFilter = filter; 
+            
+            // Aggiorna l'URL
+            const url = new URL(window.location);
+            if (filter === 'all') {
+                url.searchParams.delete('cat');
+            } else {
+                url.searchParams.set('cat', filter);
+            }
+            window.history.pushState({}, '', url);
+
+            renderNotices(); 
+            renderFilters(); 
+        }
+
+        function shareCategory(cat) {
+            const url = new URL(window.location);
+            if (cat === 'all') {
+                url.searchParams.delete('cat');
+            } else {
+                url.searchParams.set('cat', cat);
+            }
+            
+            const shareUrl = url.href;
+
+            const copyLegacy = () => {
+                const textArea = document.createElement("textarea");
+                textArea.value = shareUrl;
+                textArea.style.position = "fixed";
+                textArea.style.left = "-9999px";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) showToast("Link della sezione copiato!");
+                    else showToast("Impossibile copiare il link", true);
+                } catch (err) {
+                    showToast("Impossibile copiare il link", true);
+                }
+                document.body.removeChild(textArea);
+            };
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(shareUrl)
+                    .then(() => showToast("Link della sezione copiato!"))
+                    .catch(() => copyLegacy());
+            } else {
+                copyLegacy();
+            }
+        }
+
         function updateSearch(val) { currentSearch = val; renderNotices(); }
         function toggleArchiveView() { showArchived = !showArchived; document.getElementById('archiveBtnText').innerText = showArchived ? "Torna alla Bacheca" : "Mostra Archivio"; const banner = document.getElementById('archiveBanner'); showArchived ? banner.classList.remove('hidden') : banner.classList.add('hidden'); renderNotices(); }
 
