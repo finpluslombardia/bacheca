@@ -3154,7 +3154,7 @@
                             <div class="flex flex-wrap gap-1">${badgesHtml}</div>
                             <div class="flex gap-2 shrink-0">${n.isPinned ? `<i data-lucide="pin" class="w-4 h-4 text-blue-500 fill-blue-500 transform rotate-45"></i>` : ''}${isAdminLoggedIn ? `<button onclick="event.stopPropagation(); showQrCode('${n.id}', this.dataset.title)" data-title="${n.title.replace(/"/g, '&quot;')}" class="text-slate-400 hover:text-purple-600 transition" title="Genera QR Code"><i data-lucide="qr-code" class="w-4 h-4"></i></button><button onclick="event.stopPropagation(); editNotice('${n.id}')" class="text-slate-400 hover:text-blue-600 transition"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button onclick="event.stopPropagation(); deleteNoticePermanent('${n.id}')" class="text-slate-400 hover:text-red-600 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div>
                         </div>
-                        <h3 class="text-[15px] md:text-base font-bold text-slate-800 mb-1 leading-tight line-clamp-1">${n.title}</h3>
+                        <h3 class="text-[16px] md:text-base font-bold text-slate-800 mb-1 leading-tight line-clamp-1">${n.title}</h3>
                         <div class="relative mb-2 html-content-view">
                             <div class="text-slate-600 text-sm leading-relaxed line-clamp-3 whitespace-pre-line">${n.content}</div>
                             ${showReadMore ? `<div class="absolute bottom-0 right-0 bg-white pl-3 text-sm leading-relaxed"><span class="text-blue-600 font-bold hover:underline cursor-pointer">... Leggi di più</span></div>` : ''}
