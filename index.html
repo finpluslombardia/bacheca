@@ -910,7 +910,7 @@
 
                 <div class="flex flex-wrap items-center gap-4 pt-4 border-t border-gray-100">
                     <div class="flex items-center gap-2"><input type="checkbox" id="newPinned" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"><label for="newPinned" class="text-sm text-gray-700 font-medium">Metti in evidenza</label></div>
-                    <div class="flex items-center gap-2"><input type="checkbox" id="newPopup" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"><label for="newPopup" class="text-sm text-gray-700 font-medium">Mostra come Pop-up</label></div>
+                    <div class="flex items-center gap-2"><input type="checkbox" id="newPopup" onchange="document.getElementById('popupSummaryContainer').classList.toggle('hidden', !this.checked)" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"><label for="newPopup" class="text-sm text-gray-700 font-medium">Mostra come Pop-up</label></div>
                     <div class="flex items-center gap-2"><input type="checkbox" id="newBanner" class="w-4 h-4 text-red-600 rounded focus:ring-red-500"><label for="newBanner" class="text-sm text-gray-700 font-medium">Crea Banner in alto</label></div>
                     <div class="flex items-center gap-2 md:ml-auto">
                         <i data-lucide="palette" class="w-4 h-4 text-gray-400"></i>
@@ -948,6 +948,12 @@
                             <option value="map-pin">⚲ Luogo / Posizione</option>
                         </select>
                     </div>
+                </div>
+
+                <!-- NEW POPUP SUMMARY SECTION -->
+                <div id="popupSummaryContainer" class="hidden mt-3 bg-purple-50/50 border border-purple-100 p-3 rounded-xl">
+                    <label class="block text-sm font-bold text-purple-800 mb-1 flex items-center gap-1"><i data-lucide="message-square" class="w-4 h-4"></i> Riassunto per il Pop-up (Opzionale)</label>
+                    <textarea id="newPopupSummary" rows="2" maxlength="300" class="w-full border border-purple-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-purple-500 outline-none bg-white" placeholder="Se la notizia è molto lunga, scrivi un riassunto (max 300 caratteri) da mostrare nel pop-up all'apertura..."></textarea>
                 </div>
 
                 <!-- NEW POLL SECTION -->
@@ -3340,6 +3346,8 @@
 
             document.getElementById('newPinned').checked = notice.isPinned; 
             document.getElementById('newPopup').checked = notice.isPopup || false;
+            document.getElementById('newPopupSummary').value = notice.popupSummary || '';
+            document.getElementById('popupSummaryContainer').classList.toggle('hidden', !(notice.isPopup || false));
             document.getElementById('newBanner').checked = notice.isBanner || (notice.categories && notice.categories.includes('urgent')) || false;
             document.getElementById('newBannerColor').value = notice.bannerColor || 'red';
             document.getElementById('newBannerIcon').value = notice.bannerIcon || 'alert-triangle';
@@ -3414,6 +3422,7 @@
 
                 const isPinned = document.getElementById('newPinned').checked; 
                 const isPopup = document.getElementById('newPopup').checked;
+                const popupSummary = document.getElementById('newPopupSummary').value.trim();
                 const isBanner = document.getElementById('newBanner').checked;
                 const bannerColor = document.getElementById('newBannerColor').value;
                 const bannerIcon = document.getElementById('newBannerIcon').value;
@@ -3440,7 +3449,7 @@
                 }
 
                 // Includi scheduledDate nei dati passati
-                const noticeData = { title, content, categories, isPinned, isPopup, isBanner, bannerColor, bannerIcon, displayDate, expirationDate, scheduledDate, timestamp: Date.now() };
+                const noticeData = { title, content, categories, isPinned, isPopup, popupSummary, isBanner, bannerColor, bannerIcon, displayDate, expirationDate, scheduledDate, timestamp: Date.now() };
                 
                 if (imageUrl) noticeData.imageUrl = imageUrl;
                 else if (removeMediaFlags.cover) noticeData.imageUrl = null;
@@ -3576,8 +3585,17 @@
             }
 
             document.getElementById('viewNoticeTitle').innerText = notice.title;
+            
+            const isSummaryView = isAutoPopup && notice.popupSummary;
+
             // MODIFICATO: Usa innerHTML per renderizzare la formattazione di Quill
-            document.getElementById('viewNoticeContent').innerHTML = notice.content;
+            let displayContent = notice.content;
+            if (isSummaryView) {
+                displayContent = `<div class="text-lg font-medium text-slate-800 mb-4 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-inner">${notice.popupSummary.replace(/\n/g, '<br>')}</div>
+                                  <div class="flex justify-center mt-6 mb-2"><button onclick="viewNotice('${notice.id}', false)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-8 rounded-full transition flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"><i data-lucide="book-open" class="w-5 h-5"></i> Scopri di più</button></div>`;
+            }
+
+            document.getElementById('viewNoticeContent').innerHTML = displayContent;
             document.getElementById('viewNoticeDate').innerText = notice.displayDate ? new Date(notice.displayDate).toLocaleDateString('it-IT') : new Date(notice.timestamp).toLocaleDateString('it-IT');
             
             // Render Categorie in View Modal
@@ -3593,10 +3611,10 @@
 
             const contentImgContainer = document.getElementById('viewNoticeContentImgContainer');
             const contentImg = document.getElementById('viewNoticeContentImg');
-            if (notice.contentImageUrl) { contentImg.src = notice.contentImageUrl; contentImgContainer.classList.remove('hidden'); } else { contentImgContainer.classList.add('hidden'); }
+            if (notice.contentImageUrl && !isSummaryView) { contentImg.src = notice.contentImageUrl; contentImgContainer.classList.remove('hidden'); } else { contentImgContainer.classList.add('hidden'); }
 
             const attachContainer = document.getElementById('viewNoticeAttachmentContainer');
-            if (notice.attachmentUrl) {
+            if (notice.attachmentUrl && !isSummaryView) {
                 attachContainer.classList.remove('hidden');
                 
                 const downloadBtn = document.getElementById('viewNoticeDownloadBtn');
@@ -3656,7 +3674,11 @@
             }
 
             // Render Poll se esiste
-            renderPollUI(notice);
+            if (!isSummaryView) {
+                renderPollUI(notice);
+            } else {
+                document.getElementById('viewNoticePollContainer').classList.add('hidden');
+            }
 
             document.getElementById('viewNoticeModal').classList.remove('hidden');
             document.body.classList.add('overflow-hidden');
@@ -3861,6 +3883,8 @@
             
             document.getElementById('newPinned').checked = false; 
             document.getElementById('newPopup').checked = false;
+            document.getElementById('newPopupSummary').value = '';
+            document.getElementById('popupSummaryContainer').classList.add('hidden');
             document.getElementById('newBanner').checked = false;
             document.getElementById('newBannerColor').value = 'red';
             document.getElementById('newBannerIcon').value = 'alert-triangle';
