@@ -3532,8 +3532,26 @@
             if (isAutoPopup) {
                 modalWrapper.classList.remove('bg-black/70', 'backdrop-blur-md');
                 modalWrapper.classList.add('bg-black/40', 'backdrop-blur-sm');
-                innerContainer.classList.add('border-4', 'border-blue-500'); // Aggiunge il bordo blu
-                popupBanner.classList.remove('hidden');
+                
+                // --- APPLICA TEMA DINAMICO AL POPUP ---
+                const theme = notice.bannerColor || 'blue';
+                let pBg = 'bg-blue-600 text-white', pBrd = 'border-blue-600';
+                if (theme === 'red') { pBg = 'bg-red-600 text-white'; pBrd = 'border-red-600'; }
+                else if (theme === 'green') { pBg = 'bg-emerald-600 text-white'; pBrd = 'border-emerald-600'; }
+                else if (theme === 'yellow') { pBg = 'bg-yellow-400 text-slate-900'; pBrd = 'border-yellow-400'; }
+                else if (theme === 'orange') { pBg = 'bg-orange-500 text-white'; pBrd = 'border-orange-500'; }
+                else if (theme === 'purple') { pBg = 'bg-purple-600 text-white'; pBrd = 'border-purple-600'; }
+                else if (theme === 'pink') { pBg = 'bg-pink-600 text-white'; pBrd = 'border-pink-600'; }
+                else if (theme === 'cyan') { pBg = 'bg-cyan-500 text-slate-900'; pBrd = 'border-cyan-500'; }
+                else if (theme === 'slate') { pBg = 'bg-slate-800 text-white'; pBrd = 'border-slate-800'; }
+
+                // Resetta le classi e applica quelle nuove (per evitare sovrapposizioni di bordi)
+                innerContainer.className = 'bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] relative transition-all duration-300';
+                innerContainer.classList.add('border-4', pBrd);
+
+                popupBanner.className = `${pBg} py-2.5 font-bold uppercase tracking-wider text-sm w-full shrink-0 z-20 flex items-center justify-center gap-2`;
+                popupBanner.innerHTML = `<i data-lucide="${notice.bannerIcon || 'info'}" class="w-5 h-5"></i> <span>In Evidenza</span>`;
+
                 shareBtn.classList.add('hidden');
                 waShareBtn.classList.add('hidden');
                 if(qrBtn) qrBtn.classList.add('hidden');
@@ -3542,8 +3560,11 @@
             } else {
                 modalWrapper.classList.remove('bg-black/40', 'backdrop-blur-sm');
                 modalWrapper.classList.add('bg-black/70', 'backdrop-blur-md');
-                innerContainer.classList.remove('border-4', 'border-blue-500'); // Rimuove il bordo blu
-                popupBanner.classList.add('hidden');
+                
+                // Resetta allo stato standard (senza bordo colorato e senza banner)
+                innerContainer.className = 'bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] relative transition-all duration-300';
+                popupBanner.className = 'hidden';
+                
                 shareBtn.classList.remove('hidden');
                 waShareBtn.classList.remove('hidden');
                 if(qrBtn) {
