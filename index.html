@@ -3537,6 +3537,8 @@
             const qrBtn = document.getElementById('viewNoticeQrBtn');
             const catsContainer = document.getElementById('viewNoticeCategoriesContainer');
             const dateContainer = document.getElementById('viewNoticeDateContainer');
+            
+            const isSummaryView = isAutoPopup && notice.popupSummary;
 
             if (isAutoPopup) {
                 modalWrapper.classList.remove('bg-black/70', 'backdrop-blur-md');
@@ -3555,11 +3557,12 @@
                 else if (theme === 'slate') { pBg = 'bg-slate-800 text-white'; pBrd = 'border-slate-800'; }
 
                 // Resetta le classi e applica quelle nuove (per evitare sovrapposizioni di bordi)
-                innerContainer.className = 'bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] relative transition-all duration-300';
+                const maxWidthClass = isSummaryView ? 'max-w-lg' : 'max-w-2xl';
+                innerContainer.className = `bg-white rounded-2xl shadow-2xl w-full ${maxWidthClass} overflow-hidden flex flex-col max-h-[90vh] relative transition-all duration-300`;
                 innerContainer.classList.add('border-4', pBrd);
 
-                popupBanner.className = `${pBg} py-2.5 font-bold uppercase tracking-wider text-sm w-full shrink-0 z-20 flex items-center justify-center gap-2`;
-                popupBanner.innerHTML = `<i data-lucide="${notice.bannerIcon || 'info'}" class="w-5 h-5"></i> <span>In Evidenza</span>`;
+                popupBanner.className = `${pBg} py-2 font-bold uppercase tracking-wider text-xs md:text-sm w-full shrink-0 z-20 flex items-center justify-center gap-2`;
+                popupBanner.innerHTML = `<i data-lucide="${notice.bannerIcon || 'info'}" class="w-4 h-4 md:w-5 md:h-5"></i> <span>In Evidenza</span>`;
 
                 shareBtn.classList.add('hidden');
                 waShareBtn.classList.add('hidden');
@@ -3584,15 +3587,19 @@
                 if (dateContainer) dateContainer.classList.remove('hidden');
             }
 
-            document.getElementById('viewNoticeTitle').innerText = notice.title;
-            
-            const isSummaryView = isAutoPopup && notice.popupSummary;
+            const titleEl = document.getElementById('viewNoticeTitle');
+            titleEl.innerText = notice.title;
+            if (isSummaryView) {
+                titleEl.className = 'text-lg md:text-2xl font-bold text-slate-900 mb-4 leading-tight text-center';
+            } else {
+                titleEl.className = 'text-xl md:text-3xl font-bold text-slate-900 mb-6 leading-tight';
+            }
 
             // MODIFICATO: Usa innerHTML per renderizzare la formattazione di Quill
             let displayContent = notice.content;
             if (isSummaryView) {
-                displayContent = `<div class="text-lg font-medium text-slate-800 mb-4 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-inner">${notice.popupSummary.replace(/\n/g, '<br>')}</div>
-                                  <div class="flex justify-center mt-6 mb-2"><button onclick="viewNotice('${notice.id}', false)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-8 rounded-full transition flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"><i data-lucide="book-open" class="w-5 h-5"></i> Scopri di più</button></div>`;
+                displayContent = `<div class="text-sm md:text-base font-medium text-slate-700 mb-2 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-inner text-center">${notice.popupSummary.replace(/\n/g, '<br>')}</div>
+                                  <div class="flex justify-center mt-5 mb-1"><button onclick="viewNotice('${notice.id}', false)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full transition flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"><i data-lucide="book-open" class="w-4 h-4"></i> Scopri di più</button></div>`;
             }
 
             document.getElementById('viewNoticeContent').innerHTML = displayContent;
