@@ -3251,6 +3251,22 @@
         // --- AUTH & LOGIN HANDLERS ---
         function handleSecretClick() {
             const logo = document.getElementById('logoArea'); logo.classList.remove('pulse-animation'); void logo.offsetWidth; logo.classList.add('pulse-animation');
+            
+            // Torna alla homepage resettando i filtri
+            if (currentFilter !== 'all' || showArchived || currentSearch !== '') {
+                showArchived = false;
+                const archiveBtnText = document.getElementById('archiveBtnText');
+                if (archiveBtnText) archiveBtnText.innerText = "Mostra Archivio";
+                const banner = document.getElementById('archiveBanner');
+                if (banner) banner.classList.add('hidden');
+                
+                currentSearch = '';
+                const searchInput = document.querySelector('input[placeholder="Cerca avvisi..."]');
+                if (searchInput) searchInput.value = '';
+                
+                setFilter('all');
+            }
+
             clickCount++; if (clickTimer) clearTimeout(clickTimer); clickTimer = setTimeout(() => { clickCount = 0; }, 2000);
             if (clickCount === SECRET_CLICKS_REQUIRED) { clickCount = 0; if(!isAdminLoggedIn) document.getElementById('loginModal').classList.remove('hidden'); else showToast("Sei già connesso come Staff."); }
         }
