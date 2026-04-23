@@ -3604,21 +3604,28 @@
             }
 
             const titleEl = document.getElementById('viewNoticeTitle');
+            const contentEl = document.getElementById('viewNoticeContent');
+            const paddingWrapper = document.getElementById('viewNoticePaddingWrapper');
+            
             titleEl.innerText = notice.title;
             if (isSummaryView) {
-                titleEl.className = 'text-lg md:text-2xl font-bold text-slate-900 mb-4 leading-tight text-center';
+                titleEl.className = 'text-lg md:text-2xl font-bold text-slate-900 mb-3 leading-tight text-center';
+                contentEl.className = 'text-slate-700 leading-relaxed text-base md:text-lg mb-1 whitespace-pre-line html-content-view';
+                if (paddingWrapper) paddingWrapper.className = 'p-4 md:p-6 pb-4 md:pb-5';
             } else {
                 titleEl.className = 'text-xl md:text-3xl font-bold text-slate-900 mb-6 leading-tight';
+                contentEl.className = 'text-slate-700 leading-relaxed text-base md:text-lg mb-6 whitespace-pre-line html-content-view';
+                if (paddingWrapper) paddingWrapper.className = 'p-5 md:p-8';
             }
 
             // MODIFICATO: Usa innerHTML per renderizzare la formattazione di Quill
             let displayContent = notice.content;
             if (isSummaryView) {
-                displayContent = `<div class="text-sm md:text-base font-medium text-slate-700 mb-2 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-inner text-center">${notice.popupSummary.replace(/\n/g, '<br>')}</div>
-                                  <div class="flex justify-center mt-5 mb-1"><button onclick="viewNotice('${notice.id}', false)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full transition flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"><i data-lucide="book-open" class="w-4 h-4"></i> Scopri di più</button></div>`;
+                displayContent = `<div class="text-sm md:text-base font-medium text-slate-700 bg-slate-50 p-3 md:p-4 rounded-xl border border-slate-200 shadow-inner text-center">${notice.popupSummary.replace(/\n/g, '<br>')}</div>
+                                  <div class="flex justify-center mt-3"><button onclick="viewNotice('${notice.id}', false)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full transition flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"><i data-lucide="book-open" class="w-4 h-4"></i> Scopri di più</button></div>`;
             }
 
-            document.getElementById('viewNoticeContent').innerHTML = displayContent;
+            contentEl.innerHTML = displayContent;
             document.getElementById('viewNoticeDate').innerText = notice.displayDate ? new Date(notice.displayDate).toLocaleDateString('it-IT') : new Date(notice.timestamp).toLocaleDateString('it-IT');
             
             // Render Categorie in View Modal
