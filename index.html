@@ -1974,6 +1974,12 @@
                     });
                     newSpecialHours[dateKey][type] = { active: isActive, slots: slots };
                 });
+
+                // LEGGI STATO CORSI PER LA DATA SPECIALE
+                const corsiSelect = card.querySelector('.special-corsi-status');
+                if(corsiSelect) {
+                    newSpecialHours[dateKey].corsi = { status: corsiSelect.value };
+                }
             });
             hoursConfig.specialHours = newSpecialHours;
 
@@ -2097,7 +2103,19 @@
 
         function renderCorsiBadge() {
             const el = document.getElementById('badgeCorsi');
-            const status = hoursConfig.corsi ? hoursConfig.corsi.status : 'regular';
+            const now = new Date();
+            const dateKey = now.toISOString().split('T')[0];
+
+            // Ottieni stato base
+            let status = hoursConfig.corsi ? hoursConfig.corsi.status : 'regular';
+
+            // Sovrascrittura per date speciali / chiusure
+            if (hoursConfig.specialClosures && hoursConfig.specialClosures.includes(dateKey)) {
+                status = 'holiday'; // Se l'impianto è chiuso, assumiamo pausa corsi
+            } else if (hoursConfig.specialHours && hoursConfig.specialHours[dateKey] && hoursConfig.specialHours[dateKey].corsi) {
+                status = hoursConfig.specialHours[dateKey].corsi.status;
+            }
+
             const baseClasses = "flex items-center gap-1.5 px-2 py-0.5 rounded-full border cursor-pointer hover:scale-105 transition select-none";
             
             let html = '';
@@ -2204,33 +2222,79 @@
 
         // --- PUBLIC SCHEDULE VIEW MODAL ---
         window.openScheduleModal = function(type) {
+            const now = new Date();
+            const todayStr = now.toISOString().split('T')[0];
+
             if (type === 'corsi') {
-                const status = hoursConfig.corsi ? hoursConfig.corsi.status : 'regular';
+                let status = hoursConfig.corsi ? hoursConfig.corsi.status : 'regular';
+                let isOverride = false;
+
+                // Controlla se OGGI c'è una variazione programmata
+                if (hoursConfig.specialClosures && hoursConfig.specialClosures.includes(todayStr)) {
+                    status = 'holiday';
+                    isOverride = true;
+                } else if (hoursConfig.specialHours && hoursConfig.specialHours[todayStr] && hoursConfig.specialHours[todayStr].corsi) {
+                    status = hoursConfig.specialHours[todayStr].corsi.status;
+                    isOverride = true;
+                }
+
                 let title = 'Stato Corsi di Nuoto';
                 let content = '';
                 
+                // Contenuto principale in base allo stato (regolare o sovrascritto)
                 if(status === 'regular') {
-                    content = `<div class="text-center py-8">
+                    content = `<div class="text-center py-6">
                         <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="check-circle" class="w-8 h-8 text-green-600"></i></div>
                         <h4 class="text-xl font-bold text-green-700 mb-2">Regolari</h4>
-                        <p class="text-gray-600">I corsi si svolgono regolarmente secondo il calendario pianificato.</p>
+                        <p class="text-gray-600 text-sm">I corsi si svolgono regolarmente secondo il calendario pianificato.</p>
                     </div>`;
                 } else if(status === 'holiday') {
-                    content = `<div class="text-center py-8">
+                    content = `<div class="text-center py-6">
                         <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="calendar-off" class="w-8 h-8 text-orange-600"></i></div>
                         <h4 class="text-xl font-bold text-orange-700 mb-2">In Pausa per Festività</h4>
-                        <p class="text-gray-600">Le attività didattiche sono momentaneamente sospese per la pausa festiva.</p>
+                        <p class="text-gray-600 text-sm">Le attività didattiche sono momentaneamente sospese per la pausa festiva.</p>
                     </div>`;
                 } else {
-                    content = `<div class="text-center py-8">
+                    content = `<div class="text-center py-6">
                         <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="alert-circle" class="w-8 h-8 text-red-600"></i></div>
                         <h4 class="text-xl font-bold text-red-700 mb-2">Sospesi Momentaneamente</h4>
-                        <p class="text-gray-600">I corsi sono sospesi fino a nuova comunicazione.</p>
+                        <p class="text-gray-600 text-sm">I corsi sono sospesi fino a nuova comunicazione.</p>
                     </div>`;
                 }
+
+                if (isOverride) {
+                    content += `<div class="text-center pb-2 text-xs font-bold text-purple-600 animate-pulse">VARIAZIONE STRAORDINARIA ATTIVA OGGI</div>`;
+                }
+
+                // Genera lista delle variazioni future per i corsi
+                const upcomingSpecial = Object.keys(hoursConfig.specialHours || {})
+                    .filter(d => d > todayStr && hoursConfig.specialHours[d].corsi)
+                    .sort();
+
+                if (upcomingSpecial.length > 0) {
+                    let specialHtml = `<div class="mt-4 pt-3 border-t border-dashed border-gray-300">
+                        <h5 class="text-xs font-bold text-purple-700 uppercase mb-2">Variazioni programmate</h5>`;
+                    
+                    upcomingSpecial.forEach(date => {
+                         const spData = hoursConfig.specialHours[date].corsi;
+                         let spText = '';
+                         if(spData.status === 'regular') spText = '<span class="text-green-600 font-bold">Regolari</span>';
+                         else if(spData.status === 'holiday') spText = '<span class="text-orange-500 font-bold">In Pausa</span>';
+                         else spText = '<span class="text-red-500 font-bold">Sospesi</span>';
+
+                         specialHtml += `
+                         <div class="flex justify-between items-center py-2 text-xs border-b border-gray-50 last:border-0">
+                            <span class="font-semibold text-gray-700">${new Date(date).toLocaleDateString('it-IT')}</span>
+                            <div class="text-right">${spText}</div>
+                         </div>`;
+                    });
+                    specialHtml += `</div>`;
+                    content += specialHtml;
+                }
+
                 document.getElementById('scheduleModalTitle').innerText = title;
                 document.getElementById('scheduleModalContent').innerHTML = content;
-                document.getElementById('scheduleSpecialNote').classList.add('hidden'); // Nascondi nota
+                document.getElementById('scheduleSpecialNote').classList.add('hidden'); // Nascondi nota base
                 document.getElementById('scheduleModal').classList.remove('hidden');
                 lucide.createIcons();
                 return;
@@ -2517,6 +2581,14 @@
                         ${renderTypeEditor('nuoto', 'Nuoto Libero', dayConfig.nuoto || {active:true, slots:[]})}
                         ${renderTypeEditor('vascaEsterna', 'Vasca Esterna', dayConfig.vascaEsterna || {active:true, slots:[]})}
                     </div>
+                    <div class="px-3 py-2 border-t border-purple-100 bg-purple-50 flex justify-between items-center">
+                        <span class="text-xs font-bold uppercase text-indigo-700 flex items-center gap-1"><i data-lucide="users" class="w-4 h-4"></i> Stato Corsi:</span>
+                        <select class="special-corsi-status border border-purple-200 rounded px-2 py-1 text-xs font-medium text-gray-700 outline-none focus:ring-2 focus:ring-purple-500 bg-white shadow-sm">
+                            <option value="regular" ${(!dayConfig.corsi || dayConfig.corsi.status === 'regular') ? 'selected' : ''}>Regolari</option>
+                            <option value="holiday" ${(dayConfig.corsi && dayConfig.corsi.status === 'holiday') ? 'selected' : ''}>Pausa Festività</option>
+                            <option value="suspended" ${(dayConfig.corsi && dayConfig.corsi.status === 'suspended') ? 'selected' : ''}>Sospesi</option>
+                        </select>
+                    </div>
                 </div>`;
             }).join('');
             lucide.createIcons();
@@ -2533,11 +2605,13 @@
             }
             
             if(!hoursConfig.specialHours[dateVal]) {
-                // Init default empty structure
+                // Init default empty structure con fallback stato corsi ereditato dalle impostazioni globali
+                const globalCorsiStatus = hoursConfig.corsi ? hoursConfig.corsi.status : 'regular';
                 hoursConfig.specialHours[dateVal] = {
                     segreteria: { active: true, slots: [{start:"09:00", end:"13:00"}] }, // default mezza giornata
                     nuoto: { active: true, slots: [{start:"09:00", end:"13:00"}] },
-                    vascaEsterna: { active: false, slots: [] }
+                    vascaEsterna: { active: false, slots: [] },
+                    corsi: { status: globalCorsiStatus } // Aggiunto stato corsi programmato
                 };
                 renderSpecialHoursEditor();
             }
