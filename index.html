@@ -2308,9 +2308,7 @@
             
             // Ordine Lunedì -> Domenica
             const order = [1, 2, 3, 4, 5, 6, 0];
-            const now = new Date();
             const todayIdx = now.getDay();
-            const todayStr = now.toISOString().split('T')[0];
 
             order.forEach(dayIdx => {
                 let dayData = config[dayIdx] || { active: true, slots: [] };
