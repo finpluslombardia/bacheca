@@ -4053,9 +4053,10 @@
                         <style>
                             body { font-family: 'Inter', sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; }
                             @page { size: A4; margin: 15mm; }
-                            .html-content-view { line-height: 1.5; font-size: 11pt; color: #334155; }
-                            .html-content-view h1, .html-content-view h2 { font-size: 16pt; font-weight: bold; margin-top: 1em; margin-bottom: 0.5em; color: #0f172a; }
-                            .html-content-view h3 { font-size: 14pt; font-weight: bold; margin-top: 1em; margin-bottom: 0.5em; color: #1e293b; }
+                            /* Testo grande esattamente quanto il titolo (24pt) */
+                            .html-content-view { line-height: 1.5; font-size: 24pt; color: #334155; }
+                            .html-content-view h1, .html-content-view h2 { font-size: 24pt; font-weight: bold; margin-top: 1em; margin-bottom: 0.5em; color: #0f172a; }
+                            .html-content-view h3 { font-size: 24pt; font-weight: bold; margin-top: 1em; margin-bottom: 0.5em; color: #1e293b; }
                             .html-content-view p { margin-bottom: 0.5em; }
                             .html-content-view ul { list-style-type: disc; margin-left: 1.5em; margin-bottom: 1em; }
                             .html-content-view ol { list-style-type: decimal; margin-left: 1.5em; margin-bottom: 1em; }
@@ -4082,7 +4083,8 @@
                             ${notice.imageUrl ? `<img src="${notice.imageUrl}" class="w-full h-64 object-cover rounded-xl mb-6 shadow-sm">` : ''}
                             
                             <div class="text-sm font-semibold text-slate-400 mb-2">${dateStr}</div>
-                            <h2 class="text-3xl font-bold text-slate-900 mb-6 leading-tight">${notice.title}</h2>
+                            <!-- Titolo impostato a 24pt -->
+                            <h2 class="text-[24pt] font-bold text-slate-900 mb-6 leading-tight">${notice.title}</h2>
                             
                             <div class="html-content-view">
                                 ${notice.content}
@@ -4092,7 +4094,7 @@
                         <!-- FOOTER -->
                         <div class="mt-12 pt-6 border-t-2 border-slate-100 break-inside-avoid">
                             <div class="flex justify-between items-start mb-6">
-                                <div class="flex gap-12">
+                                <div class="flex gap-6 sm:gap-8">
                                     <div>
                                         <h4 class="font-bold text-slate-800 mb-2">Contattaci</h4>
                                         <p class="text-sm text-slate-600 mb-1">📞 02.21061258</p>
@@ -4104,8 +4106,15 @@
                                         <p class="text-sm text-slate-600 mb-1">📍 Via Lampugnano 76</p>
                                         <p class="text-sm text-slate-600">20151 Milano (MI)</p>
                                     </div>
+                                    <!-- Nuova colonna Social -->
+                                    <div>
+                                        <h4 class="font-bold text-slate-800 mb-2">Social</h4>
+                                        <p class="text-sm text-slate-600 mb-1">📱 IG: @cflampugnano</p>
+                                        <p class="text-sm text-slate-600 mb-1">📘 FB: CF Lampugnano</p>
+                                        <p class="text-sm text-slate-600">🎵 TikTok: @cflampugnano</p>
+                                    </div>
                                 </div>
-                                <div class="flex flex-col items-center">
+                                <div class="flex flex-col items-center ml-4">
                                     <img src="${qrUrl}" class="w-20 h-20 mb-2 border border-slate-200 p-1 rounded-lg shadow-sm">
                                     <p class="text-[10px] font-bold text-blue-600 text-center uppercase tracking-wider">Inquadra per<br>altre notizie</p>
                                 </div>
