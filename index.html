@@ -4017,6 +4017,106 @@
             document.getElementById('attachmentUrlManual').value = ''; 
             toggleCoverType('file'); toggleContentType('file'); toggleAttachType('file'); 
         }
+
+        // --- NEW: PRINT ARTICLE FUNCTION (ADMIN) ---
+        function printNoticeArticle() {
+            if (!openedNoticeId) return;
+            const notice = notices.find(n => n.id === openedNoticeId);
+            if (!notice) return;
+
+            // Costruisci le URL per i loghi e il QR
+            const logoUrl = new URL('./CF Lampugnano xl.png', document.baseURI).href;
+            const homeUrl = window.location.origin + window.location.pathname;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(homeUrl)}`;
+            const dateStr = notice.displayDate ? new Date(notice.displayDate).toLocaleDateString('it-IT') : new Date(notice.timestamp).toLocaleDateString('it-IT');
+
+            const printWindow = window.open('', '', 'width=800,height=900');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                    <head>
+                        <title>Stampa Avviso: ${notice.title.replace(/"/g, '&quot;')}</title>
+                        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+                        <script src="https://cdn.tailwindcss.com"><\/script>
+                        <style>
+                            body { font-family: 'Inter', sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; }
+                            @page { size: A4; margin: 15mm; }
+                            .html-content-view { line-height: 1.5; font-size: 11pt; color: #334155; }
+                            .html-content-view h1, .html-content-view h2 { font-size: 16pt; font-weight: bold; margin-top: 1em; margin-bottom: 0.5em; color: #0f172a; }
+                            .html-content-view h3 { font-size: 14pt; font-weight: bold; margin-top: 1em; margin-bottom: 0.5em; color: #1e293b; }
+                            .html-content-view p { margin-bottom: 0.5em; }
+                            .html-content-view ul { list-style-type: disc; margin-left: 1.5em; margin-bottom: 1em; }
+                            .html-content-view ol { list-style-type: decimal; margin-left: 1.5em; margin-bottom: 1em; }
+                            .html-content-view img { max-width: 100%; height: auto; border-radius: 8px; margin: 1em 0; }
+                            .break-inside-avoid { break-inside: avoid; page-break-inside: avoid; }
+                            /* Nascondi sfondi e ombre durante la stampa reale se non supportati */
+                            @media print {
+                                .shadow-sm { box-shadow: none !important; }
+                            }
+                        </style>
+                    </head>
+                    <body class="p-4 sm:p-8 flex flex-col min-h-screen">
+                        <!-- HEADER -->
+                        <div class="flex items-center gap-4 border-b-[3px] border-blue-600 pb-4 mb-8">
+                            <img src="${logoUrl}" style="height: 50px; width: auto;" onerror="this.style.display='none'">
+                            <div>
+                                <h1 class="text-xl sm:text-2xl font-bold text-blue-800 leading-tight">Centro Federale Lampugnano</h1>
+                                <p class="text-sm text-slate-500 font-medium tracking-wide">Bacheca Digitale Ufficiale</p>
+                            </div>
+                        </div>
+
+                        <!-- CONTENT -->
+                        <div class="flex-grow">
+                            ${notice.imageUrl ? `<img src="${notice.imageUrl}" class="w-full h-64 object-cover rounded-xl mb-6 shadow-sm">` : ''}
+                            
+                            <div class="text-sm font-semibold text-slate-400 mb-2">${dateStr}</div>
+                            <h2 class="text-3xl font-bold text-slate-900 mb-6 leading-tight">${notice.title}</h2>
+                            
+                            <div class="html-content-view">
+                                ${notice.content}
+                            </div>
+                        </div>
+
+                        <!-- FOOTER -->
+                        <div class="mt-12 pt-6 border-t-2 border-slate-100 break-inside-avoid">
+                            <div class="flex justify-between items-start mb-6">
+                                <div class="flex gap-12">
+                                    <div>
+                                        <h4 class="font-bold text-slate-800 mb-2">Contattaci</h4>
+                                        <p class="text-sm text-slate-600 mb-1">📞 02.21061258</p>
+                                        <p class="text-sm text-slate-600 mb-1">✉️ cflampugnano@federnuoto.it</p>
+                                        <p class="text-sm text-slate-600">💬 WhatsApp: +39 02.21061258</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-slate-800 mb-2">Dove Siamo</h4>
+                                        <p class="text-sm text-slate-600 mb-1">📍 Via Lampugnano 76</p>
+                                        <p class="text-sm text-slate-600">20151 Milano (MI)</p>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <img src="${qrUrl}" class="w-20 h-20 mb-2 border border-slate-200 p-1 rounded-lg shadow-sm">
+                                    <p class="text-[10px] font-bold text-blue-600 text-center uppercase tracking-wider">Inquadra per<br>altre notizie</p>
+                                </div>
+                            </div>
+                            <div class="text-center text-[10px] text-slate-400 border-t border-slate-100 pt-4">
+                                <p class="font-bold text-slate-500 mb-0.5">Fin Plus Lombardia S.S.D. a r.l. — FIN Centro Federale Milano Piscina Lampugnano</p>
+                                <p>P.IVA/CF 14296840961 — SL: Via Piranesi 46, 20137 Milano (MI) - SO: Via Lampugnano 76, 20151 Milano (MI)</p>
+                            </div>
+                        </div>
+                        
+                        <script>
+                            // Attendi 1 secondo per permettere a Tailwind e alle immagini (es. QR) di caricarsi completamente
+                            setTimeout(() => {
+                                window.print();
+                                window.close();
+                            }, 1000);
+                        <\/script>
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
     </script>
 </body>
 </html>
