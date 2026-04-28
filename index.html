@@ -3628,7 +3628,7 @@
             const shareBtn = document.getElementById('viewNoticeShareBtn');
             const waShareBtn = document.getElementById('viewNoticeWaShareBtn');
             const qrBtn = document.getElementById('viewNoticeQrBtn');
-            const printBtn = document.getElementById('viewNoticePrintBtn');
+            const printArticleBtn = document.getElementById('viewNoticePrintArticleBtn');
             const catsContainer = document.getElementById('viewNoticeCategoriesContainer');
             const dateContainer = document.getElementById('viewNoticeDateContainer');
             
@@ -3661,7 +3661,7 @@
                 shareBtn.classList.add('hidden');
                 waShareBtn.classList.add('hidden');
                 if(qrBtn) qrBtn.classList.add('hidden');
-                if(printBtn) printBtn.classList.add('hidden');
+                if(printArticleBtn) printArticleBtn.classList.add('hidden');
                 catsContainer.classList.add('hidden');
                 if (dateContainer) dateContainer.classList.add('hidden');
             } else {
@@ -3678,9 +3678,9 @@
                     if (isAdminLoggedIn) qrBtn.classList.remove('hidden');
                     else qrBtn.classList.add('hidden');
                 }
-                if(printBtn) {
-                    if (isAdminLoggedIn) printBtn.classList.remove('hidden');
-                    else printBtn.classList.add('hidden');
+                if(printArticleBtn) {
+                    if (isAdminLoggedIn) printArticleBtn.classList.remove('hidden');
+                    else printArticleBtn.classList.add('hidden');
                 }
                 catsContainer.classList.remove('hidden');
                 if (dateContainer) dateContainer.classList.remove('hidden');
