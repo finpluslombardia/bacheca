@@ -4052,7 +4052,8 @@
                         <script src="https://cdn.tailwindcss.com"><\/script>
                         <style>
                             body { font-family: 'Inter', sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; }
-                            @page { size: A4; margin: 15mm; }
+                            /* Margini del foglio A4 molto più stretti (8mm invece di 15mm) */
+                            @page { size: A4; margin: 8mm; }
                             /* Testo impostato a 20pt */
                             .html-content-view { line-height: 1.5; font-size: 20pt; color: #334155; }
                             .html-content-view h1, .html-content-view h2 { font-size: 22pt; font-weight: bold; margin-top: 1em; margin-bottom: 0.5em; color: #0f172a; }
@@ -4068,7 +4069,7 @@
                             }
                         </style>
                     </head>
-                    <body class="p-4 sm:p-8 flex flex-col min-h-screen">
+                    <body class="p-2 sm:p-4 flex flex-col min-h-screen">
                         <!-- HEADER -->
                         <div class="flex items-center gap-4 border-b-[3px] border-blue-600 pb-4 mb-8">
                             <img src="${logoUrl}" style="height: 50px; width: auto;" onerror="this.style.display='none'">
