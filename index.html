@@ -3722,11 +3722,11 @@
             const coverContainer = document.getElementById('viewNoticeCover');
             const coverImg = document.getElementById('viewNoticeCoverImg');
             if (notice.imageUrl) { 
-                coverImg.style.backgroundImage = `url('${notice.imageUrl}')`; 
+                coverImg.src = notice.imageUrl; 
                 coverContainer.classList.remove('hidden'); 
             } else { 
                 coverContainer.classList.add('hidden'); 
-                coverImg.style.backgroundImage = 'none'; 
+                coverImg.src = ''; 
             }
 
             const contentImgContainer = document.getElementById('viewNoticeContentImgContainer');
