@@ -375,7 +375,7 @@
         </div>
     </div>
 
-    <!-- STATUS BAR (NEW) -->
+    <!-- STATUS BAR -->
     <div class="bg-blue-950 text-slate-200 text-xs md:text-sm py-2 px-4 shadow-md border-b border-blue-900">
         <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
             <div id="currentDateTime" class="font-mono text-cyan-400 flex items-center gap-2"><i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> <span>--/--/---- --:--</span></div>
@@ -384,27 +384,27 @@
             <div class="relative w-full md:w-auto overflow-hidden md:overflow-visible">
                 <!-- Modifica Mobile: Scroll orizzontale per gli stati -->
                 <div class="flex items-center gap-4 md:gap-6 w-full md:w-auto overflow-x-auto no-scrollbar whitespace-nowrap px-2 md:px-0 md:justify-end md:flex-wrap md:overflow-visible pr-8 md:pr-0">
-                    <div class="flex items-center gap-2 shrink-0" id="statusWidgetSegreteria">
+                    <div class="flex items-center gap-2 shrink-0" id="statusWidgetSegreteria" style="order: 0;">
                         <span class="font-semibold text-blue-200/70">Segreteria:</span>
                         <div class="flex items-center gap-1.5 bg-blue-900/60 px-2 py-0.5 rounded-full border border-blue-800" id="badgeSegreteria" onclick="openScheduleModal('segreteria')">
                             <span class="status-dot-red"></span> <span class="font-bold">CHIUSO</span>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 shrink-0" id="statusWidgetNuoto">
+                    <div class="flex items-center gap-2 shrink-0" id="statusWidgetNuoto" style="order: 1;">
                         <span class="font-semibold text-blue-200/70">Nuoto Libero:</span>
                         <div class="flex items-center gap-1.5 bg-blue-900/60 px-2 py-0.5 rounded-full border border-blue-800" id="badgeNuoto" onclick="openScheduleModal('nuoto')">
                             <span class="status-dot-red"></span> <span class="font-bold">CHIUSO</span>
                         </div>
                     </div>
-                    <!-- Corsi Nuoto (Nuovo) -->
-                    <div class="flex items-center gap-2 shrink-0" id="statusWidgetCorsi">
+                    <!-- Corsi Nuoto -->
+                    <div class="flex items-center gap-2 shrink-0" id="statusWidgetCorsi" style="order: 2;">
                         <span class="font-semibold text-blue-200/70">Corsi Nuoto:</span>
                         <div class="flex items-center gap-1.5 bg-blue-900/60 px-2 py-0.5 rounded-full border border-blue-800" id="badgeCorsi" onclick="openScheduleModal('corsi')">
                             <span class="status-dot-green"></span> <span class="font-bold">REGOLARI</span>
                         </div>
                     </div>
-                    <!-- Vasca Esterna (Opzionale) -->
-                    <div class="flex items-center gap-2 shrink-0 hidden" id="statusWidgetVascaEsterna">
+                    <!-- Vasca Esterna -->
+                    <div class="flex items-center gap-2 shrink-0 hidden" id="statusWidgetVascaEsterna" style="order: 3;">
                         <span class="font-semibold text-blue-200/70">Vasca Esterna:</span>
                         <div class="flex items-center gap-1.5 bg-blue-900/60 px-2 py-0.5 rounded-full border border-blue-800" id="badgeVascaEsterna" onclick="openScheduleModal('vascaEsterna')">
                             <span class="status-dot-red"></span> <span class="font-bold">CHIUSO</span>
@@ -426,7 +426,7 @@
                 <!-- Generato via JS: Qui finiranno tutti i box (Urgenti, Info, Corsi, Novità, ecc.) -->
             </div>
             
-            <!-- CONTAINER SOTTOCATEGORIE (NEW) -->
+            <!-- CONTAINER SOTTOCATEGORIE -->
             <div id="subCategoryFiltersContainer" class="hidden mt-3 pt-3 border-t border-slate-100 flex gap-2 overflow-x-auto no-scrollbar items-center transition-all duration-300">
                 <!-- Generato via JS -->
             </div>
@@ -435,7 +435,7 @@
 
     <!-- MAIN CONTENT -->
     <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full relative z-10">
-        <!-- Controlli Admin (separati dal banner pubblico) -->
+        <!-- Controlli Admin -->
         <div class="flex justify-end items-center gap-3 mb-6">
             <div id="loadingIndicator" class="hidden"><div class="loader"></div></div>
             <button id="archiveToggleBtn" onclick="toggleArchiveView()" class="hidden flex items-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-full text-sm font-medium transition"><i data-lucide="archive" class="w-4 h-4"></i><span id="archiveBtnText">Mostra Archivio</span></button>
@@ -447,9 +447,12 @@
             <div class="flex items-center"><i data-lucide="archive" class="w-5 h-5 text-yellow-500 mr-2"></i><p class="text-sm text-yellow-700 font-bold">Stai visualizzando l'archivio storico o gli avvisi scaduti</p></div>
         </div>
 
-        <!-- HEADER CATEGORIA: AQUAFITNESS (NEW) -->
+        <!-- HEADER CATEGORIA: AQUAFITNESS -->
         <div id="aquafitnessCategoryHeader" class="hidden mb-8 fade-in relative">
-            <button id="editAquafitnessBtn" onclick="openAquafitnessModal()" class="hidden absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 z-10 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+            <div class="absolute top-4 right-4 flex items-center gap-2 z-10">
+                <button onclick="shareCategory('corsi_aquafitness')" class="bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 transition text-indigo-600" title="Condividi Sezione"><i data-lucide="share-2" class="w-5 h-5"></i></button>
+                <button id="editAquafitnessBtn" onclick="openAquafitnessModal()" class="hidden bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+            </div>
             <div class="bg-white rounded-2xl shadow-sm border border-indigo-100 overflow-hidden">
                 <div class="bg-indigo-50/50 p-5 md:p-6 border-b border-indigo-100">
                     <p id="aquafitnessDescText" class="text-slate-700 leading-relaxed text-sm md:text-base whitespace-pre-line"></p>
@@ -462,7 +465,10 @@
 
         <!-- HEADER CATEGORIA: ARTISTICO -->
         <div id="artisticoCategoryHeader" class="hidden mb-8 fade-in relative">
-            <button id="editArtisticoBtn" onclick="openArtisticoModal()" class="hidden absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 z-10 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+            <div class="absolute top-4 right-4 flex items-center gap-2 z-10">
+                <button onclick="shareCategory('corsi_artistico')" class="bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 transition text-indigo-600" title="Condividi Sezione"><i data-lucide="share-2" class="w-5 h-5"></i></button>
+                <button id="editArtisticoBtn" onclick="openArtisticoModal()" class="hidden bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+            </div>
             <div class="bg-white rounded-2xl shadow-sm border border-indigo-100 overflow-hidden">
                 <div class="bg-indigo-50/50 p-5 md:p-6 border-b border-indigo-100">
                     <p id="artisticoDescText" class="text-slate-700 leading-relaxed text-sm md:text-base whitespace-pre-line"></p>
@@ -473,9 +479,12 @@
             </div>
         </div>
 
-        <!-- HEADER CATEGORIA: AQUAGOL (NEW) -->
+        <!-- HEADER CATEGORIA: AQUAGOL -->
         <div id="aquagolCategoryHeader" class="hidden mb-8 fade-in relative">
-            <button id="editAquagolBtn" onclick="openAquagolModal()" class="hidden absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 z-10 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+            <div class="absolute top-4 right-4 flex items-center gap-2 z-10">
+                <button onclick="shareCategory('corsi_aquagol')" class="bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 transition text-indigo-600" title="Condividi Sezione"><i data-lucide="share-2" class="w-5 h-5"></i></button>
+                <button id="editAquagolBtn" onclick="openAquagolModal()" class="hidden bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+            </div>
             <div class="bg-white rounded-2xl shadow-sm border border-indigo-100 overflow-hidden">
                 <div class="bg-indigo-50/50 p-5 md:p-6 border-b border-indigo-100">
                     <p id="aquagolDescText" class="text-slate-700 leading-relaxed text-sm md:text-base whitespace-pre-line"></p>
@@ -486,9 +495,12 @@
             </div>
         </div>
 
-        <!-- HEADER CATEGORIA: PROPAGANDA (NEW) -->
+        <!-- HEADER CATEGORIA: PROPAGANDA -->
         <div id="propagandaCategoryHeader" class="hidden mb-8 fade-in relative">
-            <button id="editPropagandaBtn" onclick="openPropagandaModal()" class="hidden absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 z-10 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+            <div class="absolute top-4 right-4 flex items-center gap-2 z-10">
+                <button onclick="shareCategory('corsi_propaganda')" class="bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 transition text-indigo-600" title="Condividi Sezione"><i data-lucide="share-2" class="w-5 h-5"></i></button>
+                <button id="editPropagandaBtn" onclick="openPropagandaModal()" class="hidden bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+            </div>
             <div class="bg-white rounded-2xl shadow-sm border border-indigo-100 overflow-hidden">
                 <div class="bg-indigo-50/50 p-5 md:p-6 border-b border-indigo-100">
                     <p id="propagandaDescText" class="text-slate-700 leading-relaxed text-sm md:text-base whitespace-pre-line"></p>
@@ -499,9 +511,12 @@
             </div>
         </div>
 
-        <!-- HEADER CATEGORIA: MASTER (NEW) -->
+        <!-- HEADER CATEGORIA: MASTER -->
         <div id="masterCategoryHeader" class="hidden mb-8 fade-in relative">
-            <button id="editMasterBtn" onclick="openMasterModal()" class="hidden absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 z-10 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+            <div class="absolute top-4 right-4 flex items-center gap-2 z-10">
+                <button onclick="shareCategory('corsi_master')" class="bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 transition text-indigo-600" title="Condividi Sezione"><i data-lucide="share-2" class="w-5 h-5"></i></button>
+                <button id="editMasterBtn" onclick="openMasterModal()" class="hidden bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+            </div>
             <div class="bg-white rounded-2xl shadow-sm border border-indigo-100 overflow-hidden">
                 <div class="bg-indigo-50/50 p-5 md:p-6 border-b border-indigo-100">
                     <p id="masterDescText" class="text-slate-700 leading-relaxed text-sm md:text-base whitespace-pre-line"></p>
@@ -550,7 +565,6 @@
                             <div class="bg-slate-700 p-1.5 rounded-full group-hover:bg-slate-600 transition"><i data-lucide="mail" class="w-4 h-4"></i></div>
                             cflampugnano@federnuoto.it
                         </a>
-                        <!-- Whatsapp Spostato Qui -->
                         <a href="https://wa.me/message/SIT75DBXZR2EF1" target="_blank" class="flex items-center gap-2 hover:text-white transition group">
                             <div class="bg-slate-700 p-1.5 rounded-full group-hover:bg-slate-600 transition">
                                 <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
@@ -594,7 +608,7 @@
                     </a>
                 </div>
 
-                <!-- Social Icons (Senza Whatsapp) -->
+                <!-- Social Icons -->
                 <div class="space-y-3">
                     <h4 class="font-bold text-lg text-slate-200">Seguici sui Social</h4>
                     <div class="flex gap-4 items-center justify-center md:justify-start">
@@ -608,7 +622,7 @@
                             <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036c-2.148 0-2.971.956-2.971 3.594v.376h3.558l-.46 3.667h-3.098v7.98h-4.943Z"/></svg>
                         </a>
 
-                        <!-- TikTok (Logo Originale Ufficiale) -->
+                        <!-- TikTok -->
                         <a href="https://www.tiktok.com/@cflampugnano?_r=1&_t=ZN-93j54P6ASDG" target="_blank" class="bg-black hover:bg-gray-900 p-2.5 rounded-full transition shadow-lg transform hover:scale-110 flex items-center justify-center border border-gray-700" title="TikTok">
                             <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.03 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.74-1.75.51-.96.47-2.27.47-3.38.01-4.44-.01-8.89.01-13.33-.87-.4-1.74-.8-2.61-1.2.45-.78.9-1.57 1.35-2.35z"/>
@@ -631,27 +645,23 @@
         </div>
     </footer>
 
-    <!-- TOAST NOTIFICATION (Modificato z-index per stare sopra i modali) -->
+    <!-- TOAST NOTIFICATION -->
     <div id="toast" class="fixed bottom-6 left-1/2 bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 z-[100] pointer-events-none">
         <i id="toastIcon" data-lucide="check-circle" class="w-5 h-5 text-green-400"></i><span id="toastMessage" class="text-sm font-medium">Operazione completata</span>
     </div>
 
-    <!-- MODAL VIEW NOTICE (Aggiornato Mobile) -->
+    <!-- MODAL VIEW NOTICE -->
     <div id="viewNoticeModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-md fade-in">
         <div id="viewNoticeInnerContainer" class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] relative transition-all duration-300">
             
-            <!-- POPUP BANNER (NEW) -->
+            <!-- POPUP BANNER -->
             <div id="viewNoticePopupBanner" class="hidden bg-blue-500 text-white text-center py-2.5 font-bold uppercase tracking-wider text-sm w-full shrink-0 z-20">In Evidenza</div>
 
-            <!-- CONTENITORE BOTTONI AZIONE (FLEX) -->
+            <!-- CONTENITORE BOTTONI AZIONE -->
             <div class="absolute top-4 right-4 z-30 flex items-center gap-2">
-                <!-- Pulsante Stampa A4 (Admin) -->
                 <button id="viewNoticePrintArticleBtn" onclick="printNoticeArticle()" class="hidden bg-white/90 p-2 rounded-full hover:bg-gray-100 transition shadow-sm" title="Stampa Articolo (A4)"><i data-lucide="printer" class="w-5 h-5 md:w-6 md:h-6 text-emerald-600"></i></button>
-                <!-- Pulsante QR Code (Admin) -->
                 <button id="viewNoticeQrBtn" onclick="showQrCodeFromView()" class="hidden bg-white/90 p-2 rounded-full hover:bg-gray-100 transition shadow-sm" title="Genera QR Code da Stampare"><i data-lucide="qr-code" class="w-5 h-5 md:w-6 md:h-6 text-purple-700"></i></button>
-                <!-- Pulsante Condividi (Copia Link) -->
                 <button id="viewNoticeShareBtn" onclick="shareCurrentNotice()" class="bg-white/90 p-2 rounded-full hover:bg-gray-100 transition shadow-sm" title="Copia Link Notizia"><i data-lucide="share-2" class="w-5 h-5 md:w-6 md:h-6 text-slate-700"></i></button>
-                <!-- Pulsante Condividi WhatsApp -->
                 <button id="viewNoticeWaShareBtn" onclick="shareOnWhatsApp()" class="bg-[#25D366] text-white p-2 rounded-full hover:bg-[#1DA851] transition shadow-sm flex items-center justify-center" title="Condividi su WhatsApp">
                     <svg class="w-5 h-5 md:w-6 md:h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
                 </button>
@@ -659,15 +669,14 @@
             </div>
 
             <div class="overflow-y-auto custom-scrollbar">
-                <div id="viewNoticeCover" class="relative w-full h-48 md:h-64 bg-slate-100 hidden shrink-0"><img id="viewNoticeCoverImg" class="absolute inset-0 w-full h-full object-cover"></div>
-                <!-- Ridotto padding su mobile da p-8 a p-5 -->
-                <div class="p-5 md:p-8">
+                <!-- Copertina Fix Chrome con block e transform -->
+                <div id="viewNoticeCover" class="relative w-full h-48 md:h-64 bg-slate-100 hidden shrink-0"><img id="viewNoticeCoverImg" class="absolute inset-0 w-full h-full object-cover object-center block" style="transform: translateZ(0); backface-visibility: hidden;"></div>
+                
+                <div id="viewNoticePaddingWrapper" class="p-5 md:p-8">
                     <div class="flex flex-wrap items-center gap-3 mb-4" id="viewNoticeCategoriesContainer"></div>
                     <div id="viewNoticeDateContainer" class="flex items-center gap-1 text-slate-400 text-xs mb-2"><i data-lucide="calendar" class="w-3 h-3"></i><span id="viewNoticeDate"></span></div>
-                    <!-- Ridotto testo titolo su mobile da 3xl a xl -->
                     <h2 id="viewNoticeTitle" class="text-xl md:text-3xl font-bold text-slate-900 mb-6 leading-tight"></h2>
                     
-                    <!-- Modifica: aggiunta classe per fallback styling html -->
                     <div id="viewNoticeContent" class="text-slate-700 leading-relaxed text-base md:text-lg mb-6 whitespace-pre-line html-content-view"></div>
                     
                     <div id="viewNoticeContentImgContainer" class="hidden mb-6"><img id="viewNoticeContentImg" class="w-full rounded-xl border border-slate-200"></div>
@@ -677,7 +686,7 @@
                         <a id="viewNoticeDownloadBtn" href="#" target="_blank" class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-xl font-semibold transition w-full sm:w-auto shadow-md hover:shadow-lg"><i data-lucide="download" class="w-5 h-5"></i>Scarica / Apri Documento</a>
                     </div>
                     
-                    <!-- NEW POLL CONTAINER -->
+                    <!-- POLL CONTAINER -->
                     <div id="viewNoticePollContainer" class="hidden mt-8 pt-6 border-t border-slate-100"></div>
                 </div>
             </div>
@@ -693,10 +702,8 @@
             </div>
             <div class="p-6 overflow-y-auto">
                 <div id="scheduleModalContent">
-                    <!-- Contenuto generato via JS -->
                 </div>
                 <div id="scheduleSpecialNote" class="hidden mt-6 bg-red-50 border border-red-100 p-3 rounded-lg text-xs text-red-700">
-                    <!-- Note chiusure speciali -->
                 </div>
             </div>
         </div>
@@ -712,19 +719,16 @@
             <div class="p-6 overflow-y-auto space-y-6">
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Segreteria -->
                     <div class="space-y-3">
                         <h4 class="font-bold text-blue-800 border-b pb-2">Orari Segreteria (Settimanali)</h4>
                         <div id="scheduleSegreteriaContainer" class="space-y-2 text-sm"></div>
                     </div>
-                    <!-- Nuoto Libero -->
                     <div class="space-y-3">
                         <h4 class="font-bold text-cyan-800 border-b pb-2">Orari Nuoto Libero (Settimanali)</h4>
                         <div id="scheduleNuotoContainer" class="space-y-2 text-sm"></div>
                     </div>
                 </div>
                 
-                <!-- Vasca Esterna (Opzionale) -->
                 <div class="border-t pt-4">
                     <div class="flex justify-between items-center mb-3">
                         <h4 class="font-bold text-orange-700 flex items-center gap-2"><i data-lucide="sun" class="w-4 h-4"></i> Orari Vasca Esterna (Estiva)</h4>
@@ -736,7 +740,6 @@
                     <div id="scheduleVascaEsternaContainer" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm"></div>
                 </div>
 
-                <!-- Stato Corsi Nuoto (NUOVO) -->
                 <div class="border-t pt-4">
                     <h4 class="font-bold text-indigo-700 mb-3 flex items-center gap-2"><i data-lucide="users" class="w-4 h-4"></i> Stato Corsi di Nuoto</h4>
                     <div class="flex flex-col gap-2 p-4 bg-indigo-50 rounded-lg border border-indigo-100">
@@ -755,7 +758,6 @@
                     </div>
                 </div>
 
-                <!-- Chiusure Straordinarie -->
                 <div class="bg-red-50 p-4 rounded-lg border border-red-100 mt-4">
                     <h4 class="font-bold text-red-800 mb-2 flex items-center gap-2"><i data-lucide="calendar-off" class="w-4 h-4"></i> Chiusure Straordinarie (Feste, Manutenzione)</h4>
                     <p class="text-xs text-red-600 mb-3">Inserisci le date in cui l'impianto è COMPLETAMENTE CHIUSO (Es. 25 Dicembre). Queste date sovrascrivono l'orario settimanale.</p>
@@ -766,7 +768,6 @@
                     <div id="specialDatesList" class="flex flex-wrap gap-2"></div>
                 </div>
 
-                <!-- Orari Speciali (NEW) -->
                 <div class="border-t border-purple-100 bg-purple-50 p-4 rounded-lg mt-4">
                     <h4 class="font-bold text-purple-800 mb-2 flex items-center gap-2">
                         <i data-lucide="calendar-clock" class="w-4 h-4"></i> Giorni con Orari Speciali
@@ -778,7 +779,17 @@
                         <button onclick="addSpecialHourDate()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm font-bold">Configura Data</button>
                     </div>
                     <div id="specialHoursContainer" class="space-y-4">
-                        <!-- Cards generated via JS -->
+                    </div>
+                </div>
+
+                <!-- NEW: ORDINAMENTO BANNER BLU -->
+                <div class="border-t border-blue-100 bg-blue-50 p-4 rounded-lg mt-4">
+                    <h4 class="font-bold text-blue-800 mb-2 flex items-center gap-2">
+                        <i data-lucide="move-horizontal" class="w-4 h-4"></i> Ordine visualizzazione nel banner
+                    </h4>
+                    <p class="text-xs text-blue-600 mb-3">Usa le frecce per riordinare i widget nella barra blu in alto.</p>
+                    <div id="statusOrderContainer" class="space-y-2">
+                        <!-- Generato via JS -->
                     </div>
                 </div>
 
@@ -787,7 +798,7 @@
         </div>
     </div>
 
-    <!-- MODAL ORDINAMENTO CATEGORIE (NUOVO) -->
+    <!-- MODAL ORDINAMENTO CATEGORIE -->
     <div id="categoryOrderModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[85vh]">
             <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
@@ -797,7 +808,6 @@
             <div class="p-6 overflow-y-auto">
                 <p class="text-sm text-gray-500 mb-4">Usa le frecce per riordinare le categorie nel menu orizzontale.</p>
                 <div id="categoryOrderList" class="space-y-2">
-                    <!-- Generato via JS -->
                 </div>
             </div>
             <div class="p-5 border-t border-gray-100 bg-gray-50">
@@ -817,12 +827,9 @@
                 <input type="hidden" id="editNoticeId">
                 <div><label class="block text-sm font-medium text-gray-700 mb-1">Titolo</label><input type="text" id="newTitle" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Es. Chiusura Vasca"></div>
                 
-                <!-- Multi Categoria -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Categorie (Seleziona una o più)</label>
-                    <div class="flex flex-wrap gap-2" id="categoryCheckboxes">
-                        <!-- Generato via JS -->
-                    </div>
+                    <div class="flex flex-wrap gap-2" id="categoryCheckboxes"></div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -831,11 +838,9 @@
                     <div><label class="block text-sm font-medium text-gray-700 mb-1 text-red-600">Scadenza (Opz)</label><input type="date" id="newExpirationDate" class="w-full border border-red-200 rounded-lg p-2.5 focus:ring-2 focus:ring-red-500 outline-none" title="Se impostata, l'avviso verrà nascosto automaticamente dopo questa data"></div>
                 </div>
 
-                <!-- FILE SECTIONS -->
                 <div class="space-y-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
                     <p class="text-xs text-orange-600 font-semibold mb-2"><i data-lucide="info" class="w-3 h-3 inline"></i> Puoi caricare file dal PC o usare Link Pubblici (Google Drive).</p>
                     
-                    <!-- Cover -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2"><i data-lucide="image" class="w-4 h-4"></i>Immagine Copertina</label>
                         <div id="currentCoverBadge" class="hidden mb-2 flex items-center justify-between bg-blue-100/50 border border-blue-200 px-3 py-2 rounded-lg">
@@ -844,7 +849,6 @@
                         </div>
                         <div class="flex gap-2 mb-2 text-xs"><button type="button" onclick="toggleCoverType('file')" id="btnCoverFile" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button><button type="button" onclick="toggleCoverType('link')" id="btnCoverLink" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive</button></div><div id="coverFileInput"><input type="file" id="coverFile" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"></div><div id="coverLinkInput" class="hidden"><input type="url" id="coverUrlManual" placeholder="Incolla link Google Drive..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></div>
                     </div>
-                    <!-- Content Image -->
                     <div class="border-t border-slate-200 pt-3">
                         <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2"><i data-lucide="image-plus" class="w-4 h-4"></i>Immagine nel Testo (Opzionale)</label>
                         <div id="currentContentImgBadge" class="hidden mb-2 flex items-center justify-between bg-blue-100/50 border border-blue-200 px-3 py-2 rounded-lg">
@@ -853,7 +857,6 @@
                         </div>
                         <div class="flex gap-2 mb-2 text-xs"><button type="button" onclick="toggleContentType('file')" id="btnContentFile" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button><button type="button" onclick="toggleContentType('link')" id="btnContentLink" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive</button></div><div id="contentFileInput"><input type="file" id="contentImageFile" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"></div><div id="contentLinkInput" class="hidden"><input type="url" id="contentUrlManual" placeholder="Incolla link Google Drive..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></div>
                     </div>
-                    <!-- Attachment -->
                     <div class="border-t border-slate-200 pt-3">
                         <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2"><i data-lucide="paperclip" class="w-4 h-4"></i>Allegato (PDF o Link Esterno)</label>
                         <div id="currentAttachmentBadge" class="hidden mb-2 flex items-center justify-between bg-blue-100/50 border border-blue-200 px-3 py-2 rounded-lg">
@@ -864,7 +867,6 @@
                     </div>
                 </div>
                 
-                <!-- Editor Messaggio con Quill -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Messaggio</label>
                     <div id="quillToolbar" class="bg-gray-50 border-gray-300 rounded-t-lg">
@@ -919,18 +921,18 @@
                     <div class="flex items-center gap-2"><input type="checkbox" id="newBanner" class="w-4 h-4 text-red-600 rounded focus:ring-red-500"><label for="newBanner" class="text-sm text-gray-700 font-medium">Crea Banner in alto</label></div>
                     <div class="flex items-center gap-2 md:ml-auto">
                         <i data-lucide="palette" class="w-4 h-4 text-gray-400"></i>
-                        <select id="newBannerColor" class="border border-gray-300 rounded px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-white" title="Scegli il colore del Banner in alto">
-                            <option value="red">Banner Rosso</option>
-                            <option value="blue">Banner Blu</option>
-                            <option value="green">Banner Verde</option>
-                            <option value="yellow">Banner Giallo</option>
-                            <option value="orange">Banner Arancione</option>
-                            <option value="purple">Banner Viola</option>
-                            <option value="pink">Banner Rosa</option>
-                            <option value="cyan">Banner Ciano</option>
-                            <option value="slate">Banner Grigio Scuro</option>
+                        <select id="newBannerColor" class="border border-gray-300 rounded px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-white" title="Scegli il colore (per Banner e Pop-up)">
+                            <option value="red">Colore Rosso</option>
+                            <option value="blue">Colore Blu</option>
+                            <option value="green">Colore Verde</option>
+                            <option value="yellow">Colore Giallo</option>
+                            <option value="orange">Colore Arancione</option>
+                            <option value="purple">Colore Viola</option>
+                            <option value="pink">Colore Rosa</option>
+                            <option value="cyan">Colore Ciano</option>
+                            <option value="slate">Colore Grigio Scuro</option>
                         </select>
-                        <select id="newBannerIcon" class="border border-gray-300 rounded px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-white ml-1" title="Scegli l'icona del Banner">
+                        <select id="newBannerIcon" class="border border-gray-300 rounded px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-white ml-1" title="Scegli l'icona (per Banner e Pop-up)">
                             <option value="alert-triangle">⚠ Attenzione</option>
                             <option value="info">ⓘ Info</option>
                             <option value="bell">⚑ Campanella</option>
@@ -955,13 +957,11 @@
                     </div>
                 </div>
 
-                <!-- NEW POPUP SUMMARY SECTION -->
                 <div id="popupSummaryContainer" class="hidden mt-3 bg-purple-50/50 border border-purple-100 p-3 rounded-xl">
                     <label class="block text-sm font-bold text-purple-800 mb-1 flex items-center gap-1"><i data-lucide="message-square" class="w-4 h-4"></i> Riassunto per il Pop-up (Opzionale)</label>
                     <textarea id="newPopupSummary" rows="2" maxlength="300" class="w-full border border-purple-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-purple-500 outline-none bg-white" placeholder="Se la notizia è molto lunga, scrivi un riassunto (max 300 caratteri) da mostrare nel pop-up all'apertura..."></textarea>
                 </div>
 
-                <!-- NEW POLL SECTION -->
                 <div class="border-t border-gray-100 pt-4 mt-2">
                     <div class="flex items-center justify-between mb-3">
                         <label class="text-sm font-bold text-gray-800 flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-4 h-4 text-blue-600"></i> Aggiungi Sondaggio (Opzionale)</label>
@@ -1003,7 +1003,7 @@
         </div>
     </div>
 
-    <!-- MODAL LOGIN (AGGIUNTO per funzionalità Admin) -->
+    <!-- MODAL LOGIN -->
     <div id="loginModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden p-6">
             <h3 class="text-xl font-bold text-gray-800 mb-4">Area Riservata</h3>
@@ -1233,6 +1233,15 @@
         let removeMediaFlags = { cover: false, content: false, attachment: false }; // NEW
         const SECRET_CLICKS_REQUIRED = 5;
 
+        // STATUS ORDER DEFAULT
+        const DEFAULT_STATUS_ORDER = ['segreteria', 'nuoto', 'corsi', 'vascaEsterna'];
+        const STATUS_TYPES = {
+            'segreteria': { label: 'Segreteria', id: 'statusWidgetSegreteria' },
+            'nuoto': { label: 'Nuoto Libero', id: 'statusWidgetNuoto' },
+            'corsi': { label: 'Corsi Nuoto', id: 'statusWidgetCorsi' },
+            'vascaEsterna': { label: 'Vasca Esterna', id: 'statusWidgetVascaEsterna' }
+        };
+
         // Struttura dati orari default MULTI-SLOT
         let hoursConfig = {
             specialClosures: [],
@@ -1242,6 +1251,7 @@
             vascaEsterna: { visible: false }, // default invisibile
             corsi: { status: 'regular' }, // Default: Regolari
             categoryOrder: [], // NEW: Ordine categorie personalizzato
+            statusOrder: [...DEFAULT_STATUS_ORDER], // INIZIALIZZA ORDINE
             summerEmptyMessage: '' // NEW: Messaggio personalizzato vuoto estivo
         };
         // Inizializza giorni vuoti
@@ -1317,11 +1327,11 @@
             const adminControls = document.getElementById('adminControls');
             const addBtn = document.getElementById('addNoticeBtn');
             const archiveBtn = document.getElementById('archiveToggleBtn');
-            const editAquaFitBtn = document.getElementById('editAquafitnessBtn'); // Tasto Edit Aquafitness
-            const editArtBtn = document.getElementById('editArtisticoBtn'); // Tasto Edit Artistico
-            const editAquaBtn = document.getElementById('editAquagolBtn'); // Tasto Edit Aquagol
-            const editPropBtn = document.getElementById('editPropagandaBtn'); // Tasto Edit Propaganda
-            const editMasterBtn = document.getElementById('editMasterBtn'); // Tasto Edit Master
+            const editAquaFitBtn = document.getElementById('editAquafitnessBtn'); 
+            const editArtBtn = document.getElementById('editArtisticoBtn'); 
+            const editAquaBtn = document.getElementById('editAquagolBtn'); 
+            const editPropBtn = document.getElementById('editPropagandaBtn'); 
+            const editMasterBtn = document.getElementById('editMasterBtn'); 
             
             if (isAdmin) { 
                 adminControls.classList.remove('hidden'); 
@@ -1374,9 +1384,8 @@
             });
 
             // FIX: Evita che la formattazione si espanda ai paragrafi successivi.
-            // Pulisce la selezione e, per i sottotitoli, la limita tassativamente alla prima riga.
             const safeBlockFormat = (formatName, value) => {
-                let range = quill.getSelection(true); // true forza il mantenimento del focus
+                let range = quill.getSelection(true); 
                 if (range) {
                     let index = range.index;
                     let length = range.length;
@@ -1396,8 +1405,6 @@
                         if (value === '2' || value === 2) finalValue = 2;
                         else if (value === '3' || value === 3) finalValue = 3;
                         
-                        // 2. Se è un sottotitolo, impedisce che venga applicato a più righe 
-                        // tagliando la selezione alla prima occorrenza di un a capo (se l'utente ha sbordato col mouse)
                         if (length > 0) {
                             let text = quill.getText(index, length);
                             if (text.includes('\n')) {
@@ -1408,7 +1415,6 @@
                         finalValue = false;
                     }
                     
-                    // 3. Applica il formato SOLO al testo purificato tramite formatLine
                     quill.setSelection(index, length);
                     quill.formatLine(index, length, formatName, finalValue);
                 }
@@ -1418,9 +1424,8 @@
             quill.getModule('toolbar').addHandler('lineHeight', (val) => safeBlockFormat('lineHeight', val));
             quill.getModule('toolbar').addHandler('marginBottom', (val) => safeBlockFormat('marginBottom', val));
 
-            // Gestione custom per upload immagini inline su Firebase Storage (evita base64 enormi nel DB)
+            // Gestione custom per upload immagini inline su Firebase Storage
             quill.getModule('toolbar').addHandler('image', () => {
-                // SALVA IL RANGE PRIMA DI APRIRE IL FILE PICKER (Fix perdita di focus e bug inserimento)
                 let range = quill.getSelection();
                 if (!range) {
                     range = { index: quill.getLength() };
@@ -1463,6 +1468,7 @@
             window.openCategoryOrderModal = openCategoryOrderModal;
             window.closeCategoryOrderModal = closeCategoryOrderModal;
             window.saveCategoryOrder = saveCategoryOrder;
+            window.moveStatus = moveStatus; // NEW: Ordine Widget
 
             // SHARE FUNCTION
             window.shareCurrentNotice = shareCurrentNotice;
@@ -1553,7 +1559,6 @@
 
         // --- AQUAFITNESS CONFIGURATOR ---
         window.openAquafitnessModal = function() {
-            // Default texts per Aquafitness
             const defDesc = "L'Aquafitness unisce i benefici dell'acqua a un allenamento cardiovascolare e tonificante. Ideale per tenersi in forma divertendosi a tempo di musica, senza stressare le articolazioni.";
             const defAcc = [
                 { title: "Stagione 2025/26", content: "Dettagli della stagione in via di definizione..." },
@@ -1600,7 +1605,6 @@
 
         // --- ARTISTICO CONFIGURATOR ---
         window.openArtisticoModal = function() {
-            // Default texts
             const defDesc = "Hai mai sognato di ballare sott'acqua o di fare acrobazie come se stessi volando? Allora il Nuoto Artistico (una volta chiamato Nuoto Sincronizzato) è lo sport perfetto per te! Imparerai a scoprire che in acqua tutto è possibile e trasformerai i tuoi movimenti in magia.";
             const defAcc = [
                 { title: "Stagione 2025/26", content: "Dettagli della stagione in via di definizione..." },
@@ -1647,7 +1651,6 @@
 
         // --- AQUAGOL CONFIGURATOR ---
         window.openAquagolModal = function() {
-            // Default texts per Aquagol
             const defDesc = "L'Aquagol è l'attività propedeutica alla Pallanuoto. Un gioco di squadra in acqua che sviluppa le capacità natatorie unendole al divertimento con la palla. Impara a fare passaggi, tiri e a giocare insieme ai tuoi compagni!";
             const defAcc = [
                 { title: "Stagione 2025/26", content: "Dettagli della stagione in via di definizione..." },
@@ -1694,7 +1697,6 @@
 
         // --- PROPAGANDA CONFIGURATOR ---
         window.openPropagandaModal = function() {
-            // Default texts per Propaganda
             const defDesc = "Il settore Propaganda è l'ideale per i ragazzi che vogliono vivere il nuoto a livello pre-agonistico. Un percorso per perfezionare gli stili in un ambiente sano e competitivo senza l'impegno agonistico estremo.";
             const defAcc = [
                 { title: "Stagione 2025/26", content: "Dettagli della stagione in via di definizione..." },
@@ -1741,7 +1743,6 @@
 
         // --- MASTER CONFIGURATOR ---
         window.openMasterModal = function() {
-            // Default texts per Master
             const defDesc = "Il nuoto Master è dedicato a chi desidera continuare a nuotare e competere, unendo la passione per questo sport all'allenamento in un gruppo affiatato. Se vuoi metterti alla prova e partecipare alle gare, questo è il tuo posto!";
             const defAcc = [
                 { title: "Stagione 2025/26", content: "Dettagli della stagione in via di definizione..." },
@@ -1786,7 +1787,7 @@
             }
         };
 
-        // --- OG META TAGS UPDATER (NEW) ---
+        // --- OG META TAGS UPDATER ---
         function updateDynamicMetaTags(notice) {
             if (!notice) return;
             
@@ -1895,7 +1896,8 @@
                     if(data.specialHours) hoursConfig.specialHours = data.specialHours;
                     // Load category order if exists, otherwise empty (will use defaults in render)
                     if(data.categoryOrder) hoursConfig.categoryOrder = data.categoryOrder;
-                    if(data.summerEmptyMessage) hoursConfig.summerEmptyMessage = data.summerEmptyMessage;
+                    if(data.statusOrder) hoursConfig.statusOrder = data.statusOrder;
+                    if(data.summerEmptyMessage !== undefined) hoursConfig.summerEmptyMessage = data.summerEmptyMessage;
                     
                     // Caricamento Dati Aquafitness
                     if(data.aquafitnessDesc !== undefined) hoursConfig.aquafitnessDesc = data.aquafitnessDesc;
@@ -1943,7 +1945,6 @@
                 return schedule;
             };
 
-            // FIX ERROR: Usare 'seg' come prefisso per leggere correttamente i dati dal DOM
             hoursConfig.segreteria = readScheduleFromDOM('seg');
             hoursConfig.nuoto = readScheduleFromDOM('nuoto');
             
@@ -1989,6 +1990,12 @@
             });
             hoursConfig.specialHours = newSpecialHours;
 
+            // Salva nuovo ordine Widget status
+            const statusList = document.getElementById('statusOrderContainer');
+            if (statusList && statusList.dataset.currentOrder) {
+                hoursConfig.statusOrder = JSON.parse(statusList.dataset.currentOrder);
+            }
+
             try {
                 // Save everything, including existing categoryOrder
                 await setDoc(doc(db, CONFIG_COLLECTION, HOURS_DOC_ID), hoursConfig);
@@ -1998,7 +2005,40 @@
             } catch(e) { console.error(e); showToast("Errore salvataggio orari", true); }
         }
 
-        // --- NEW: CATEGORY ORDER MANAGEMENT ---
+        function getEffectiveStatusOrder() {
+            let order = hoursConfig.statusOrder || [...DEFAULT_STATUS_ORDER];
+            const missing = DEFAULT_STATUS_ORDER.filter(k => !order.includes(k));
+            return [...order, ...missing];
+        }
+
+        function renderStatusOrderEditor(order) {
+            const list = document.getElementById('statusOrderContainer');
+            if(!list) return;
+            list.innerHTML = order.map((key, index) => {
+                const item = STATUS_TYPES[key];
+                if(!item) return '';
+                return `
+                <div class="flex items-center justify-between bg-white p-2 rounded border border-blue-100">
+                    <span class="text-sm font-medium text-blue-800">${item.label}</span>
+                    <div class="flex items-center gap-1">
+                        <button onclick="moveStatus(${index}, -1)" class="p-1 hover:bg-blue-100 rounded text-blue-600 disabled:opacity-30" ${index === 0 ? 'disabled' : ''}><i data-lucide="arrow-up" class="w-4 h-4"></i></button>
+                        <button onclick="moveStatus(${index}, 1)" class="p-1 hover:bg-blue-100 rounded text-blue-600 disabled:opacity-30" ${index === order.length - 1 ? 'disabled' : ''}><i data-lucide="arrow-down" class="w-4 h-4"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+            lucide.createIcons();
+            list.dataset.currentOrder = JSON.stringify(order);
+        }
+
+        function moveStatus(index, direction) {
+            const list = document.getElementById('statusOrderContainer');
+            const order = JSON.parse(list.dataset.currentOrder);
+            if (index + direction < 0 || index + direction >= order.length) return;
+            const temp = order[index]; order[index] = order[index + direction]; order[index + direction] = temp;
+            renderStatusOrderEditor(order);
+        }
+
+        // --- CATEGORY ORDER MANAGEMENT ---
         function getEffectiveCategoryOrder() {
             let order = hoursConfig.categoryOrder || [];
             
@@ -2103,6 +2143,15 @@
             const widgetVasca = document.getElementById('statusWidgetVascaEsterna');
             if(hoursConfig.vascaEsterna.visible) widgetVasca.classList.remove('hidden');
             else widgetVasca.classList.add('hidden');
+
+            const statusOrder = getEffectiveStatusOrder();
+            statusOrder.forEach((key, index) => {
+                const widgetId = STATUS_TYPES[key] ? STATUS_TYPES[key].id : null;
+                if(widgetId) {
+                    const widget = document.getElementById(widgetId);
+                    if(widget) widget.style.order = index;
+                }
+            });
 
             lucide.createIcons();
         }
@@ -2430,6 +2479,7 @@
 
             renderSpecialDates();
             renderSpecialHoursEditor(); // NEW
+            renderStatusOrderEditor(getEffectiveStatusOrder());
             document.getElementById('hoursModal').classList.remove('hidden');
             lucide.createIcons();
         }
@@ -2809,7 +2859,7 @@
             let html = '';
             // Salta "all" che non è una categoria assegnabile
             for (const key in CATEGORIES) {
-                if(key === 'all') continue;
+                if(key === 'all' || CATEGORIES[key].isSubcategory) continue; // Salta anche sottocategorie dirette nel form
                 html += `
                 <div>
                     <input type="checkbox" id="cat_${key}" value="${key}" class="category-checkbox hidden">
@@ -3161,990 +3211,3 @@
                 const editBtnId = 'editSummerMsgBtn';
                 const existingBtn = document.getElementById(editBtnId);
                 if(existingBtn) existingBtn.remove();
-
-                if (currentFilter === 'summer' && !showArchived) {
-                    msg = hoursConfig.summerEmptyMessage || "Nessuna attività estiva in programma al momento.";
-                    if (isAdminLoggedIn) {
-                        const btn = document.createElement('button');
-                        btn.id = editBtnId;
-                        btn.className = "mt-4 text-blue-600 font-bold text-sm hover:underline flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full";
-                        btn.innerHTML = '<i data-lucide="edit-3" class="w-4 h-4"></i> Modifica Messaggio';
-                        btn.onclick = editSummerMessage;
-                        empty.appendChild(btn);
-                        lucide.createIcons();
-                    }
-                }
-                
-                document.getElementById('emptyStateText').innerText = msg;
-            } 
-            else {
-                empty.classList.add('hidden');
-                grid.innerHTML = ''; 
-
-                for (const n of filtered) {
-                    const card = document.createElement('div');
-                    card.className = "bg-white rounded-xl shadow-sm border transition-all hover:shadow-md overflow-hidden flex flex-col fade-in card cursor-pointer hover:-translate-y-1";
-                    if (n.isPinned) card.classList.add('border-l-4', 'border-l-blue-500', 'ring-1', 'ring-blue-100');
-                    else card.classList.add('border-slate-100');
-                    card.onclick = () => viewNotice(n.id);
-
-                    let cardHtml = '';
-                    if (n.imageUrl) {
-                        cardHtml += `<div class="card-image-container"><img src="${n.imageUrl}" alt="Copertina" class="card-image" onerror="this.style.display='none'">${n.attachmentUrl ? `<div class="attachment-badge"><i data-lucide="paperclip" class="w-3 h-3 text-slate-500"></i> Allegato</div>` : ''}</div>`;
-                    }
-
-                    // Generazione Badges Categorie
-                    let badgesHtml = '';
-                    
-                    // CONTROLLO BADGE PROGRAMMAZIONE (solo admin lo vede)
-                    const isScheduled = n.scheduledDate && new Date(n.scheduledDate).getTime() > new Date().getTime();
-                    if (isAdminLoggedIn && isScheduled) {
-                        const dateObj = new Date(n.scheduledDate);
-                        const formatOpts = { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' };
-                        badgesHtml += `<span class="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wide border bg-yellow-100 text-yellow-800 border-yellow-300 mr-1 mb-1" title="Visibile al pubblico dal ${dateObj.toLocaleString('it-IT', formatOpts)}"><i data-lucide="clock" class="w-3 h-3 inline mr-1"></i>PROGRAMMATA</span>`;
-                    }
-
-                    n.normalizedCategories.forEach(catKey => {
-                        // Fallback per avvisi legacy salvati in precedenza come "Urgenti"
-                        const fallbackLabel = catKey === 'urgent' ? 'Urgenti' : catKey;
-                        const catData = CATEGORIES[catKey] || { label: fallbackLabel, class: 'bg-gray-100', text: 'text-gray-600', border: 'border-gray-200' };
-                        // Usa stili semplificati per i badge interni alla card
-                        let badgeStyle = "bg-gray-100 text-gray-600 border-gray-200";
-                        if (catKey === 'urgent') badgeStyle = "bg-red-100 text-red-700 border-red-200";
-                        else if (catKey === 'info') badgeStyle = "bg-blue-100 text-blue-700 border-blue-200";
-                        else if (catKey === 'nuoto_libero') badgeStyle = "bg-cyan-100 text-cyan-700 border-cyan-200";
-                        else if (catKey.startsWith('corsi')) badgeStyle = "bg-indigo-100 text-indigo-700 border-indigo-200";
-                        else if (catKey === 'summer') badgeStyle = "bg-orange-100 text-orange-700 border-orange-200";
-                        else if (catKey === 'news') badgeStyle = "bg-emerald-100 text-emerald-700 border-emerald-200";
-                        else if (catKey === 'promo') badgeStyle = "bg-pink-100 text-pink-700 border-pink-200";
-
-                        badgesHtml += `<span class="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wide border ${badgeStyle} mr-1 mb-1">${catData.label}</span>`;
-                    });
-
-                    // Calcolo euristico per "Leggi di più": se testo lungo (>130 car) o più di 3 a capo
-                    const plainText = n.content.replace(/<[^>]+>/g, '');
-                    const showReadMore = plainText.length > 130 || n.content.split('\n').length > 3;
-
-                    // Modifiche Mobile: ridotto padding da p-5 a p-4
-                    // Desktop: ridotto a p-3 e testo contenuto
-                    cardHtml += `<div class="p-4 md:p-3 flex-1">
-                        <div class="flex flex-wrap items-start mb-2 gap-1 w-full justify-between">
-                            <div class="flex flex-wrap gap-1">${badgesHtml}</div>
-                            <div class="flex gap-2 shrink-0">${n.isPinned ? `<i data-lucide="pin" class="w-4 h-4 text-blue-500 fill-blue-500 transform rotate-45"></i>` : ''}${isAdminLoggedIn ? `<button onclick="event.stopPropagation(); showQrCode('${n.id}', this.dataset.title)" data-title="${n.title.replace(/"/g, '&quot;')}" class="text-slate-400 hover:text-purple-600 transition" title="Genera QR Code"><i data-lucide="qr-code" class="w-4 h-4"></i></button><button onclick="event.stopPropagation(); editNotice('${n.id}')" class="text-slate-400 hover:text-blue-600 transition"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button onclick="event.stopPropagation(); deleteNoticePermanent('${n.id}')" class="text-slate-400 hover:text-red-600 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div>
-                        </div>
-                        <h3 class="text-[16px] md:text-base font-bold text-slate-800 mb-1 leading-tight line-clamp-1">${n.title}</h3>
-                        <div class="relative mb-2 html-content-view">
-                            <div class="text-slate-600 text-sm leading-relaxed line-clamp-3 whitespace-pre-line">${n.content}</div>
-                            ${showReadMore ? `<div class="absolute bottom-0 right-0 bg-white pl-3 text-sm leading-relaxed"><span class="text-blue-600 font-bold hover:underline cursor-pointer">... Leggi di più</span></div>` : ''}
-                        </div>
-                    `;
-
-                    // Anteprima PDF (Solo se non c'è copertina)
-                    if (n.attachmentUrl && !n.imageUrl) {
-                        cardHtml += `<div class="card-preview-container" id="preview-${n.id}">
-                            <div class="flex items-center justify-center w-full h-full text-slate-300">
-                                <div class="loader"></div>
-                            </div>
-                            <div class="card-preview-overlay"></div>
-                        </div>`;
-                    }
-
-                    // Badge per le visualizzazioni (visibile solo admin)
-                    const viewsCount = n.views || 0;
-                    const viewsBadge = isAdminLoggedIn ? `<div class="flex items-center gap-1 text-slate-500 bg-white border border-slate-200 px-1.5 py-1 rounded" title="${viewsCount} visualizzazioni"><i data-lucide="eye" class="w-3.5 h-3.5"></i><span class="font-semibold">${viewsCount}</span></div>` : '';
-
-                    // Modifiche Mobile Footer: ridotto padding
-                    cardHtml += `</div>
-                        <div class="px-4 py-3 md:py-2 md:px-3 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
-                            <div class="flex flex-col">
-                                <div class="flex items-center gap-2 mb-0.5"><i data-lucide="calendar" class="w-3.5 h-3.5"></i><span>${n.displayDate ? new Date(n.displayDate).toLocaleDateString('it-IT') : new Date(n.timestamp).toLocaleDateString('it-IT')}</span></div>
-                                ${n.expirationDate ? `<div class="flex items-center gap-2 text-red-400"><i data-lucide="clock" class="w-3.5 h-3.5"></i><span>Scade: ${new Date(n.expirationDate).toLocaleDateString('it-IT')}</span></div>` : ''}
-                            </div>
-                            <div class="flex items-center gap-2">
-                                ${viewsBadge}
-                                <div class="${isAdminLoggedIn ? 'flex' : 'hidden'} gap-2"><button onclick="event.stopPropagation(); togglePin('${n.id}', ${n.isPinned})" class="p-1.5 rounded hover:bg-blue-100 ${n.isPinned ? 'text-blue-600' : 'text-slate-400'}" title="Evidenza"><i data-lucide="pin" class="w-4 h-4"></i></button>${showArchived ? `<button onclick="event.stopPropagation(); restoreNotice('${n.id}')" class="p-1.5 rounded hover:bg-green-100 text-slate-400 hover:text-green-600 transition" title="Ripristina (Rimuove scadenza)"><i data-lucide="refresh-ccw" class="w-4 h-4"></i></button>` : `<button onclick="event.stopPropagation(); archiveNotice('${n.id}')" class="p-1.5 rounded hover:bg-yellow-100 text-slate-400 hover:text-yellow-600 transition" title="Archivia"><i data-lucide="archive" class="w-4 h-4"></i></button>`}</div>
-                            </div>
-                        </div>
-                    `;
-
-                    card.innerHTML = cardHtml;
-                    grid.appendChild(card);
-
-                    if (n.attachmentUrl && !n.imageUrl) {
-                        generatePdfThumbnail(n.attachmentUrl, `preview-${n.id}`);
-                    }
-                }
-                
-                lucide.createIcons();
-            }
-        }
-
-        async function generatePdfThumbnail(url, containerId) {
-            const container = document.getElementById(containerId);
-            if(!container) return;
-
-            // Se è Google Drive -> Usa l'API Thumbnail di Google (FOTO STATICA)
-            if (url.includes('drive.google.com')) {
-                let id = '';
-                if (url.includes('/file/d/')) id = url.split('/file/d/')[1].split('/')[0];
-                else if (url.includes('id=')) id = url.split('id=')[1].split('&')[0];
-                
-                if(id) {
-                    // Questa API di Google genera una JPG statica del documento
-                    const thumbUrl = `https://drive.google.com/thumbnail?sz=w800&id=${id}`;
-                    container.innerHTML = `<img src="${thumbUrl}" class="w-full h-full object-cover object-top" onerror="this.parentElement.innerHTML='<div class=\\'flex flex-col items-center justify-center w-full h-full text-slate-400 gap-2\\'><i data-lucide=\\'file-text\\' class=\\'w-8 h-8\\'></i><span class=\\'text-xs\\'>Documento</span></div>'; lucide.createIcons();">`;
-                    return;
-                }
-            }
-
-            // Se è PDF Base64 o Storage -> PDF.js Image
-            if (url.startsWith('data:application/pdf') || url.toLowerCase().includes('.pdf')) {
-                try {
-                    const loadingTask = pdfjsLib.getDocument(url);
-                    const pdf = await loadingTask.promise;
-                    const page = await pdf.getPage(1);
-                    const viewport = page.getViewport({ scale: 1.0 });
-                    const canvas = document.createElement('canvas');
-                    canvas.className = 'w-full h-auto';
-                    const context = canvas.getContext('2d');
-                    canvas.width = viewport.width;
-                    canvas.height = viewport.height;
-                    
-                    await page.render({canvasContext: context, viewport: viewport}).promise;
-                    
-                    container.innerHTML = '';
-                    container.appendChild(canvas);
-                } catch (e) {
-                    console.error("PDF Render Error", e);
-                    container.innerHTML = `<div class="flex flex-col items-center justify-center w-full h-full text-slate-400 gap-2"><i data-lucide="file-x" class="w-8 h-8"></i><span class="text-xs">Anteprima non disponibile</span></div>`;
-                    lucide.createIcons();
-                }
-                return;
-            }
-
-            // Fallback immagine
-            container.innerHTML = `<img src="${url}" class="w-full h-full object-cover object-top">`;
-        }
-
-        // --- AUTH & LOGIN HANDLERS ---
-        function handleSecretClick() {
-            const logo = document.getElementById('logoArea'); logo.classList.remove('pulse-animation'); void logo.offsetWidth; logo.classList.add('pulse-animation');
-            
-            // Torna alla homepage resettando i filtri
-            if (currentFilter !== 'all' || showArchived || currentSearch !== '') {
-                showArchived = false;
-                const archiveBtnText = document.getElementById('archiveBtnText');
-                if (archiveBtnText) archiveBtnText.innerText = "Mostra Archivio";
-                const banner = document.getElementById('archiveBanner');
-                if (banner) banner.classList.add('hidden');
-                
-                currentSearch = '';
-                const searchInput = document.querySelector('input[placeholder="Cerca avvisi..."]');
-                if (searchInput) searchInput.value = '';
-                
-                setFilter('all');
-            }
-
-            clickCount++; if (clickTimer) clearTimeout(clickTimer); clickTimer = setTimeout(() => { clickCount = 0; }, 2000);
-            if (clickCount === SECRET_CLICKS_REQUIRED) { clickCount = 0; if(!isAdminLoggedIn) document.getElementById('loginModal').classList.remove('hidden'); else showToast("Sei già connesso come Staff."); }
-        }
-        function closeLoginModal() { document.getElementById('loginModal').classList.add('hidden'); document.getElementById('loginError').classList.add('hidden'); }
-        async function handleLoginSubmit(e) { e.preventDefault(); try { await signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); closeLoginModal(); showToast("Login effettuato con successo!"); } catch (error) { console.error(error); document.getElementById('loginError').classList.remove('hidden'); } }
-        async function handleLogout() { await signOut(auth); showToast("Disconnessione effettuata. Modalità pubblica."); }
-
-        // --- ACTIONS ---
-        function setFilter(filter) { 
-            currentFilter = filter; 
-            
-            // Aggiorna l'URL
-            const url = new URL(window.location);
-            if (filter === 'all') {
-                url.searchParams.delete('cat');
-            } else {
-                url.searchParams.set('cat', filter);
-            }
-            window.history.pushState({}, '', url);
-
-            renderNotices(); 
-            renderFilters(); 
-        }
-
-        function shareCategory(cat) {
-            const url = new URL(window.location);
-            if (cat === 'all') {
-                url.searchParams.delete('cat');
-            } else {
-                url.searchParams.set('cat', cat);
-            }
-            
-            const shareUrl = url.href;
-
-            const copyLegacy = () => {
-                const textArea = document.createElement("textarea");
-                textArea.value = shareUrl;
-                textArea.style.position = "fixed";
-                textArea.style.left = "-9999px";
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                try {
-                    const successful = document.execCommand('copy');
-                    if (successful) showToast("Link della sezione copiato!");
-                    else showToast("Impossibile copiare il link", true);
-                } catch (err) {
-                    showToast("Impossibile copiare il link", true);
-                }
-                document.body.removeChild(textArea);
-            };
-
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(shareUrl)
-                    .then(() => showToast("Link della sezione copiato!"))
-                    .catch(() => copyLegacy());
-            } else {
-                copyLegacy();
-            }
-        }
-
-        function updateSearch(val) { currentSearch = val; renderNotices(); }
-        function toggleArchiveView() { showArchived = !showArchived; document.getElementById('archiveBtnText').innerText = showArchived ? "Torna alla Bacheca" : "Mostra Archivio"; const banner = document.getElementById('archiveBanner'); showArchived ? banner.classList.remove('hidden') : banner.classList.add('hidden'); renderNotices(); }
-
-        function markMediaForRemoval(type) {
-            removeMediaFlags[type] = true;
-            if (type === 'cover') document.getElementById('currentCoverBadge').classList.add('hidden');
-            if (type === 'content') document.getElementById('currentContentImgBadge').classList.add('hidden');
-            if (type === 'attachment') document.getElementById('currentAttachmentBadge').classList.add('hidden');
-            showToast("Elemento rimosso. Salva l'avviso per confermare.");
-        }
-
-        window.toggleAttachType = function(type) {
-            if(type === 'file') { document.getElementById('attachFileInput').classList.remove('hidden'); document.getElementById('attachLinkInput').classList.add('hidden'); document.getElementById('btnFileType').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnFileType').classList.replace('border','font-medium'); document.getElementById('btnLinkType').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnLinkType').classList.add('border'); } 
-            else { document.getElementById('attachFileInput').classList.add('hidden'); document.getElementById('attachLinkInput').classList.remove('hidden'); document.getElementById('btnLinkType').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnLinkType').classList.remove('border'); document.getElementById('btnFileType').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnFileType').classList.add('border'); }
-        }
-        window.toggleCoverType = function(type) { if(type === 'file') { document.getElementById('coverFileInput').classList.remove('hidden'); document.getElementById('coverLinkInput').classList.add('hidden'); document.getElementById('btnCoverFile').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnCoverFile').classList.replace('border','font-medium'); document.getElementById('btnCoverLink').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnCoverLink').classList.add('border'); } else { document.getElementById('coverFileInput').classList.add('hidden'); document.getElementById('coverLinkInput').classList.remove('hidden'); document.getElementById('btnCoverLink').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnCoverLink').classList.remove('border'); document.getElementById('btnCoverFile').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnCoverFile').classList.add('border'); } }
-        window.toggleContentType = function(type) { if(type === 'file') { document.getElementById('contentFileInput').classList.remove('hidden'); document.getElementById('contentLinkInput').classList.add('hidden'); document.getElementById('btnContentFile').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnContentFile').classList.replace('border','font-medium'); document.getElementById('btnContentLink').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnContentLink').classList.add('border'); } else { document.getElementById('contentFileInput').classList.add('hidden'); document.getElementById('contentLinkInput').classList.remove('hidden'); document.getElementById('btnContentLink').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnContentLink').classList.remove('border'); document.getElementById('btnContentFile').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnContentFile').classList.add('border'); } }
-
-        function editNotice(id) {
-            const notice = notices.find(n => n.id === id); if (!notice) return; editingId = id;
-            document.getElementById('modalTitle').innerText = "Modifica Avviso"; document.getElementById('submitBtnText').innerText = "Aggiorna Avviso";
-            document.getElementById('newTitle').value = notice.title;
-            
-            // Popola Quill Editor
-            quill.root.innerHTML = notice.content || '';
-            
-            // Popola Checkboxes Categorie
-            const normalizedCats = notice.categories || (notice.category ? [notice.category] : ['info']);
-            document.querySelectorAll('.category-checkbox').forEach(cb => {
-                cb.checked = normalizedCats.includes(cb.value);
-            });
-
-            document.getElementById('newPinned').checked = notice.isPinned; 
-            document.getElementById('newPopup').checked = notice.isPopup || false;
-            document.getElementById('newPopupSummary').value = notice.popupSummary || '';
-            document.getElementById('popupSummaryContainer').classList.toggle('hidden', !(notice.isPopup || false));
-            document.getElementById('newBanner').checked = notice.isBanner || (notice.categories && notice.categories.includes('urgent')) || false;
-            document.getElementById('newBannerColor').value = notice.bannerColor || 'red';
-            document.getElementById('newBannerIcon').value = notice.bannerIcon || 'alert-triangle';
-            document.getElementById('newDate').value = notice.displayDate || '';
-            document.getElementById('newScheduledDate').value = notice.scheduledDate || ''; // Popola programmazione
-            document.getElementById('newExpirationDate').value = notice.expirationDate || ''; // Popola scadenza
-            
-            // Gestione visiva media esistenti
-            removeMediaFlags = { cover: false, content: false, attachment: false };
-            if (notice.imageUrl) document.getElementById('currentCoverBadge').classList.remove('hidden'); else document.getElementById('currentCoverBadge').classList.add('hidden');
-            if (notice.contentImageUrl) document.getElementById('currentContentImgBadge').classList.remove('hidden'); else document.getElementById('currentContentImgBadge').classList.add('hidden');
-            if (notice.attachmentUrl) document.getElementById('currentAttachmentBadge').classList.remove('hidden'); else document.getElementById('currentAttachmentBadge').classList.add('hidden');
-            
-            // Popola Sondaggio
-            const pollToggle = document.getElementById('newPollToggle');
-            const pollSection = document.getElementById('pollSection');
-            const pollOptionsContainer = document.getElementById('pollOptionsContainer');
-            
-            if (notice.poll && notice.poll.question) {
-                pollToggle.checked = true;
-                pollSection.classList.remove('hidden');
-                document.getElementById('pollQuestion').value = notice.poll.question;
-                
-                pollOptionsContainer.innerHTML = '';
-                notice.poll.options.forEach((opt, idx) => {
-                    const div = document.createElement('div');
-                    div.className = 'flex items-center gap-2 mt-2';
-                    div.innerHTML = `<input type="text" class="poll-option-input w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" value="${opt.text.replace(/"/g, '&quot;')}" placeholder="Opzione ${idx + 1}">
-                                     <input type="hidden" class="poll-option-votes" value="${opt.votes}">
-                                     ${idx >= 2 ? `<button type="button" onclick="removePollOption(this)" class="text-red-400 hover:text-red-600"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}`;
-                    pollOptionsContainer.appendChild(div);
-                });
-            } else {
-                pollToggle.checked = false;
-                pollSection.classList.add('hidden');
-                document.getElementById('pollQuestion').value = '';
-                pollOptionsContainer.innerHTML = `
-                    <div class="flex items-center gap-2"><input type="text" class="poll-option-input w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Opzione 1"></div>
-                    <div class="flex items-center gap-2"><input type="text" class="poll-option-input w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Opzione 2"></div>
-                `;
-            }
-
-            openNoticeModal();
-        }
-
-        async function deleteNoticePermanent(id) { if(confirm("Eliminare DEFINITIVAMENTE?")) { try { await deleteDoc(doc(db, NOTICES_COLLECTION, id)); showToast("Avviso eliminato definitivamente."); } catch (err) { console.error(err); showToast("Errore eliminazione: " + err.message, true); } } }
-
-        async function handleFormSubmit(e) {
-            e.preventDefault(); 
-            const btn = document.getElementById('submitBtn'); 
-            const originalBtnContent = btn.innerHTML; 
-            
-            // Lettura del contenuto dall'editor Quill
-            let content = quill.root.innerHTML;
-            if (content === '<p><br></p>') content = ''; // Gestione campo vuoto di Quill
-            
-            if (!content.trim()) {
-                showToast("Il messaggio è obbligatorio", true);
-                return;
-            }
-            
-            btn.disabled = true; 
-            btn.innerHTML = '<div class="loader mr-2"></div> Caricamento...';
-            
-            try {
-                const title = document.getElementById('newTitle').value; 
-                
-                // Raccoglie categorie selezionate
-                const categories = Array.from(document.querySelectorAll('.category-checkbox:checked')).map(cb => cb.value);
-                // Fallback se nessuna selezionata
-                if (categories.length === 0) categories.push('info');
-
-                const isPinned = document.getElementById('newPinned').checked; 
-                const isPopup = document.getElementById('newPopup').checked;
-                const popupSummary = document.getElementById('newPopupSummary').value.trim();
-                const isBanner = document.getElementById('newBanner').checked;
-                const bannerColor = document.getElementById('newBannerColor').value;
-                const bannerIcon = document.getElementById('newBannerIcon').value;
-                const displayDate = document.getElementById('newDate').value;
-                const scheduledDate = document.getElementById('newScheduledDate').value; // Leggi il campo
-                const expirationDate = document.getElementById('newExpirationDate').value;
-
-                let imageUrl = null; let contentImageUrl = null; let attachmentUrl = null;
-
-                const coverFile = document.getElementById('coverFile').files[0]; const coverUrlManual = document.getElementById('coverUrlManual').value;
-                if (coverFile) imageUrl = await handleImageUpload(coverFile, 'covers'); else if (coverUrlManual) imageUrl = processDriveLink(coverUrlManual);
-
-                const contentImageFile = document.getElementById('contentImageFile').files[0]; const contentUrlManual = document.getElementById('contentUrlManual').value;
-                if (contentImageFile) contentImageUrl = await handleImageUpload(contentImageFile, 'content'); else if (contentUrlManual) contentImageUrl = processDriveLink(contentUrlManual);
-
-                const attachmentFile = document.getElementById('attachmentFile').files[0]; const attachmentUrlManual = document.getElementById('attachmentUrlManual').value;
-                if (attachmentFile) {
-                    if (attachmentFile.type.startsWith('image/')) attachmentUrl = await handleImageUpload(attachmentFile, 'attachments');
-                    else attachmentUrl = await uploadFileToStorage(attachmentFile, 'attachments');
-                } 
-                else if (attachmentUrlManual) {
-                    if (attachmentUrlManual.includes('drive.google.com')) attachmentUrl = getDrivePreviewUrl(attachmentUrlManual);
-                    else attachmentUrl = attachmentUrlManual;
-                }
-
-                // Includi scheduledDate nei dati passati
-                const noticeData = { title, content, categories, isPinned, isPopup, popupSummary, isBanner, bannerColor, bannerIcon, displayDate, expirationDate, scheduledDate, timestamp: Date.now() };
-                
-                if (imageUrl) noticeData.imageUrl = imageUrl;
-                else if (removeMediaFlags.cover) noticeData.imageUrl = null;
-                
-                if (contentImageUrl) noticeData.contentImageUrl = contentImageUrl;
-                else if (removeMediaFlags.content) noticeData.contentImageUrl = null;
-                
-                if (attachmentUrl) noticeData.attachmentUrl = attachmentUrl;
-                else if (removeMediaFlags.attachment) noticeData.attachmentUrl = null;
-
-                // Gestione Sondaggio
-                if (document.getElementById('newPollToggle').checked) {
-                    const question = document.getElementById('pollQuestion').value.trim();
-                    const optionDivs = document.querySelectorAll('#pollOptionsContainer > div');
-                    const options = [];
-                    optionDivs.forEach(div => {
-                        const text = div.querySelector('.poll-option-input').value.trim();
-                        const votesInput = div.querySelector('.poll-option-votes');
-                        const votes = votesInput ? parseInt(votesInput.value) || 0 : 0;
-                        if (text) options.push({ text, votes });
-                    });
-                    
-                    if (question && options.length >= 2) {
-                        noticeData.poll = { question, options };
-                    }
-                } else {
-                    noticeData.poll = null; // Rimuove se disattivato
-                }
-
-                if (editingId) { 
-                    await updateDoc(doc(db, NOTICES_COLLECTION, editingId), noticeData); 
-                    showToast("Modificato con successo!"); 
-                } 
-                else { 
-                    noticeData.archived = false; 
-                    noticeData.views = 0; // Inizializza il contatore visualizzazioni a 0
-                    await addDoc(collection(db, NOTICES_COLLECTION), noticeData); 
-                    showToast("Pubblicato con successo!"); 
-                }
-                closeNoticeModal();
-            } catch (err) { console.error(err); showToast("Errore: " + err.message, true); } finally { btn.disabled = false; btn.innerHTML = originalBtnContent; }
-        }
-
-        function getDrivePreviewUrl(url) {
-            const driveRegex = /drive\.google\.com\/file\/d\/([-_\w]+)/;
-            const match = url.match(driveRegex);
-            return (match && match[1]) ? `https://drive.google.com/file/d/${match[1]}/preview` : url;
-        }
-
-        function processDriveLink(url) {
-            const driveRegex = /drive\.google\.com\/file\/d\/([-_\w]+)/;
-            const match = url.match(driveRegex);
-            return (match && match[1]) ? `https://drive.google.com/uc?export=view&id=${match[1]}` : url;
-        }
-
-        async function archiveNotice(id) { if(confirm("Archiviare?")) { await updateDoc(doc(db, NOTICES_COLLECTION, id), { archived: true, isPinned: false }); showToast("Archiviata"); } }
-        async function restoreNotice(id) { 
-            // Quando si ripristina, rimuoviamo anche la data di scadenza per farla riapparire, oppure la lasciamo se l'utente la modificherà dopo. 
-            // Per sicurezza, se era scaduta, meglio azzerare la scadenza o avvisare. Qui la mantengo ma essendo in "showArchived" true vedrà che è scaduta. 
-            // Se vuole rimetterla pubblica deve cambiare data.
-            // Facciamo che resetta la scadenza se è passata? No, semplice unarchive.
-            if(confirm("Ripristinare? (Se la notizia è scaduta, rimarrà nascosta finché non cambi la data di scadenza).")) { 
-                await updateDoc(doc(db, NOTICES_COLLECTION, id), { archived: false }); showToast("Ripristinata"); 
-            } 
-        }
-        async function togglePin(id, currentStatus) { await updateDoc(doc(db, NOTICES_COLLECTION, id), { isPinned: !currentStatus }); }
-
-        // NEW: View Notice Logic (MODAL) - Usa ancora IFRAME per lettura
-        function viewNotice(id, isAutoPopup = false) {
-            const notice = notices.find(n => n.id === id);
-            if (!notice) return;
-
-            // Incrementa views se l'utente non è admin
-            if (!isAdminLoggedIn) {
-                updateDoc(doc(db, NOTICES_COLLECTION, id), { views: increment(1) }).catch(e => console.error("Errore aggiornamento views:", e));
-            }
-
-            openedNoticeId = id; // Set global current ID for sharing
-
-            const modalWrapper = document.getElementById('viewNoticeModal');
-            const innerContainer = document.getElementById('viewNoticeInnerContainer');
-            const popupBanner = document.getElementById('viewNoticePopupBanner');
-            const shareBtn = document.getElementById('viewNoticeShareBtn');
-            const waShareBtn = document.getElementById('viewNoticeWaShareBtn');
-            const qrBtn = document.getElementById('viewNoticeQrBtn');
-            const printArticleBtn = document.getElementById('viewNoticePrintArticleBtn');
-            const catsContainer = document.getElementById('viewNoticeCategoriesContainer');
-            const dateContainer = document.getElementById('viewNoticeDateContainer');
-            
-            const isSummaryView = isAutoPopup && notice.popupSummary;
-
-            if (isAutoPopup) {
-                modalWrapper.classList.remove('bg-black/70', 'backdrop-blur-md');
-                modalWrapper.classList.add('bg-black/40', 'backdrop-blur-sm');
-                
-                // --- APPLICA TEMA DINAMICO AL POPUP ---
-                const theme = notice.bannerColor || 'blue';
-                let pBg = 'bg-blue-600 text-white', pBrd = 'border-blue-600';
-                if (theme === 'red') { pBg = 'bg-red-600 text-white'; pBrd = 'border-red-600'; }
-                else if (theme === 'green') { pBg = 'bg-emerald-600 text-white'; pBrd = 'border-emerald-600'; }
-                else if (theme === 'yellow') { pBg = 'bg-yellow-400 text-slate-900'; pBrd = 'border-yellow-400'; }
-                else if (theme === 'orange') { pBg = 'bg-orange-500 text-white'; pBrd = 'border-orange-500'; }
-                else if (theme === 'purple') { pBg = 'bg-purple-600 text-white'; pBrd = 'border-purple-600'; }
-                else if (theme === 'pink') { pBg = 'bg-pink-600 text-white'; pBrd = 'border-pink-600'; }
-                else if (theme === 'cyan') { pBg = 'bg-cyan-500 text-slate-900'; pBrd = 'border-cyan-500'; }
-                else if (theme === 'slate') { pBg = 'bg-slate-800 text-white'; pBrd = 'border-slate-800'; }
-
-                // Resetta le classi e applica quelle nuove (per evitare sovrapposizioni di bordi)
-                const maxWidthClass = isSummaryView ? 'max-w-lg' : 'max-w-2xl';
-                innerContainer.className = `bg-white rounded-2xl shadow-2xl w-full ${maxWidthClass} overflow-hidden flex flex-col max-h-[90vh] relative transition-all duration-300`;
-                innerContainer.classList.add('border-4', pBrd);
-
-                popupBanner.className = `${pBg} py-2 font-bold uppercase tracking-wider text-xs md:text-sm w-full shrink-0 z-20 flex items-center justify-center gap-2`;
-                popupBanner.innerHTML = `<i data-lucide="${notice.bannerIcon || 'info'}" class="w-4 h-4 md:w-5 md:h-5"></i> <span>In Evidenza</span>`;
-
-                shareBtn.classList.add('hidden');
-                waShareBtn.classList.add('hidden');
-                if(qrBtn) qrBtn.classList.add('hidden');
-                if(printArticleBtn) printArticleBtn.classList.add('hidden');
-                catsContainer.classList.add('hidden');
-                if (dateContainer) dateContainer.classList.add('hidden');
-            } else {
-                modalWrapper.classList.remove('bg-black/40', 'backdrop-blur-sm');
-                modalWrapper.classList.add('bg-black/70', 'backdrop-blur-md');
-                
-                // Resetta allo stato standard (senza bordo colorato e senza banner)
-                innerContainer.className = 'bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] relative transition-all duration-300';
-                popupBanner.className = 'hidden';
-                
-                shareBtn.classList.remove('hidden');
-                waShareBtn.classList.remove('hidden');
-                if(qrBtn) {
-                    if (isAdminLoggedIn) qrBtn.classList.remove('hidden');
-                    else qrBtn.classList.add('hidden');
-                }
-                if(printArticleBtn) {
-                    if (isAdminLoggedIn) printArticleBtn.classList.remove('hidden');
-                    else printArticleBtn.classList.add('hidden');
-                }
-                catsContainer.classList.remove('hidden');
-                if (dateContainer) dateContainer.classList.remove('hidden');
-            }
-
-            const titleEl = document.getElementById('viewNoticeTitle');
-            const contentEl = document.getElementById('viewNoticeContent');
-            const paddingWrapper = document.getElementById('viewNoticePaddingWrapper');
-            
-            titleEl.innerText = notice.title;
-            if (isSummaryView) {
-                titleEl.className = 'text-lg md:text-2xl font-bold text-slate-900 mb-3 leading-tight text-center';
-                contentEl.className = 'text-slate-700 leading-relaxed text-base md:text-lg mb-1 whitespace-pre-line html-content-view';
-                if (paddingWrapper) paddingWrapper.className = 'p-4 md:p-6 pb-4 md:pb-5';
-            } else {
-                titleEl.className = 'text-xl md:text-3xl font-bold text-slate-900 mb-6 leading-tight';
-                contentEl.className = 'text-slate-700 leading-relaxed text-base md:text-lg mb-6 whitespace-pre-line html-content-view';
-                if (paddingWrapper) paddingWrapper.className = 'p-5 md:p-8';
-            }
-
-            // MODIFICATO: Usa innerHTML per renderizzare la formattazione di Quill
-            let displayContent = notice.content;
-            if (isSummaryView) {
-                displayContent = `<div class="text-sm md:text-base font-medium text-slate-700 bg-slate-50 p-3 md:p-4 rounded-xl border border-slate-200 shadow-inner text-center">${notice.popupSummary.replace(/\n/g, '<br>')}</div>
-                                  <div class="flex justify-center mt-3"><button onclick="viewNotice('${notice.id}', false)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full transition flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"><i data-lucide="book-open" class="w-4 h-4"></i> Scopri di più</button></div>`;
-            }
-
-            contentEl.innerHTML = displayContent;
-            document.getElementById('viewNoticeDate').innerText = notice.displayDate ? new Date(notice.displayDate).toLocaleDateString('it-IT') : new Date(notice.timestamp).toLocaleDateString('it-IT');
-            
-            // Render Categorie in View Modal
-            const normalizedCats = notice.categories || (notice.category ? [notice.category] : ['info']);
-            catsContainer.innerHTML = normalizedCats.map(catKey => {
-                const cat = CATEGORIES[catKey] || { label: catKey, class: 'bg-gray-100' };
-                return `<span class="px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wide border ${cat.class}">${cat.label}</span>`;
-            }).join('');
-
-            const coverContainer = document.getElementById('viewNoticeCover');
-            const coverImg = document.getElementById('viewNoticeCoverImg');
-            if (notice.imageUrl) { 
-                coverImg.src = notice.imageUrl; 
-                coverContainer.classList.remove('hidden'); 
-            } else { 
-                coverContainer.classList.add('hidden'); 
-                coverImg.src = ''; 
-            }
-
-            const contentImgContainer = document.getElementById('viewNoticeContentImgContainer');
-            const contentImg = document.getElementById('viewNoticeContentImg');
-            if (notice.contentImageUrl && !isSummaryView) { contentImg.src = notice.contentImageUrl; contentImgContainer.classList.remove('hidden'); } else { contentImgContainer.classList.add('hidden'); }
-
-            const attachContainer = document.getElementById('viewNoticeAttachmentContainer');
-            if (notice.attachmentUrl && !isSummaryView) {
-                attachContainer.classList.remove('hidden');
-                
-                const downloadBtn = document.getElementById('viewNoticeDownloadBtn');
-                
-                // FIX: Gestione corretta dei PDF Base64 caricati dal PC per evitare blocchi del browser
-                if (notice.attachmentUrl.startsWith('data:')) {
-                    downloadBtn.removeAttribute('href');
-                    downloadBtn.onclick = (e) => {
-                        e.preventDefault();
-                        try {
-                            // Conversione sincrona da Base64 a Blob per evitare i blocchi dei popup
-                            const arr = notice.attachmentUrl.split(',');
-                            const mime = arr[0].match(/:(.*?);/)[1];
-                            const bstr = atob(arr[1]);
-                            let n = bstr.length;
-                            const u8arr = new Uint8Array(n);
-                            while(n--){
-                                u8arr[n] = bstr.charCodeAt(n);
-                            }
-                            const blob = new Blob([u8arr], {type: mime});
-                            const blobUrl = URL.createObjectURL(blob);
-                            
-                            // Crea un link temporaneo per forzare il download ed evitare la pagina bianca
-                            const link = document.createElement('a');
-                            link.href = blobUrl;
-                            link.download = 'Documento_Allegato.pdf'; 
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                            
-                            setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-                        } catch (err) {
-                            console.error("Errore estrazione PDF", err);
-                            showToast("Errore durante il download del documento", true);
-                        }
-                    };
-                } else {
-                    downloadBtn.href = notice.attachmentUrl;
-                    downloadBtn.onclick = null;
-                }
-
-                const previewBox = document.getElementById('viewNoticePreviewBox');
-                // Usa iframe nel modal per permettere lettura
-                let previewHtml = '';
-                if (notice.attachmentUrl.includes('drive.google.com')) {
-                    const cleanUrl = getDrivePreviewUrl(notice.attachmentUrl);
-                    previewHtml = `<iframe src="${cleanUrl}" class="w-full h-96 border-none" loading="lazy"></iframe>`;
-                } else if (notice.attachmentUrl.startsWith('data:application/pdf') || notice.attachmentUrl.toLowerCase().includes('.pdf')) {
-                    previewHtml = `<embed src="${notice.attachmentUrl}#toolbar=0" type="application/pdf" class="w-full h-96 border-none">`;
-                } else {
-                    previewHtml = `<img src="${notice.attachmentUrl}" class="w-full h-auto">`;
-                }
-                previewBox.innerHTML = previewHtml;
-                previewBox.classList.remove('hidden');
-            } else {
-                attachContainer.classList.add('hidden');
-            }
-
-            // Render Poll se esiste
-            if (!isSummaryView) {
-                renderPollUI(notice);
-            } else {
-                document.getElementById('viewNoticePollContainer').classList.add('hidden');
-            }
-
-            document.getElementById('viewNoticeModal').classList.remove('hidden');
-            document.body.classList.add('overflow-hidden');
-            lucide.createIcons();
-        }
-
-        // --- SONDAGGI (POLLS) LOGIC ---
-        function togglePollSection() {
-            const section = document.getElementById('pollSection');
-            if (document.getElementById('newPollToggle').checked) section.classList.remove('hidden');
-            else section.classList.add('hidden');
-        }
-
-        function addPollOption() {
-            const container = document.getElementById('pollOptionsContainer');
-            const count = container.children.length + 1;
-            const div = document.createElement('div');
-            div.className = 'flex items-center gap-2 mt-2';
-            div.innerHTML = `<input type="text" class="poll-option-input w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Opzione ${count}">
-                             <button type="button" onclick="removePollOption(this)" class="text-red-400 hover:text-red-600"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
-            container.appendChild(div);
-            lucide.createIcons();
-        }
-
-        function removePollOption(btn) {
-            btn.parentElement.remove();
-        }
-
-        async function submitVote(noticeId, optionIndex) {
-            if (localStorage.getItem('voted_' + noticeId) && !isAdminLoggedIn) return; // Previeni doppio voto pubblico
-            
-            const notice = notices.find(n => n.id === noticeId);
-            if (!notice || !notice.poll) return;
-
-            // Incrementa voto
-            notice.poll.options[optionIndex].votes += 1;
-            
-            try {
-                await updateDoc(doc(db, NOTICES_COLLECTION, noticeId), { poll: notice.poll });
-                localStorage.setItem('voted_' + noticeId, 'true');
-                renderPollUI(notice); // Ridisegna immediatamente il sondaggio
-                showToast("Voto registrato!");
-            } catch(e) {
-                console.error(e);
-                showToast("Errore durante il voto", true);
-            }
-        }
-
-        function renderPollUI(notice) {
-            const container = document.getElementById('viewNoticePollContainer');
-            if (!notice.poll || !notice.poll.question || notice.poll.options.length === 0) {
-                container.classList.add('hidden');
-                return;
-            }
-
-            container.classList.remove('hidden');
-            const hasVoted = localStorage.getItem('voted_' + notice.id);
-            const showResults = hasVoted || isAdminLoggedIn;
-            const totalVotes = notice.poll.options.reduce((sum, opt) => sum + opt.votes, 0);
-
-            let html = `<h4 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-5 h-5 text-blue-600"></i> ${notice.poll.question}</h4><div class="space-y-3">`;
-
-            notice.poll.options.forEach((opt, idx) => {
-                if (showResults) {
-                    const percentage = totalVotes === 0 ? 0 : Math.round((opt.votes / totalVotes) * 100);
-                    html += `
-                    <div class="relative w-full bg-slate-100 rounded-lg overflow-hidden h-10 border border-slate-200">
-                        <div class="absolute top-0 left-0 h-full bg-blue-100/80 transition-all duration-500" style="width: ${percentage}%;"></div>
-                        <div class="absolute inset-0 flex items-center justify-between px-4 text-sm font-medium text-slate-700">
-                            <span class="z-10 relative drop-shadow-sm font-semibold">${opt.text}</span>
-                            <span class="z-10 relative font-bold text-blue-700">${percentage}% <span class="text-xs text-slate-500 font-normal ml-1">(${opt.votes})</span></span>
-                        </div>
-                    </div>`;
-                } else {
-                    html += `
-                    <button onclick="submitVote('${notice.id}', ${idx})" class="w-full text-left bg-white border border-slate-300 hover:border-blue-500 hover:bg-blue-50 rounded-lg p-3 text-sm font-medium text-slate-700 transition shadow-sm flex items-center gap-2">
-                        <div class="w-4 h-4 rounded-full border-2 border-slate-300"></div> ${opt.text}
-                    </button>`;
-                }
-            });
-
-            html += `</div>`;
-            if (showResults) {
-                html += `<p class="mt-3 text-xs text-slate-400 text-right">Totale voti: ${totalVotes}</p>`;
-            }
-
-            container.innerHTML = html;
-            lucide.createIcons();
-        }
-
-        // --- QR CODE FUNCTIONALITY ---
-        function showQrCode(id, title) {
-            const url = `${window.location.origin}${window.location.pathname}?id=${id}`;
-            // Usa api.qrserver.com per generare il QR Code istantaneamente
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(url)}&margin=10`;
-            document.getElementById('qrCodeImg').src = qrUrl;
-            document.getElementById('qrNoticeTitle').innerText = title;
-            document.getElementById('qrModal').classList.remove('hidden');
-            lucide.createIcons();
-        }
-
-        function showQrCodeFromView() {
-            if (!openedNoticeId) return;
-            const notice = notices.find(n => n.id === openedNoticeId);
-            if (notice) {
-                showQrCode(notice.id, notice.title);
-            }
-        }
-
-        function closeQrModal() {
-            document.getElementById('qrModal').classList.add('hidden');
-            document.getElementById('qrCodeImg').src = ''; // resetta l'immagine
-        }
-
-        function printQrCode() {
-            const printContent = document.getElementById('printQrArea').innerHTML;
-            const printWindow = window.open('', '', 'width=800,height=900');
-            printWindow.document.write(`
-                <html>
-                    <head>
-                        <title>Stampa QR Code</title>
-                        <style>
-                            @page { size: A4; margin: 0; }
-                            body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; text-align: center; padding: 40px; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fff; }
-                            #printQrArea { display: flex; flex-direction: column; align-items: center; justify-content: center; max-width: 80%; }
-                            img { max-width: 400px; margin-bottom: 30px; border: 2px solid #eee; padding: 10px; border-radius: 16px; }
-                            p { margin: 5px 0; color: #333; }
-                            .text-lg { font-size: 32px; font-weight: bold; margin-bottom: 15px; }
-                            .text-xs { font-size: 18px; color: #666; border-top: 1px solid #ccc; padding-top: 15px; margin-top: 10px; }
-                        </style>
-                    </head>
-                    <body>
-                        ${printContent.replace('id="qrNoticeTitle" class="', 'id="qrNoticeTitle" class="text-lg ').replace('class="text-xs text-gray-500"', 'class="text-xs"')}
-                    </body>
-                </html>
-            `);
-            printWindow.document.close();
-            printWindow.focus();
-            
-            // Attendi che l'immagine sia caricata prima di stampare per non avere buchi bianchi
-            const img = printWindow.document.querySelector('img');
-            if (img) {
-                img.onload = () => {
-                    setTimeout(() => { printWindow.print(); printWindow.close(); }, 200);
-                };
-            } else {
-                setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
-            }
-        }
-
-        async function downloadQrCode() {
-            const imgSrc = document.getElementById('qrCodeImg').src;
-            const title = document.getElementById('qrNoticeTitle').innerText;
-            if (!imgSrc) return;
-
-            try {
-                showToast("Preparazione download in corso...");
-                const response = await fetch(imgSrc);
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                // Crea un nome file pulito senza spazi o caratteri speciali
-                const safeTitle = title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'qrcode';
-                a.download = `QR_${safeTitle}.png`;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-            } catch (err) {
-                console.error("Errore download QR:", err);
-                showToast("Errore durante il download del QR Code", true);
-            }
-        }
-
-        function closeViewModal() { 
-            document.getElementById('viewNoticeModal').classList.add('hidden'); 
-            document.body.classList.remove('overflow-hidden');
-            openedNoticeId = null;
-        }
-
-        function openNoticeModal(notice = null) { 
-            if (!notice && !editingId) { 
-                document.getElementById('modalTitle').innerText = "Pubblica Avviso"; 
-                document.getElementById('submitBtnText').innerText = "Pubblica Avviso"; 
-            } 
-            document.getElementById('noticeModal').classList.remove('hidden'); 
-        }
-        
-        function closeNoticeModal() { 
-            document.getElementById('noticeModal').classList.add('hidden'); 
-            editingId = null; 
-            document.getElementById('newTitle').value = ''; 
-            
-            // Reset Quill Editor
-            quill.setText('');
-            
-            // Reset checkboxes
-            document.querySelectorAll('.category-checkbox').forEach(cb => cb.checked = false);
-            // Default select info if none (visual reset handled by rendering)
-            
-            document.getElementById('newPinned').checked = false; 
-            document.getElementById('newPopup').checked = false;
-            document.getElementById('newPopupSummary').value = '';
-            document.getElementById('popupSummaryContainer').classList.add('hidden');
-            document.getElementById('newBanner').checked = false;
-            document.getElementById('newBannerColor').value = 'red';
-            document.getElementById('newBannerIcon').value = 'alert-triangle';
-            document.getElementById('newDate').value = ''; 
-            document.getElementById('newScheduledDate').value = ''; // Reset programmazione
-            document.getElementById('newExpirationDate').value = ''; // Reset scadenza
-            
-            // Reset Sondaggio
-            document.getElementById('newPollToggle').checked = false;
-            document.getElementById('pollSection').classList.add('hidden');
-            document.getElementById('pollQuestion').value = '';
-            document.getElementById('pollOptionsContainer').innerHTML = `
-                <div class="flex items-center gap-2"><input type="text" class="poll-option-input w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Opzione 1"></div>
-                <div class="flex items-center gap-2"><input type="text" class="poll-option-input w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Opzione 2"></div>
-            `;
-
-            // Reset Media Badges
-            removeMediaFlags = { cover: false, content: false, attachment: false };
-            document.getElementById('currentCoverBadge').classList.add('hidden');
-            document.getElementById('currentContentImgBadge').classList.add('hidden');
-            document.getElementById('currentAttachmentBadge').classList.add('hidden');
-
-            document.getElementById('coverFile').value = ''; 
-            document.getElementById('coverUrlManual').value = ''; 
-            document.getElementById('contentImageFile').value = ''; 
-            document.getElementById('contentUrlManual').value = ''; 
-            document.getElementById('attachmentFile').value = ''; 
-            document.getElementById('attachmentUrlManual').value = ''; 
-            toggleCoverType('file'); toggleContentType('file'); toggleAttachType('file'); 
-        }
-
-        // --- NEW: PRINT ARTICLE FUNCTION (ADMIN) ---
-        function printNoticeArticle() {
-            if (!openedNoticeId) return;
-            const notice = notices.find(n => n.id === openedNoticeId);
-            if (!notice) return;
-
-            // Costruisci le URL per i loghi e il QR
-            const logoUrl = new URL('./CF Lampugnano xl.png', document.baseURI).href;
-            const homeUrl = window.location.origin + window.location.pathname;
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(homeUrl)}`;
-            const dateStr = notice.displayDate ? new Date(notice.displayDate).toLocaleDateString('it-IT') : new Date(notice.timestamp).toLocaleDateString('it-IT');
-
-            const printWindow = window.open('', '', 'width=800,height=900');
-            printWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                    <head>
-                        <title>Stampa Avviso: ${notice.title.replace(/"/g, '&quot;')}</title>
-                        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-                        <script src="https://cdn.tailwindcss.com"><\/script>
-                        <style>
-                            body { font-family: 'Inter', sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; }
-                            /* Margini del foglio A4 molto più stretti (8mm invece di 15mm) */
-                            @page { size: A4; margin: 8mm; }
-                            /* Testo impostato a 20pt */
-                            .html-content-view { line-height: 1.5; font-size: 20pt; color: #334155; }
-                            .html-content-view h1, .html-content-view h2 { font-size: 22pt; font-weight: bold; margin-top: 1em; margin-bottom: 0.5em; color: #0f172a; }
-                            .html-content-view h3 { font-size: 20pt; font-weight: bold; margin-top: 1em; margin-bottom: 0.5em; color: #1e293b; }
-                            .html-content-view p { margin-bottom: 0.5em; }
-                            .html-content-view ul { list-style-type: disc; margin-left: 1.5em; margin-bottom: 1em; }
-                            .html-content-view ol { list-style-type: decimal; margin-left: 1.5em; margin-bottom: 1em; }
-                            .html-content-view img { max-width: 100%; height: auto; border-radius: 8px; margin: 1em 0; }
-                            .break-inside-avoid { break-inside: avoid; page-break-inside: avoid; }
-                            /* Nascondi sfondi e ombre durante la stampa reale se non supportati */
-                            @media print {
-                                .shadow-sm { box-shadow: none !important; }
-                            }
-                        </style>
-                    </head>
-                    <body class="p-2 sm:p-4 flex flex-col min-h-screen">
-                        <!-- HEADER -->
-                        <div class="flex items-center gap-4 border-b-[3px] border-blue-600 pb-4 mb-8">
-                            <img src="${logoUrl}" style="height: 50px; width: auto;" onerror="this.style.display='none'">
-                            <div>
-                                <h1 class="text-xl sm:text-2xl font-bold text-blue-800 leading-tight">Centro Federale Lampugnano</h1>
-                                <p class="text-sm text-slate-500 font-medium tracking-wide">Bacheca Digitale Ufficiale</p>
-                            </div>
-                        </div>
-
-                        <!-- CONTENT -->
-                        <div class="flex-grow">
-                            ${notice.imageUrl ? `<img src="${notice.imageUrl}" class="w-full h-64 object-cover rounded-xl mb-6 shadow-sm">` : ''}
-                            
-                            <div class="text-sm font-semibold text-slate-400 mb-2">${dateStr}</div>
-                            <!-- Titolo impostato a 24pt -->
-                            <h2 class="text-[24pt] font-bold text-slate-900 mb-6 leading-tight">${notice.title}</h2>
-                            
-                            <div class="html-content-view">
-                                ${notice.content}
-                            </div>
-                        </div>
-
-                        <!-- FOOTER -->
-                        <div class="mt-12 pt-6 border-t-2 border-slate-100 break-inside-avoid">
-                            <div class="flex justify-between items-start mb-6">
-                                <div class="flex gap-6 sm:gap-8">
-                                    <div>
-                                        <h4 class="font-bold text-slate-800 mb-2">Contattaci</h4>
-                                        <p class="text-sm text-slate-600 mb-1">📞 02.21061258</p>
-                                        <p class="text-sm text-slate-600 mb-1">✉️ cflampugnano@federnuoto.it</p>
-                                        <p class="text-sm text-slate-600">💬 WhatsApp: +39 02.21061258</p>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-bold text-slate-800 mb-2">Dove Siamo</h4>
-                                        <p class="text-sm text-slate-600 mb-1">📍 Via Lampugnano 76</p>
-                                        <p class="text-sm text-slate-600">20151 Milano (MI)</p>
-                                    </div>
-                                    <!-- Nuova colonna Social -->
-                                    <div>
-                                        <h4 class="font-bold text-slate-800 mb-2">Social</h4>
-                                        <p class="text-sm text-slate-600 mb-1">IG: @cflampugnano</p>
-                                        <p class="text-sm text-slate-600 mb-1">FB: CF Lampugnano</p>
-                                        <p class="text-sm text-slate-600">TikTok: @cflampugnano</p>
-                                    </div>
-                                </div>
-                                <div class="flex flex-col items-center ml-4">
-                                    <img src="${qrUrl}" class="w-20 h-20 mb-2 border border-slate-200 p-1 rounded-lg shadow-sm">
-                                    <p class="text-[10px] font-bold text-blue-600 text-center uppercase tracking-wider">Inquadra per<br>altre notizie</p>
-                                </div>
-                            </div>
-                            <div class="text-center text-[10px] text-slate-400 border-t border-slate-100 pt-4">
-                                <p class="font-bold text-slate-500 mb-0.5">Fin Plus Lombardia S.S.D. a r.l. — FIN Centro Federale Milano Piscina Lampugnano</p>
-                                <p>P.IVA/CF 14296840961 — SL: Via Piranesi 46, 20137 Milano (MI) - SO: Via Lampugnano 76, 20151 Milano (MI)</p>
-                            </div>
-                        </div>
-                        
-                        <script>
-                            // Attendi 1 secondo per permettere a Tailwind e alle immagini (es. QR) di caricarsi completamente
-                            setTimeout(() => {
-                                window.print();
-                                window.close();
-                            }, 1000);
-                        <\/script>
-                    </body>
-                </html>
-            `);
-            printWindow.document.close();
-        }
-
-    </script>
-</body>
-</html>
