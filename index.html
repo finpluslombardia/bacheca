@@ -416,6 +416,40 @@
     html.dark #widgetOrderList .border-slate-200 { border-color: #334155 !important; }
     html.dark #widgetOrderList .bg-blue-100 { background-color: #1e3a5f !important; }
     html.dark #widgetOrderList .bg-slate-100 { background-color: #334155 !important; }
+    
+    /* Widget status bar: hint interattività */
+    .widget-badge-hint {
+        animation: hintPulse 1.2s ease-in-out 3;
+    }
+    @keyframes hintPulse {
+        0%   { box-shadow: 0 0 0 0 rgba(148,163,184,0.5); transform: scale(1); }
+        50%  { box-shadow: 0 0 0 6px rgba(148,163,184,0); transform: scale(1.07); }
+        100% { box-shadow: 0 0 0 0 rgba(148,163,184,0); transform: scale(1); }
+    }
+    .widget-badge {
+        position: relative;
+    }
+    .widget-badge::after {
+        content: 'Tocca per gli orari';
+        position: absolute;
+        bottom: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(15,23,42,0.88);
+        color: #f1f5f9;
+        font-size: 10px;
+        font-weight: 600;
+        white-space: nowrap;
+        padding: 4px 8px;
+        border-radius: 6px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        z-index: 50;
+    }
+    .widget-badge:hover::after {
+        opacity: 1;
+    }
     </style>
     
     <script>
@@ -2181,11 +2215,19 @@
         div.className = 'flex items-center gap-2 shrink-0';
         div.id = 'statusWidget' + key.charAt(0).toUpperCase() + key.slice(1);
         div.innerHTML = `<span class="font-semibold text-blue-200/70">${meta.label}:</span>
-        <div class="flex items-center gap-1.5 bg-blue-900/60 px-2 py-0.5 rounded-full border border-blue-800 cursor-pointer hover:scale-105 transition select-none" id="${meta.badgeId}" onclick="openScheduleModal('${meta.modalType}')">
+        <div class="widget-badge flex items-center gap-1.5 bg-blue-900/60 px-2 py-0.5 rounded-full border border-blue-800 cursor-pointer hover:scale-105 hover:bg-blue-800/70 hover:border-blue-600 active:scale-95 transition select-none" id="${meta.badgeId}" onclick="openScheduleModal('${meta.modalType}')" title="Tocca per vedere gli orari">
         <span class="status-dot-red"></span> <span class="font-bold">CHIUSO</span>
+        <i data-lucide="chevron-down" class="w-3 h-3 opacity-60 ml-0.5"></i>
         </div>`;
         container.appendChild(div);
     });
+    // Pulse hint al primo caricamento della sessione
+    if (!sessionStorage.getItem('widgetHintShown')) {
+        setTimeout(() => {
+            document.querySelectorAll('.widget-badge').forEach(el => el.classList.add('widget-badge-hint'));
+            sessionStorage.setItem('widgetHintShown', '1');
+        }, 1800);
+    }
     }
 
     function updateStatusWidget() {
@@ -2243,8 +2285,8 @@
     classes = `${baseClasses} bg-red-900/30 border-red-700/50 text-red-400`;
     }
     
-    el.innerHTML = html + `<i data-lucide="info" class="w-3 h-3 ml-1 opacity-50"></i>`;
-    el.className = classes;
+    el.innerHTML = html + `<i data-lucide="chevron-down" class="w-3 h-3 ml-1 opacity-50"></i>`;
+    el.className = classes + ' widget-badge';
     }
 
     function calculateStatus(type, now) {
@@ -2314,23 +2356,25 @@
 
     function renderBadge(elementId, status) {
     const el = document.getElementById(elementId);
-    const baseClasses = "flex items-center gap-1.5 px-2 py-0.5 rounded-full border cursor-pointer hover:scale-105 transition select-none";
-    
+    if (!el) return;
+    const baseClasses = "widget-badge flex items-center gap-1.5 px-2 py-0.5 rounded-full border cursor-pointer hover:scale-105 hover:brightness-110 active:scale-95 transition select-none";
+    const chevron = `<i data-lucide="chevron-down" class="w-3 h-3 opacity-50 ml-0.5"></i>`;
     if (status === 'OPEN') {
-    el.innerHTML = `<span class="status-dot-green"></span> <span class="font-bold text-green-400">APERTO</span> <i data-lucide="info" class="w-3 h-3 text-green-400/50 ml-1"></i>`;
+    el.innerHTML = `<span class="status-dot-green"></span> <span class="font-bold text-green-400">APERTO</span> ${chevron}`;
     el.className = `${baseClasses} bg-green-900/30 border-green-700/50 text-green-400`;
     } else if (status === 'CLOSING_SOON') {
-    el.innerHTML = `<span class="status-dot-orange"></span> <span class="font-bold text-orange-400">CHIUDE TRA POCO</span> <i data-lucide="clock" class="w-3 h-3 text-orange-400/50 ml-1"></i>`;
+    el.innerHTML = `<span class="status-dot-orange"></span> <span class="font-bold text-orange-400">CHIUDE TRA POCO</span> <i data-lucide="clock" class="w-3 h-3 opacity-50 ml-1"></i> ${chevron}`;
     el.className = `${baseClasses} bg-orange-900/30 border-orange-700/50 text-orange-400`;
     } else if (status === 'OPENING_SOON') {
-    el.innerHTML = `<span class="status-dot-orange"></span> <span class="font-bold text-orange-400">APRE TRA POCO</span> <i data-lucide="clock" class="w-3 h-3 text-orange-400/50 ml-1"></i>`;
+    el.innerHTML = `<span class="status-dot-orange"></span> <span class="font-bold text-orange-400">APRE TRA POCO</span> <i data-lucide="clock" class="w-3 h-3 opacity-50 ml-1"></i> ${chevron}`;
     el.className = `${baseClasses} bg-orange-900/30 border-orange-700/50 text-orange-400`;
     } else {
-    el.innerHTML = `<span class="status-dot-red"></span> <span class="font-bold text-red-400">CHIUSO</span> <i data-lucide="info" class="w-3 h-3 text-red-400/50 ml-1"></i>`;
+    el.innerHTML = `<span class="status-dot-red"></span> <span class="font-bold text-red-400">CHIUSO</span> ${chevron}`;
     el.className = `${baseClasses} bg-red-900/30 border-red-700/50 text-red-400`;
     }
     }
 
+    
     // --- PUBLIC SCHEDULE VIEW MODAL ---
     window.openScheduleModal = function(type) {
     const now = new Date();
