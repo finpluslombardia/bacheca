@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
     <title id="page-title">AquaBoard - Centro Federale Lampugnano</title>
     
     <!-- Open Graph / Social Meta Tags (NEW) -->
@@ -32,6 +33,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
+    :root { color-scheme: light; }
     body { font-family: 'Inter', sans-serif; }
     .fade-in { animation: fadeIn 0.3s ease-in-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -2221,13 +2223,6 @@
         </div>`;
         container.appendChild(div);
     });
-    // Pulse hint al primo caricamento della sessione
-    if (!sessionStorage.getItem('widgetHintShown')) {
-        setTimeout(() => {
-            document.querySelectorAll('.widget-badge').forEach(el => el.classList.add('widget-badge-hint'));
-            sessionStorage.setItem('widgetHintShown', '1');
-        }, 1800);
-    }
     }
 
     function updateStatusWidget() {
