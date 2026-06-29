@@ -368,6 +368,11 @@
         html:not(.dark) #categoryFadeWrapper,
         html:not(.dark) #categoryFiltersContainer,
         html:not(.dark) #subCategoryFiltersContainer { background-color: #ffffff !important; }
+
+        /* Forza color-scheme light su tutti gli elementi quando il sito è in modalità chiara */
+        html:not(.dark) * {
+            color-scheme: light !important;
+        }
     }
     html.dark #categoryFiltersContainer,
     html.dark #subCategoryFiltersContainer { background-color: #1e293b; border-color: #334155; }
