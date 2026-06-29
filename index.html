@@ -494,6 +494,19 @@
         background: linear-gradient(to right, transparent, #1e293b);
     }
 
+        /* Forza light mode nel modale orari (JS-generated content) */
+    @media (prefers-color-scheme: dark) {
+        html:not(.dark) #scheduleModal > div { background-color: #ffffff !important; color-scheme: light !important; }
+        html:not(.dark) #scheduleModal > div * { color-scheme: light !important; }
+        html:not(.dark) #scheduleModalContent .bg-blue-50 { background-color: #eff6ff !important; }
+        html:not(.dark) #scheduleModalContent .text-blue-700 { color: #1d4ed8 !important; }
+        html:not(.dark) #scheduleModalContent .font-bold { color: inherit; }
+        html:not(.dark) #scheduleModalContent .text-gray-600 { color: #4b5563 !important; }
+        html:not(.dark) #scheduleModalContent .text-red-500 { color: #ef4444 !important; }
+        html:not(.dark) #scheduleModalContent .border-gray-100 { border-color: #f3f4f6 !important; }
+        html:not(.dark) #scheduleModalContent .border-b { border-color: #f3f4f6 !important; }
+    }
+
     </style>
     
     <script>
@@ -834,11 +847,11 @@
     <h3 class="text-lg font-bold text-gray-800" id="scheduleModalTitle">Orari Apertura</h3>
     <button onclick="closeScheduleModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-6 h-6"></i></button>
     </div>
-    <div class="p-6 overflow-y-auto">
-    <div id="scheduleModalContent">
+    <div class="p-6 overflow-y-auto" style="background-color: #ffffff;">
+    <div id="scheduleModalContent" style="color: #1e293b;">
     <!-- Contenuto generato via JS -->
     </div>
-    <div id="scheduleSpecialNote" class="hidden mt-6 bg-red-50 border border-red-100 p-3 rounded-lg text-xs text-red-700">
+    <div id="scheduleSpecialNote" class="hidden mt-6 bg-red-50 border border-red-100 p-3 rounded-lg text-xs text-red-700" style="background-color: #fff7ed; color: #9a3412;">
     <!-- Note chiusure speciali -->
     </div>
     </div>
