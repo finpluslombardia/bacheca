@@ -311,24 +311,111 @@
     .ql-snow .ql-picker.ql-marginBottom .ql-picker-label[data-value="1.5em"]::before,
     .ql-snow .ql-picker.ql-marginBottom .ql-picker-item[data-value="1.5em"]::before { content: 'Paragrafo: Largo'; }
 
-    /* Dark Mode Overrides (Impatto minimo sulle classi Tailwind esistenti) */
-    html.dark body { background-color: #0f172a; color: #f8fafc; }
-    html.dark .bg-white { background-color: #1e293b !important; }
-    html.dark .bg-white\/90 { background-color: #334155 !important; } /* Fix tasti modal (Chiudi/Condividi) */
-    html.dark .hover\:bg-gray-100:hover { background-color: #475569 !important; } /* Fix hover tasti modal */
-    html.dark .bg-slate-50, html.dark .bg-gray-50 { background-color: #0f172a !important; }
-    html.dark .text-slate-800, html.dark .text-gray-800, html.dark .text-slate-900 { color: #f8fafc !important; }
+    /* ═══════════════════════════════════════════
+       DARK MODE — Essenziale (admin-first)
+       bg #0f172a | surface #1e293b | card #253348 | border #334155
+       ═══════════════════════════════════════════ */
+
+    /* Base */
+    html.dark body { background-color: #0f172a; color: #f1f5f9; }
+
+    /* Sfondo superfici */
+    html.dark .bg-white   { background-color: #1e293b !important; }
+    html.dark .bg-white\/90 { background-color: #334155 !important; }
+    html.dark .bg-white\/20 { background-color: #475569 !important; }
+    html.dark .bg-white\/10 { background-color: #253348 !important; }
+    html.dark .bg-slate-50, html.dark .bg-gray-50  { background-color: #0f172a !important; }
+    html.dark .bg-slate-100, html.dark .bg-gray-100 { background-color: #1e293b !important; }
+    html.dark .bg-slate-200, html.dark .bg-gray-200 { background-color: #253348 !important; }
+
+    /* Testi */
+    html.dark .text-slate-900, html.dark .text-gray-900 { color: #f1f5f9 !important; }
+    html.dark .text-slate-800, html.dark .text-gray-800 { color: #f1f5f9 !important; }
     html.dark .text-slate-700, html.dark .text-gray-700 { color: #e2e8f0 !important; }
     html.dark .text-slate-600, html.dark .text-gray-600 { color: #cbd5e1 !important; }
     html.dark .text-slate-500, html.dark .text-gray-500 { color: #94a3b8 !important; }
-    html.dark .border-slate-100, html.dark .border-gray-100 { border-color: #1e293b !important; }
-    html.dark .border-slate-200, html.dark .border-gray-200, html.dark .border-gray-300 { border-color: #334155 !important; }
+    html.dark .text-slate-400, html.dark .text-gray-400 { color: #64748b !important; }
+
+    /* Bordi */
+    html.dark .border-slate-100, html.dark .border-gray-100 { border-color: #253348 !important; }
+    html.dark .border-slate-200, html.dark .border-gray-200 { border-color: #334155 !important; }
+    html.dark .border-slate-300, html.dark .border-gray-300 { border-color: #475569 !important; }
+
+    /* Hover */
+    html.dark .hover\:bg-slate-50:hover, html.dark .hover\:bg-gray-50:hover { background-color: #253348 !important; }
+    html.dark .hover\:bg-slate-100:hover, html.dark .hover\:bg-gray-100:hover { background-color: #334155 !important; }
+    html.dark .hover\:bg-gray-100:hover { background-color: #334155 !important; }
+    html.dark .hover\:bg-slate-200:hover { background-color: #3e4e66 !important; }
+
+    /* Categoria bar */
+    html.dark #categoryFiltersContainer,
+    html.dark #subCategoryFiltersContainer { background-color: #1e293b; border-color: #334155; }
+    html.dark #categoryFiltersContainer button,
+    html.dark #subCategoryFiltersContainer button { background-color: #1e293b !important; border-color: #334155 !important; color: #cbd5e1 !important; }
+
+    /* Card avvisi */
     html.dark .card-image-container { background-color: #334155 !important; }
-    html.dark .ql-toolbar { background-color: #f1f5f9; border-color: #475569 !important; }    
-    html.dark .ql-container { border-color: #475569 !important; }
+    html.dark .card-preview-container { background-color: #334155 !important; border-color: #475569 !important; }
+    html.dark .card-preview-overlay { background: linear-gradient(to bottom, rgba(30,41,59,0), rgba(30,41,59,1)) !important; }
+
+    /* Stato vuoto */
+    html.dark #emptyState { background-color: #1e293b !important; border-color: #334155 !important; }
+
+    /* Header categorie corsi (accordion) */
+    html.dark .bg-indigo-50\/50 { background-color: #1e2a3a !important; }
+    html.dark .border-indigo-100 { border-color: #2d3a52 !important; }
+
+    /* Footer istituzionale */
+    html.dark footer.bg-slate-100 { background-color: #1e293b !important; border-color: #334155 !important; }
+    html.dark footer .text-slate-700 { color: #cbd5e1 !important; }
+
+    /* Footer contatti */
+    html.dark .bg-slate-700 { background-color: #253348 !important; }
+    html.dark .bg-slate-800 { background-color: #1a2336 !important; }
+
+    /* Modali — sfondo header */
+    html.dark .bg-gray-50 { background-color: #253348 !important; }
+
+    /* Inputs nei modali */
+    html.dark input[type="text"], html.dark input[type="date"],
+    html.dark input[type="email"], html.dark input[type="password"],
+    html.dark select, html.dark textarea {
+        background-color: #1e293b !important;
+        color: #f1f5f9 !important;
+        border-color: #475569 !important;
+    }
+    html.dark input::placeholder, html.dark textarea::placeholder { color: #64748b !important; }
+
+    /* Modal view avviso */
     html.dark .html-content-view { color: #e2e8f0; }
-    html.dark #categoryFiltersContainer button.bg-white { background-color: transparent !important; }
-    html.dark #categoryFiltersContainer button.bg-slate-100 { background-color: #334155 !important; }
+    html.dark .preview-overlay { background: linear-gradient(to bottom, rgba(30,41,59,0), rgba(30,41,59,1)) !important; }
+    html.dark .preview-box { background-color: #253348 !important; border-color: #475569 !important; }
+
+    /* Quill editor */
+    html.dark .ql-toolbar.ql-snow { background-color: #253348; border-color: #475569 !important; }
+    html.dark .ql-toolbar.ql-snow .ql-stroke { stroke: #94a3b8; }
+    html.dark .ql-toolbar.ql-snow .ql-fill { fill: #94a3b8; }
+    html.dark .ql-toolbar.ql-snow .ql-picker-label { color: #94a3b8; }
+    html.dark .ql-container.ql-snow { background-color: #1e293b; border-color: #475569 !important; }
+    html.dark .ql-editor { color: #e2e8f0; }
+
+    /* Toast */
+    html.dark #toast { background-color: #334155 !important; }
+
+    /* Banner colorati (archivio, chiusure, ecc.) */
+    html.dark .bg-yellow-50 { background-color: #2d2a1a !important; }
+    html.dark .bg-red-50    { background-color: #2d1a1a !important; }
+    html.dark .bg-purple-50 { background-color: #221a2d !important; }
+    html.dark .bg-indigo-50 { background-color: #1a1e2d !important; }
+    html.dark .bg-orange-50 { background-color: #2d2018 !important; }
+    html.dark .bg-green-50  { background-color: #182d1e !important; }
+    html.dark .bg-blue-50   { background-color: #181e2d !important; }
+
+    /* Widget order list (modal orari) */
+    html.dark #widgetOrderList .bg-white { background-color: #253348 !important; }
+    html.dark #widgetOrderList .border-slate-200 { border-color: #334155 !important; }
+    html.dark #widgetOrderList .bg-blue-100 { background-color: #1e3a5f !important; }
+    html.dark #widgetOrderList .bg-slate-100 { background-color: #334155 !important; }
     </style>
     
     <script>
@@ -340,7 +427,7 @@
     }
     </script>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col transition-colors duration-200">
+<body class="dark:bg-slate-950 bg-slate-50 text-slate-800 min-h-screen flex flex-col transition-colors duration-200">
 
     <!-- HEADER -->
     <header class="bg-[#4169e1] text-white shadow-sm sticky top-0 z-20">
@@ -395,7 +482,7 @@
     </div>
 
     <!-- BANNER CATEGORIE UNIFICATO (Scroll orizzontale su mobile) -->
-    <div class="bg-white border-b border-slate-200 py-3 shadow-sm relative z-10">
+    <div class="bg-white dark:bg-slate-900 border-b border-slate-200 py-3 shadow-sm relative z-10">
     <div class="max-w-6xl mx-auto px-4">
     <div class="flex gap-3 overflow-x-auto no-scrollbar pb-1 items-center" id="categoryFiltersContainer">
     <!-- Generato via JS: Qui finiranno tutti i box (Urgenti, Info, Corsi, Novità, ecc.) -->
@@ -413,7 +500,7 @@
     <!-- Controlli Admin (separati dal banner pubblico) -->
     <div class="flex justify-end items-center gap-3 mb-6">
     <div id="loadingIndicator" class="hidden"><div class="loader"></div></div>
-    <button id="archiveToggleBtn" onclick="toggleArchiveView()" class="hidden flex items-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-full text-sm font-medium transition"><i data-lucide="archive" class="w-4 h-4"></i><span id="archiveBtnText">Mostra Archivio</span></button>
+    <button id="archiveToggleBtn" onclick="toggleArchiveView()" class="hidden flex items-center gap-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-full text-sm font-medium transition"><i data-lucide="archive" class="w-4 h-4"></i><span id="archiveBtnText">Mostra Archivio</span></button>
     <button id="addNoticeBtn" onclick="openNoticeModal()" class="hidden flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-full shadow-md transition font-medium"><i data-lucide="plus" class="w-5 h-5"></i>Nuovo</button>
     </div>
 
@@ -491,7 +578,7 @@
     <div id="noticesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start"></div>
 
     <!-- Stato Vuoto -->
-    <div id="emptyState" class="hidden col-span-full py-12 flex flex-col items-center justify-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-200 mt-6"><i data-lucide="megaphone" class="w-12 h-12 mb-4 opacity-20"></i><p class="text-lg" id="emptyStateText">Nessun avviso trovato.</p></div>
+    <div id="emptyState" class="hidden col-span-full py-12 flex flex-col items-center justify-center text-slate-400 bg-white dark:bg-slate-800 rounded-xl border border-dashed border-slate-200 mt-6"><i data-lucide="megaphone" class="w-12 h-12 mb-4 opacity-20"></i><p class="text-lg" id="emptyStateText">Nessun avviso trovato.</p></div>
     </main>
     
     <!-- FASCIA CONTATTI & SOCIAL -->
@@ -613,7 +700,7 @@
 
     <!-- MODAL VIEW NOTICE (Aggiornato Mobile) -->
     <div id="viewNoticeModal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-md fade-in">
-    <div id="viewNoticeInnerContainer" class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] relative transition-all duration-300">
+    <div id="viewNoticeInnerContainer" class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] relative transition-all duration-300">
     
     <!-- POPUP BANNER (NEW) -->
     <div id="viewNoticePopupBanner" class="hidden bg-blue-500 text-white text-center py-2.5 font-bold uppercase tracking-wider text-sm w-full shrink-0 z-20">In Evidenza</div>
@@ -661,7 +748,7 @@
 
     <!-- MODAL VIEW SCHEDULE (NEW PUBLIC VIEW) -->
     <div id="scheduleModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[85vh]">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[85vh]">
     <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
     <h3 class="text-lg font-bold text-gray-800" id="scheduleModalTitle">Orari Apertura</h3>
     <button onclick="closeScheduleModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -679,7 +766,7 @@
 
     <!-- MODAL GESTIONE ORARI (ADMIN) -->
     <div id="hoursModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
     <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
     <h3 class="text-xl font-bold text-gray-800">Gestione Orari Apertura</h3>
     <button onclick="closeHoursModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -769,7 +856,7 @@
 
     <!-- MODAL ORDINAMENTO CATEGORIE (NUOVO) -->
     <div id="categoryOrderModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[85vh]">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[85vh]">
     <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
     <h3 class="text-lg font-bold text-gray-800">Ordina Menu Categorie</h3>
     <button onclick="closeCategoryOrderModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -788,7 +875,7 @@
 
     <!-- MODAL NUOVO AVVISO / MODIFICA -->
     <div id="noticeModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden flex flex-col max-h-[90vh]">
     <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
     <h3 class="text-xl font-bold text-gray-800" id="modalTitle">Pubblica Avviso</h3>
     <button onclick="closeNoticeModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -964,7 +1051,7 @@
     
     <!-- MODAL QR CODE (ADMIN) -->
     <div id="qrModal" class="hidden fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4 backdrop-blur-sm fade-in">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col p-6 text-center relative">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col p-6 text-center relative">
     <button onclick="closeQrModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-6 h-6"></i></button>
     <h3 class="text-xl font-bold text-gray-800 mb-4 pr-6 text-left">QR Code Avviso</h3>
     <div id="printQrArea" class="flex flex-col items-center bg-white p-4 rounded-xl border border-dashed border-gray-300">
@@ -985,7 +1072,7 @@
 
     <!-- MODAL LOGIN (AGGIUNTO per funzionalità Admin) -->
     <div id="loginModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden p-6">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden p-6">
     <h3 class="text-xl font-bold text-gray-800 mb-4">Area Riservata</h3>
     <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
     <input type="email" id="loginEmail" placeholder="Email" class="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500" required>
@@ -1001,7 +1088,7 @@
 
     <!-- MODAL AQUAFITNESS CONFIG (ADMIN) -->
     <div id="aquafitnessModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
     <div class="p-6 border-b border-indigo-100 flex justify-between items-center bg-indigo-50">
     <h3 class="text-xl font-bold text-indigo-900 flex items-center gap-2"><i data-lucide="activity" class="w-5 h-5 text-indigo-600"></i> Modifica Testi Aquafitness</h3>
     <button onclick="closeAquafitnessModal()" class="text-indigo-400 hover:text-indigo-600"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -1035,7 +1122,7 @@
 
     <!-- MODAL ARTISTICO CONFIG (ADMIN) -->
     <div id="artisticoModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
     <div class="p-6 border-b border-indigo-100 flex justify-between items-center bg-indigo-50">
     <h3 class="text-xl font-bold text-indigo-900 flex items-center gap-2"><i data-lucide="star" class="w-5 h-5 text-indigo-600"></i> Modifica Testi Artistico</h3>
     <button onclick="closeArtisticoModal()" class="text-indigo-400 hover:text-indigo-600"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -1069,7 +1156,7 @@
 
     <!-- MODAL AQUAGOL CONFIG (ADMIN) -->
     <div id="aquagolModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
     <div class="p-6 border-b border-indigo-100 flex justify-between items-center bg-indigo-50">
     <h3 class="text-xl font-bold text-indigo-900 flex items-center gap-2"><i data-lucide="target" class="w-5 h-5 text-indigo-600"></i> Modifica Testi Aquagol</h3>
     <button onclick="closeAquagolModal()" class="text-indigo-400 hover:text-indigo-600"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -1103,7 +1190,7 @@
 
     <!-- MODAL PROPAGANDA CONFIG (ADMIN) -->
     <div id="propagandaModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
     <div class="p-6 border-b border-indigo-100 flex justify-between items-center bg-indigo-50">
     <h3 class="text-xl font-bold text-indigo-900 flex items-center gap-2"><i data-lucide="megaphone" class="w-5 h-5 text-indigo-600"></i> Modifica Testi Propaganda</h3>
     <button onclick="closePropagandaModal()" class="text-indigo-400 hover:text-indigo-600"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -1137,7 +1224,7 @@
 
     <!-- MODAL MASTER CONFIG (ADMIN) -->
     <div id="masterModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm fade-in">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
     <div class="p-6 border-b border-indigo-100 flex justify-between items-center bg-indigo-50">
     <h3 class="text-xl font-bold text-indigo-900 flex items-center gap-2"><i data-lucide="award" class="w-5 h-5 text-indigo-600"></i> Modifica Testi Master</h3>
     <button onclick="closeMasterModal()" class="text-indigo-400 hover:text-indigo-600"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -3717,7 +3804,7 @@
 
     // Resetta le classi e applica quelle nuove (per evitare sovrapposizioni di bordi)
     const maxWidthClass = isSummaryView ? 'max-w-lg' : 'max-w-2xl';
-    innerContainer.className = `bg-white rounded-2xl shadow-2xl w-full ${maxWidthClass} overflow-hidden flex flex-col max-h-[90vh] relative transition-all duration-300`;
+    innerContainer.className = `bg-white dark:bg-slate-800 dark:bg-slate-800 rounded-2xl shadow-2xl w-full ${maxWidthClass} overflow-hidden flex flex-col max-h-[90vh] relative transition-all duration-300`;
     innerContainer.classList.add('border-4', pBrd);
 
     popupBanner.className = `${pBg} py-2 font-bold uppercase tracking-wider text-xs md:text-sm w-full shrink-0 z-20 flex items-center justify-center gap-2`;
@@ -3734,7 +3821,7 @@
     modalWrapper.classList.add('bg-black/70', 'backdrop-blur-md');
     
     // Resetta allo stato standard (senza bordo colorato e senza banner)
-    innerContainer.className = 'bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] relative transition-all duration-300';
+    innerContainer.className = 'bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] relative transition-all duration-300';
     popupBanner.className = 'hidden';
     
     shareBtn.classList.remove('hidden');
