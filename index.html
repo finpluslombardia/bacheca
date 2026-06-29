@@ -361,6 +361,14 @@
     html.dark .hover\:bg-slate-200:hover { background-color: #3e4e66 !important; }
 
     /* Categoria bar */
+    #categoryFadeWrapper, #categoryFiltersContainer, #subCategoryFiltersContainer {
+        background-color: #ffffff;
+    }
+    @media (prefers-color-scheme: dark) {
+        html:not(.dark) #categoryFadeWrapper,
+        html:not(.dark) #categoryFiltersContainer,
+        html:not(.dark) #subCategoryFiltersContainer { background-color: #ffffff !important; }
+    }
     html.dark #categoryFiltersContainer,
     html.dark #subCategoryFiltersContainer { background-color: #1e293b; border-color: #334155; }
     html.dark #categoryFiltersContainer button,
@@ -547,7 +555,7 @@
     </div>
 
     <!-- BANNER CATEGORIE UNIFICATO (Scroll orizzontale su mobile) -->
-    <div class="bg-white dark:bg-slate-900 border-b border-slate-200 py-3 shadow-sm relative z-10">
+    <div class="bg-white dark:bg-slate-900 border-b border-slate-200 py-3 shadow-sm relative z-10" style="background-color: #ffffff;">
     <div class="scroll-fade-wrapper" id="categoryFadeWrapper">
     <div class="max-w-6xl mx-auto px-4">
     <div class="flex gap-3 overflow-x-auto no-scrollbar pb-1 items-center" id="categoryFiltersContainer">
