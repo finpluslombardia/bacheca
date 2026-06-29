@@ -452,6 +452,24 @@
     .widget-badge:hover::after {
         opacity: 1;
     }
+        /* Categoria bar: fade laterale per indicare scroll orizzontale */
+    .scroll-fade-wrapper { position: relative; }
+    .scroll-fade-wrapper::after {
+        content: '';
+        position: absolute;
+        top: 0; right: 0;
+        width: 52px; height: 100%;
+        background: linear-gradient(to right, transparent, white);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.25s ease;
+        z-index: 2;
+    }
+    .scroll-fade-wrapper.has-overflow::after { opacity: 1; }
+    html.dark .scroll-fade-wrapper::after {
+        background: linear-gradient(to right, transparent, #1e293b);
+    }
+
     </style>
     
     <script>
@@ -1459,12 +1477,7 @@
     renderCategoryCheckboxes();    
     lucide.createIcons();
 
-    // Fade laterale barra categorie
-    const catContainer = document.getElementById('categoryFiltersContainer');
-    if (catContainer) {
-    catContainer.addEventListener('scroll', updateCategoryFade, { passive: true });
-    window.addEventListener('resize', updateCategoryFade, { passive: true });
-    }
+    // Fade laterale: listener gestiti dal modulo ES
     
     // Registrazione nuovi attributi per spaziatura Quill
     const Parchment = Quill.import('parchment');
@@ -2997,10 +3010,27 @@
     }
 
     lucide.createIcons();
+    setTimeout(updateCategoryFade, 50);
     }
 
     function updateHighlightButtons() {
     // Deprecato con il nuovo banner unificato, ma lasciato vuoto per sicurezza
+    }
+
+    function updateCategoryFade() {
+    const container = document.getElementById('categoryFiltersContainer');
+    const wrapper = document.getElementById('categoryFadeWrapper');
+    if (!container || !wrapper) return;
+    const isAtEnd = container.scrollLeft + container.clientWidth >= container.scrollWidth - 8;
+    const hasOverflow = container.scrollWidth > container.clientWidth + 4;
+    wrapper.classList.toggle('has-overflow', hasOverflow && !isAtEnd);
+    }
+    window.updateCategoryFade = updateCategoryFade;
+    // Listener per il fade barra categorie (dentro il modulo per sicurezza scope)
+    const _catEl = document.getElementById('categoryFiltersContainer');
+    if (_catEl) {
+    _catEl.addEventListener('scroll', updateCategoryFade, { passive: true });
+    window.addEventListener('resize', updateCategoryFade, { passive: true });
     }
     
     function renderCategoryCheckboxes() {
