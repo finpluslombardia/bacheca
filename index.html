@@ -1753,10 +1753,13 @@
     document.getElementById(`aquaFitTitle${i+1}`).value = item.title;
     const editorEl = document.getElementById(`aquaFitContent${i+1}Editor`);
     if (editorEl) {
-        editorEl.innerHTML = '';
-        const q = new Quill(editorEl, { theme: 'snow', modules: { toolbar: [['bold','italic','underline','clean']] } });
-        q.root.innerHTML = item.content || '';
-        editorEl.__quill = q;
+        if (editorEl.__quill) {
+            editorEl.__quill.root.innerHTML = item.content || '';
+        } else {
+            const q = new Quill(editorEl, { theme: 'snow', modules: { toolbar: [['bold','italic','underline','clean']] } });
+            q.root.innerHTML = item.content || '';
+            editorEl.__quill = q;
+        }
     }
     }
     document.getElementById('aquafitnessModal').classList.remove('hidden');
@@ -1808,10 +1811,13 @@
     document.getElementById(`artTitle${i+1}`).value = item.title;
     const editorEl_artistico = document.getElementById(`artContent${i+1}Editor`);
     if (editorEl_artistico) {
-        editorEl_artistico.innerHTML = '';
-        const q = new Quill(editorEl_artistico, { theme: 'snow', modules: { toolbar: [['bold','italic','underline','clean']] } });
-        q.root.innerHTML = item.content || '';
-        editorEl_artistico.__quill = q;
+        if (editorEl_artistico.__quill) {
+            editorEl_artistico.__quill.root.innerHTML = item.content || '';
+        } else {
+            const q = new Quill(editorEl_artistico, { theme: 'snow', modules: { toolbar: [['bold','italic','underline','clean']] } });
+            q.root.innerHTML = item.content || '';
+            editorEl_artistico.__quill = q;
+        }
     }
     }
     document.getElementById('artisticoModal').classList.remove('hidden');
@@ -1863,10 +1869,13 @@
     document.getElementById(`aquaTitle${i+1}`).value = item.title;
     const editorEl_aquagol = document.getElementById(`aquaContent${i+1}Editor`);
     if (editorEl_aquagol) {
-        editorEl_aquagol.innerHTML = '';
-        const q = new Quill(editorEl_aquagol, { theme: 'snow', modules: { toolbar: [['bold','italic','underline','clean']] } });
-        q.root.innerHTML = item.content || '';
-        editorEl_aquagol.__quill = q;
+        if (editorEl_aquagol.__quill) {
+            editorEl_aquagol.__quill.root.innerHTML = item.content || '';
+        } else {
+            const q = new Quill(editorEl_aquagol, { theme: 'snow', modules: { toolbar: [['bold','italic','underline','clean']] } });
+            q.root.innerHTML = item.content || '';
+            editorEl_aquagol.__quill = q;
+        }
     }
     }
     document.getElementById('aquagolModal').classList.remove('hidden');
@@ -1918,10 +1927,13 @@
     document.getElementById(`propTitle${i+1}`).value = item.title;
     const editorEl_propaganda = document.getElementById(`propContent${i+1}Editor`);
     if (editorEl_propaganda) {
-        editorEl_propaganda.innerHTML = '';
-        const q = new Quill(editorEl_propaganda, { theme: 'snow', modules: { toolbar: [['bold','italic','underline','clean']] } });
-        q.root.innerHTML = item.content || '';
-        editorEl_propaganda.__quill = q;
+        if (editorEl_propaganda.__quill) {
+            editorEl_propaganda.__quill.root.innerHTML = item.content || '';
+        } else {
+            const q = new Quill(editorEl_propaganda, { theme: 'snow', modules: { toolbar: [['bold','italic','underline','clean']] } });
+            q.root.innerHTML = item.content || '';
+            editorEl_propaganda.__quill = q;
+        }
     }
     }
     document.getElementById('propagandaModal').classList.remove('hidden');
@@ -1973,10 +1985,13 @@
     document.getElementById(`masterTitle${i+1}`).value = item.title;
     const editorEl_master = document.getElementById(`masterContent${i+1}Editor`);
     if (editorEl_master) {
-        editorEl_master.innerHTML = '';
-        const q = new Quill(editorEl_master, { theme: 'snow', modules: { toolbar: [['bold','italic','underline','clean']] } });
-        q.root.innerHTML = item.content || '';
-        editorEl_master.__quill = q;
+        if (editorEl_master.__quill) {
+            editorEl_master.__quill.root.innerHTML = item.content || '';
+        } else {
+            const q = new Quill(editorEl_master, { theme: 'snow', modules: { toolbar: [['bold','italic','underline','clean']] } });
+            q.root.innerHTML = item.content || '';
+            editorEl_master.__quill = q;
+        }
     }
     }
     document.getElementById('masterModal').classList.remove('hidden');
