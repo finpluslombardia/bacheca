@@ -850,7 +850,7 @@
     
     <div id="viewNoticeContentImgContainer" class="hidden mb-6"><img id="viewNoticeContentImg" class="w-full rounded-xl border border-slate-200"></div>
     <div id="viewNoticeAttachmentContainer" class="hidden mt-8 pt-6 border-t border-slate-100">
-    <h4 class="text-sm font-bold text-slate-500 uppercase mb-3 flex items-center gap-2"><i data-lucide="paperclip" class="w-4 h-4"></i> Allegato</h4>
+    <h4 class="text-sm font-bold text-slate-500 uppercase mb-3 flex items-center gap-2"><i data-lucide="paperclip" class="w-4 h-4"></i> Allegati</h4>
     <div id="viewNoticePreviewBox" class="hidden mb-4 rounded-lg overflow-hidden border border-slate-200"></div>
     <a id="viewNoticeDownloadBtn" href="#" target="_blank" class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-xl font-semibold transition w-full sm:w-auto shadow-md hover:shadow-lg"><i data-lucide="download" class="w-5 h-5"></i>Scarica / Apri Documento</a>
     </div>
@@ -1036,14 +1036,53 @@
     </div>
     <div class="flex gap-2 mb-2 text-xs"><button type="button" onclick="toggleContentType('file')" id="btnContentFile" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button><button type="button" onclick="toggleContentType('link')" id="btnContentLink" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive</button></div><div id="contentFileInput"><input type="file" id="contentImageFile" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"></div><div id="contentLinkInput" class="hidden"><input type="url" id="contentUrlManual" placeholder="Incolla link Google Drive..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></div>
     </div>
-    <!-- Attachment -->
+    <!-- Allegati multipli (max 3) -->
     <div class="border-t border-slate-200 pt-3">
-    <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2"><i data-lucide="paperclip" class="w-4 h-4"></i>Allegato (PDF o Link Esterno)</label>
-    <div id="currentAttachmentBadge" class="hidden mb-2 flex items-center justify-between bg-blue-100/50 border border-blue-200 px-3 py-2 rounded-lg">
-    <span class="text-xs font-bold text-blue-800 flex items-center gap-1.5"><i data-lucide="check-circle" class="w-4 h-4 text-blue-600"></i> Allegato salvato nel database</span>
-    <button type="button" onclick="markMediaForRemoval('attachment')" class="text-xs bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:text-red-800 font-bold py-1 px-2 rounded-md shadow-sm transition flex items-center gap-1"><i data-lucide="trash-2" class="w-3 h-3"></i> Rimuovi</button>
+    <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2"><i data-lucide="paperclip" class="w-4 h-4"></i>Allegati (max 3 — PDF, immagini o link)</label>
+    <div id="attachmentSlotsContainer" class="space-y-3">
+    <!-- Slot 1 -->
+    <div class="attach-slot bg-slate-50 border border-slate-200 rounded-lg p-2.5" data-slot="0">
+    <div class="flex justify-between items-center mb-2">
+    <span class="text-xs font-bold text-slate-500 uppercase">Allegato 1</span>
+    <div id="savedAttachBadge_0" class="hidden flex items-center gap-1.5 text-xs font-bold text-blue-700"><i data-lucide="check-circle" class="w-3.5 h-3.5 text-blue-500"></i> Salvato <button type="button" onclick="removeAttachSlot(0)" class="ml-1 text-red-400 hover:text-red-600"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></div>
     </div>
-    <div class="flex gap-2 mb-2 text-xs"><button type="button" onclick="toggleAttachType('file')" id="btnFileType" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button><button type="button" onclick="toggleAttachType('link')" id="btnLinkType" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Usa Link Drive/Web</button></div><div id="attachFileInput"><input type="file" id="attachmentFile" accept=".pdf,image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100"><p class="text-[10px] text-gray-400 mt-1">Nessun limite di dimensione (Archiviazione Cloud attiva).</p></div><div id="attachLinkInput" class="hidden"><input type="url" id="attachmentUrlManual" placeholder="Es. https://drive.google.com/..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></div>
+    <div class="flex gap-2 mb-2 text-xs">
+    <button type="button" onclick="toggleSlotType(0,'file')" id="slotBtnFile_0" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button>
+    <button type="button" onclick="toggleSlotType(0,'link')" id="slotBtnLink_0" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Link Drive/Web</button>
+    </div>
+    <div id="slotFileInput_0"><input type="file" id="attachFile_0" accept=".pdf,image/*" class="block w-full text-sm text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200"></div>
+    <div id="slotLinkInput_0" class="hidden"><input type="url" id="attachUrl_0" placeholder="https://drive.google.com/..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></div>
+    </div>
+    <!-- Slot 2 -->
+    <div class="attach-slot bg-slate-50 border border-slate-200 rounded-lg p-2.5 hidden" data-slot="1" id="attachSlot_1">
+    <div class="flex justify-between items-center mb-2">
+    <span class="text-xs font-bold text-slate-500 uppercase">Allegato 2</span>
+    <div id="savedAttachBadge_1" class="hidden flex items-center gap-1.5 text-xs font-bold text-blue-700"><i data-lucide="check-circle" class="w-3.5 h-3.5 text-blue-500"></i> Salvato <button type="button" onclick="removeAttachSlot(1)" class="ml-1 text-red-400 hover:text-red-600"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></div>
+    </div>
+    <div class="flex gap-2 mb-2 text-xs">
+    <button type="button" onclick="toggleSlotType(1,'file')" id="slotBtnFile_1" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button>
+    <button type="button" onclick="toggleSlotType(1,'link')" id="slotBtnLink_1" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Link Drive/Web</button>
+    </div>
+    <div id="slotFileInput_1"><input type="file" id="attachFile_1" accept=".pdf,image/*" class="block w-full text-sm text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200"></div>
+    <div id="slotLinkInput_1" class="hidden"><input type="url" id="attachUrl_1" placeholder="https://drive.google.com/..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></div>
+    </div>
+    <!-- Slot 3 -->
+    <div class="attach-slot bg-slate-50 border border-slate-200 rounded-lg p-2.5 hidden" data-slot="2" id="attachSlot_2">
+    <div class="flex justify-between items-center mb-2">
+    <span class="text-xs font-bold text-slate-500 uppercase">Allegato 3</span>
+    <div id="savedAttachBadge_2" class="hidden flex items-center gap-1.5 text-xs font-bold text-blue-700"><i data-lucide="check-circle" class="w-3.5 h-3.5 text-blue-500"></i> Salvato <button type="button" onclick="removeAttachSlot(2)" class="ml-1 text-red-400 hover:text-red-600"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></div>
+    </div>
+    <div class="flex gap-2 mb-2 text-xs">
+    <button type="button" onclick="toggleSlotType(2,'file')" id="slotBtnFile_2" class="px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700">Carica File</button>
+    <button type="button" onclick="toggleSlotType(2,'link')" id="slotBtnLink_2" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500">Link Drive/Web</button>
+    </div>
+    <div id="slotFileInput_2"><input type="file" id="attachFile_2" accept=".pdf,image/*" class="block w-full text-sm text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200"></div>
+    <div id="slotLinkInput_2" class="hidden"><input type="url" id="attachUrl_2" placeholder="https://drive.google.com/..." class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"></div>
+    </div>
+    </div>
+    <div class="flex gap-2 mt-2">
+    <button type="button" onclick="addAttachSlot()" id="addAttachSlotBtn" class="text-xs text-blue-600 font-bold flex items-center gap-1 hover:text-blue-800 transition bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-full w-max"><i data-lucide="plus" class="w-3 h-3"></i> Aggiungi allegato</button>
+    </div>
     </div>
     </div>
     
@@ -3757,13 +3796,86 @@
     removeMediaFlags[type] = true;
     if (type === 'cover') document.getElementById('currentCoverBadge').classList.add('hidden');
     if (type === 'content') document.getElementById('currentContentImgBadge').classList.add('hidden');
-    if (type === 'attachment') document.getElementById('currentAttachmentBadge').classList.add('hidden');
+    if (type === 'attachment') {
+    // Legacy: rimuovi tutti gli allegati
+    for (let si = 0; si < 3; si++) {
+    const badge = document.getElementById(`savedAttachBadge_${si}`);
+    if (badge) badge.classList.add('hidden');
+    }
+    if (!window._removedAttachSlots) window._removedAttachSlots = new Set([0,1,2]);
+    else { window._removedAttachSlots.add(0); window._removedAttachSlots.add(1); window._removedAttachSlots.add(2); }
+    }
     showToast("Elemento rimosso. Salva l'avviso per confermare.");
     }
 
     window.toggleAttachType = function(type) {
-    if(type === 'file') { document.getElementById('attachFileInput').classList.remove('hidden'); document.getElementById('attachLinkInput').classList.add('hidden'); document.getElementById('btnFileType').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnFileType').classList.replace('border','font-medium'); document.getElementById('btnLinkType').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnLinkType').classList.add('border'); }    
-    else { document.getElementById('attachFileInput').classList.add('hidden'); document.getElementById('attachLinkInput').classList.remove('hidden'); document.getElementById('btnLinkType').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnLinkType').classList.remove('border'); document.getElementById('btnFileType').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnFileType').classList.add('border'); }
+    // Legacy - kept for compatibility
+    }
+
+    window.toggleSlotType = function(slotIdx, type) {
+    const fileDiv = document.getElementById(`slotFileInput_${slotIdx}`);
+    const linkDiv = document.getElementById(`slotLinkInput_${slotIdx}`);
+    const btnFile = document.getElementById(`slotBtnFile_${slotIdx}`);
+    const btnLink = document.getElementById(`slotBtnLink_${slotIdx}`);
+    if (type === 'file') {
+    fileDiv.classList.remove('hidden'); linkDiv.classList.add('hidden');
+    btnFile.className = 'px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700';
+    btnLink.className = 'px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500';
+    } else {
+    fileDiv.classList.add('hidden'); linkDiv.classList.remove('hidden');
+    btnLink.className = 'px-3 py-1 bg-slate-200 rounded-full font-medium text-slate-700';
+    btnFile.className = 'px-3 py-1 bg-white border border-slate-200 rounded-full text-slate-500';
+    }
+    }
+
+    window.addAttachSlot = function() {
+    for (let si = 1; si < 3; si++) {
+    const slot = document.getElementById(`attachSlot_${si}`);
+    if (slot && slot.classList.contains('hidden')) {
+        slot.classList.remove('hidden');
+        if (si === 2) document.getElementById('addAttachSlotBtn').classList.add('hidden');
+        return;
+    }
+    }
+    }
+
+    window.removeAttachSlot = function(slotIdx) {
+    if (!window._removedAttachSlots) window._removedAttachSlots = new Set();
+    window._removedAttachSlots.add(slotIdx);
+    delete (window._savedAttachments || {})[slotIdx];
+    const badge = document.getElementById(`savedAttachBadge_${slotIdx}`);
+    if (badge) badge.classList.add('hidden');
+    const fEl = document.getElementById(`attachFile_${slotIdx}`);
+    const uEl = document.getElementById(`attachUrl_${slotIdx}`);
+    if (fEl) fEl.value = '';
+    if (uEl) uEl.value = '';
+    if (slotIdx > 0) {
+    const slot = document.getElementById(`attachSlot_${slotIdx}`);
+    if (slot) slot.classList.add('hidden');
+    const addBtn = document.getElementById('addAttachSlotBtn');
+    if (addBtn) addBtn.classList.remove('hidden');
+    }
+    showToast('Allegato rimosso. Salva per confermare.');
+    }
+
+    window.downloadBase64 = function(idx) {
+    const url = (window._viewAttachments || [])[parseInt(idx)];
+    if (!url || !url.startsWith('data:')) return;
+    try {
+    const arr = url.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while(n--) u8arr[n] = bstr.charCodeAt(n);
+    const blob = new Blob([u8arr], {type: mime});
+    const blobUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = 'Allegato_' + (parseInt(idx)+1) + '.pdf';
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    } catch(err) { showToast('Errore download', true); }
     }
     window.toggleCoverType = function(type) { if(type === 'file') { document.getElementById('coverFileInput').classList.remove('hidden'); document.getElementById('coverLinkInput').classList.add('hidden'); document.getElementById('btnCoverFile').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnCoverFile').classList.replace('border','font-medium'); document.getElementById('btnCoverLink').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnCoverLink').classList.add('border'); } else { document.getElementById('coverFileInput').classList.add('hidden'); document.getElementById('coverLinkInput').classList.remove('hidden'); document.getElementById('btnCoverLink').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnCoverLink').classList.remove('border'); document.getElementById('btnCoverFile').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnCoverFile').classList.add('border'); } }
     window.toggleContentType = function(type) { if(type === 'file') { document.getElementById('contentFileInput').classList.remove('hidden'); document.getElementById('contentLinkInput').classList.add('hidden'); document.getElementById('btnContentFile').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnContentFile').classList.replace('border','font-medium'); document.getElementById('btnContentLink').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnContentLink').classList.add('border'); } else { document.getElementById('contentFileInput').classList.add('hidden'); document.getElementById('contentLinkInput').classList.remove('hidden'); document.getElementById('btnContentLink').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnContentLink').classList.remove('border'); document.getElementById('btnContentFile').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnContentFile').classList.add('border'); } }
@@ -3797,7 +3909,29 @@
     removeMediaFlags = { cover: false, content: false, attachment: false };
     if (notice.imageUrl) document.getElementById('currentCoverBadge').classList.remove('hidden'); else document.getElementById('currentCoverBadge').classList.add('hidden');
     if (notice.contentImageUrl) document.getElementById('currentContentImgBadge').classList.remove('hidden'); else document.getElementById('currentContentImgBadge').classList.add('hidden');
-    if (notice.attachmentUrl) document.getElementById('currentAttachmentBadge').classList.remove('hidden'); else document.getElementById('currentAttachmentBadge').classList.add('hidden');
+    // Popola slot allegati esistenti
+    const savedAtts = notice.attachments || (notice.attachmentUrl ? [notice.attachmentUrl] : []);
+    window._savedAttachments = {};
+    window._removedAttachSlots = new Set();
+    for (let si = 0; si < 3; si++) {
+    const slot = si === 0 ? document.querySelector('.attach-slot[data-slot="0"]') : document.getElementById(`attachSlot_${si}`);
+    const badge = document.getElementById(`savedAttachBadge_${si}`);
+    const fileEl = document.getElementById(`attachFile_${si}`);
+    const urlEl = document.getElementById(`attachUrl_${si}`);
+    if (fileEl) fileEl.value = '';
+    if (urlEl) urlEl.value = '';
+    if (savedAtts[si]) {
+        window._savedAttachments[si] = savedAtts[si];
+        if (si > 0 && slot) slot.classList.remove('hidden');
+        if (badge) badge.classList.remove('hidden');
+    } else {
+        if (si > 0 && slot) slot.classList.add('hidden');
+        if (badge) badge.classList.add('hidden');
+    }
+    }
+    // Mostra/nascondi pulsante aggiungi
+    const addBtn = document.getElementById('addAttachSlotBtn');
+    if (addBtn) addBtn.classList.toggle('hidden', savedAtts.length >= 3);
     
     // Popola Sondaggio
     const pollToggle = document.getElementById('newPollToggle');
@@ -3876,14 +4010,31 @@
     const contentImageFile = document.getElementById('contentImageFile').files[0]; const contentUrlManual = document.getElementById('contentUrlManual').value;
     if (contentImageFile) contentImageUrl = await handleImageUpload(contentImageFile, 'content'); else if (contentUrlManual) contentImageUrl = processDriveLink(contentUrlManual);
 
-    const attachmentFile = document.getElementById('attachmentFile').files[0]; const attachmentUrlManual = document.getElementById('attachmentUrlManual').value;
-    if (attachmentFile) {
-    if (attachmentFile.type.startsWith('image/')) attachmentUrl = await handleImageUpload(attachmentFile, 'attachments');
-    else attachmentUrl = await uploadFileToStorage(attachmentFile, 'attachments');
-    }    
-    else if (attachmentUrlManual) {
-    if (attachmentUrlManual.includes('drive.google.com')) attachmentUrl = getDrivePreviewUrl(attachmentUrlManual);
-    else attachmentUrl = attachmentUrlManual;
+    // Gestione allegati multipli (max 3)
+    const attachments = [];
+    for (let si = 0; si < 3; si++) {
+    const slotEl = document.getElementById(`attachSlot_${si}`) || (si === 0 ? document.querySelector('.attach-slot[data-slot="0"]') : null);
+    if (si > 0 && (!slotEl || slotEl.classList.contains('hidden'))) continue;
+    const fileEl = document.getElementById(`attachFile_${si}`);
+    const urlEl = document.getElementById(`attachUrl_${si}`);
+    const file = fileEl && fileEl.files[0];
+    const urlVal = urlEl && urlEl.value.trim();
+    if (file) {
+        let url;
+        if (file.type.startsWith('image/')) url = await handleImageUpload(file, 'attachments');
+        else url = await uploadFileToStorage(file, 'attachments');
+        attachments.push(url);
+    } else if (urlVal) {
+        attachments.push(urlVal.includes('drive.google.com') ? getDrivePreviewUrl(urlVal) : urlVal);
+    } else {
+        // Check if there was a previously saved attachment for this slot
+        const badge = document.getElementById(`savedAttachBadge_${si}`);
+        if (badge && !badge.classList.contains('hidden') && window._savedAttachments && window._savedAttachments[si]) {
+        if (!window._removedAttachSlots || !window._removedAttachSlots.has(si)) {
+            attachments.push(window._savedAttachments[si]);
+        }
+        }
+    }
     }
 
     // Includi scheduledDate nei dati passati
@@ -3895,8 +4046,14 @@
     if (contentImageUrl) noticeData.contentImageUrl = contentImageUrl;
     else if (removeMediaFlags.content) noticeData.contentImageUrl = null;
     
-    if (attachmentUrl) noticeData.attachmentUrl = attachmentUrl;
-    else if (removeMediaFlags.attachment) noticeData.attachmentUrl = null;
+    // Retrocompatibilità: mantieni attachmentUrl per il primo allegato
+    if (attachments.length > 0) {
+    noticeData.attachmentUrl = attachments[0];
+    noticeData.attachments = attachments;
+    } else if (removeMediaFlags.attachment) {
+    noticeData.attachmentUrl = null;
+    noticeData.attachments = [];
+    }
 
     // Gestione Sondaggio
     if (document.getElementById('newPollToggle').checked) {
@@ -4079,63 +4236,55 @@
     if (notice.contentImageUrl && !isSummaryView) { contentImg.src = notice.contentImageUrl; contentImgContainer.classList.remove('hidden'); } else { contentImgContainer.classList.add('hidden'); }
 
     const attachContainer = document.getElementById('viewNoticeAttachmentContainer');
-    if (notice.attachmentUrl && !isSummaryView) {
+    // Supporto allegati multipli con retrocompatibilità
+    const allAttachments = notice.attachments && notice.attachments.length > 0
+    ? notice.attachments
+    : (notice.attachmentUrl ? [notice.attachmentUrl] : []);
+
+    if (allAttachments.length > 0 && !isSummaryView) {
     attachContainer.classList.remove('hidden');
     
-    const downloadBtn = document.getElementById('viewNoticeDownloadBtn');
-    
-    // FIX: Gestione corretta dei PDF Base64 caricati dal PC per evitare blocchi del browser
-    if (notice.attachmentUrl.startsWith('data:')) {
-    downloadBtn.removeAttribute('href');
-    downloadBtn.onclick = (e) => {
-    e.preventDefault();
-    try {
-    // Conversione sincrona da Base64 a Blob per evitare i blocchi dei popup
-    const arr = notice.attachmentUrl.split(',');
-    const mime = arr[0].match(/:(.*?);/)[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while(n--){
-    u8arr[n] = bstr.charCodeAt(n);
-    }
-    const blob = new Blob([u8arr], {type: mime});
-    const blobUrl = URL.createObjectURL(blob);
-    
-    // Crea un link temporaneo per forzare il download ed evitare la pagina bianca
-    const link = document.createElement('a');
-    link.href = blobUrl;
-    link.download = 'Documento_Allegato.pdf';    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-    } catch (err) {
-    console.error("Errore estrazione PDF", err);
-    showToast("Errore durante il download del documento", true);
-    }
-    };
+    // Helper per generare anteprima di un allegato
+    function buildAttachPreview(url, idx) {
+    let previewHtml = '';
+    if (url.includes('drive.google.com')) {
+        const cleanUrl = getDrivePreviewUrl(url);
+        previewHtml = `<iframe src="${cleanUrl}" class="w-full h-64 border-none" loading="lazy"></iframe>`;
+    } else if (url.startsWith('data:application/pdf') || url.toLowerCase().includes('.pdf')) {
+        previewHtml = `<embed src="${url}#toolbar=0" type="application/pdf" class="w-full h-64 border-none">`;
+    } else if (url.startsWith('data:') || url.match(/\.(jpe?g|png|gif|webp|svg)(\?|$)/i)) {
+        previewHtml = `<img src="${url}" class="w-full h-auto max-h-64 object-contain">`;
     } else {
-    downloadBtn.href = notice.attachmentUrl;
-    downloadBtn.onclick = null;
+        previewHtml = `<div class="flex flex-col items-center justify-center h-24 text-slate-400 gap-2"><i data-lucide="file" class="w-8 h-8"></i><span class="text-xs">Documento</span></div>`;
+    }
+
+    // Download button
+    let dlHtml = '';
+    if (url.startsWith('data:')) {
+        dlHtml = `<button onclick="downloadBase64('${idx}')" class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-semibold text-sm transition w-full mt-2 shadow"><i data-lucide="download" class="w-4 h-4"></i> Scarica Allegato ${allAttachments.length > 1 ? idx+1 : ''}</button>`;
+    } else {
+        dlHtml = `<a href="${url}" target="_blank" class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-semibold text-sm transition w-full mt-2 shadow"><i data-lucide="download" class="w-4 h-4"></i> Apri / Scarica${allAttachments.length > 1 ? ' Allegato '+(idx+1) : ''}</a>`;
+    }
+
+    return `<div class="rounded-lg overflow-hidden border border-slate-200">${previewHtml}${dlHtml}</div>`;
     }
 
     const previewBox = document.getElementById('viewNoticePreviewBox');
-    // Usa iframe nel modal per permettere lettura
-    let previewHtml = '';
-    if (notice.attachmentUrl.includes('drive.google.com')) {
-    const cleanUrl = getDrivePreviewUrl(notice.attachmentUrl);
-    previewHtml = `<iframe src="${cleanUrl}" class="w-full h-96 border-none" loading="lazy"></iframe>`;
-    } else if (notice.attachmentUrl.startsWith('data:application/pdf') || notice.attachmentUrl.toLowerCase().includes('.pdf')) {
-    previewHtml = `<embed src="${notice.attachmentUrl}#toolbar=0" type="application/pdf" class="w-full h-96 border-none">`;
-    } else {
-    previewHtml = `<img src="${notice.attachmentUrl}" class="w-full h-auto">`;
-    }
-    previewBox.innerHTML = previewHtml;
+    const gridCols = allAttachments.length === 1 ? '' : 'grid grid-cols-1 sm:grid-cols-2 gap-3';
+    previewBox.className = gridCols ? `mb-4 ${gridCols}` : 'mb-4';
+    previewBox.innerHTML = allAttachments.map((url, idx) => buildAttachPreview(url, idx)).join('');
     previewBox.classList.remove('hidden');
+
+    // Store urls for base64 download
+    window._viewAttachments = allAttachments;
+
+    // Hide old single download btn — replaced by per-item buttons
+    const downloadBtn = document.getElementById('viewNoticeDownloadBtn');
+    if (downloadBtn) downloadBtn.classList.add('hidden');
     } else {
     attachContainer.classList.add('hidden');
+    const downloadBtn = document.getElementById('viewNoticeDownloadBtn');
+    if (downloadBtn) downloadBtn.classList.remove('hidden');
     }
 
     // Render Poll se esiste
@@ -4376,9 +4525,24 @@
     document.getElementById('coverUrlManual').value = '';    
     document.getElementById('contentImageFile').value = '';    
     document.getElementById('contentUrlManual').value = '';    
-    document.getElementById('attachmentFile').value = '';    
-    document.getElementById('attachmentUrlManual').value = '';    
-    toggleCoverType('file'); toggleContentType('file'); toggleAttachType('file');    
+    // Reset slot allegati
+    for (let si = 0; si < 3; si++) {
+    const fEl = document.getElementById(`attachFile_${si}`);
+    const uEl = document.getElementById(`attachUrl_${si}`);
+    const badge = document.getElementById(`savedAttachBadge_${si}`);
+    if (fEl) fEl.value = '';
+    if (uEl) uEl.value = '';
+    if (badge) badge.classList.add('hidden');
+    if (si > 0) {
+        const slot = document.getElementById(`attachSlot_${si}`);
+        if (slot) slot.classList.add('hidden');
+    }
+    }
+    window._savedAttachments = {};
+    window._removedAttachSlots = new Set();
+    const addAttBtn = document.getElementById('addAttachSlotBtn');
+    if (addAttBtn) addAttBtn.classList.remove('hidden');
+    toggleCoverType('file'); toggleContentType('file');    
     }
 
     // --- NEW: PRINT ARTICLE FUNCTION (ADMIN) ---
