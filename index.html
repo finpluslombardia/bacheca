@@ -498,6 +498,11 @@
     @media (prefers-color-scheme: dark) {
         html:not(.dark) #scheduleModal > div { background-color: #ffffff !important; color-scheme: light !important; }
         html:not(.dark) #scheduleModal > div * { color-scheme: light !important; }
+        html:not(.dark) #viewNoticeModal > div,
+        html:not(.dark) #viewNoticeModal > div * { color-scheme: light !important; }
+        html:not(.dark) #viewNoticeInnerContainer { background-color: #ffffff !important; }
+        html:not(.dark) #viewNoticeContent,
+        html:not(.dark) #viewNoticeContent * { color-scheme: light !important; color: inherit; }
         html:not(.dark) #scheduleModalContent .bg-blue-50 { background-color: #eff6ff !important; }
         html:not(.dark) #scheduleModalContent .text-blue-700 { color: #1d4ed8 !important; }
         html:not(.dark) #scheduleModalContent .font-bold { color: inherit; }
@@ -3993,6 +3998,7 @@
     // Resetta le classi e applica quelle nuove (per evitare sovrapposizioni di bordi)
     const maxWidthClass = isSummaryView ? 'max-w-lg' : 'max-w-2xl';
     innerContainer.className = `bg-white dark:bg-slate-800 dark:bg-slate-800 rounded-2xl shadow-2xl w-full ${maxWidthClass} overflow-hidden flex flex-col max-h-[90vh] relative transition-all duration-300`;
+    innerContainer.style.cssText = 'color-scheme: light; background-color: #ffffff;';
     innerContainer.classList.add('border-4', pBrd);
 
     popupBanner.className = `${pBg} py-2 font-bold uppercase tracking-wider text-xs md:text-sm w-full shrink-0 z-20 flex items-center justify-center gap-2`;
