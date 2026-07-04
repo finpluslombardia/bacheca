@@ -1137,6 +1137,7 @@
 
     <div class="flex flex-wrap items-center gap-4 pt-4 border-t border-gray-100">
     <div class="flex items-center gap-2"><input type="checkbox" id="newPinned" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"><label for="newPinned" class="text-sm text-gray-700 font-medium">Metti in evidenza</label></div>
+    <div class="flex items-center gap-2"><input type="checkbox" id="newHideFromHome" class="w-4 h-4 text-slate-500 rounded focus:ring-slate-400"><label for="newHideFromHome" class="text-sm text-gray-700 font-medium" title="La notizia non apparirà in &quot;Tutti&quot; ma sarà visibile nelle sue categorie">Solo in categoria</label></div>
     <div class="flex items-center gap-2"><input type="checkbox" id="newPopup" onchange="document.getElementById('popupSummaryContainer').classList.toggle('hidden', !this.checked)" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"><label for="newPopup" class="text-sm text-gray-700 font-medium">Mostra come Pop-up</label></div>
     <div class="flex items-center gap-2"><input type="checkbox" id="newBanner" class="w-4 h-4 text-red-600 rounded focus:ring-red-500"><label for="newBanner" class="text-sm text-gray-700 font-medium">Crea Banner in alto</label></div>
     <div class="flex items-center gap-2 md:ml-auto">
@@ -3511,7 +3512,7 @@
     const cats = n.normalizedCategories;
     
     if (currentFilter === 'all') {
-    matchesCategory = true;
+    matchesCategory = !n.hideFromHome;
     } else if (currentFilter === 'corsi') {
     // Mostra sia 'corsi' generici che tutte le sottocategorie in modo sicuro
     matchesCategory = cats.includes('corsi') || cats.some(c => typeof c === 'string' && c.startsWith('corsi_'));
@@ -3613,7 +3614,7 @@
     cardHtml += `<div class="p-4 md:p-3 flex-1">
     <div class="flex flex-wrap items-start mb-2 gap-1 w-full justify-between">
     <div class="flex flex-wrap gap-1">${badgesHtml}</div>
-    <div class="flex gap-2 shrink-0">${n.isPinned ? `<i data-lucide="pin" class="w-4 h-4 text-blue-500 fill-blue-500 transform rotate-45"></i>` : ''}${isAdminLoggedIn ? `<button onclick="event.stopPropagation(); showQrCode('${n.id}', this.dataset.title)" data-title="${n.title.replace(/"/g, '&quot;')}" class="text-slate-400 hover:text-purple-600 transition" title="Genera QR Code"><i data-lucide="qr-code" class="w-4 h-4"></i></button><button onclick="event.stopPropagation(); editNotice('${n.id}')" class="text-slate-400 hover:text-blue-600 transition"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button onclick="event.stopPropagation(); deleteNoticePermanent('${n.id}')" class="text-slate-400 hover:text-red-600 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div>
+    <div class="flex gap-2 shrink-0">${(n.hideFromHome ? `<span class="text-[9px] font-bold text-slate-400 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded" title="Non visibile in Home">SOLO CAT.</span>` : '') + (n.isPinned ? `<i data-lucide="pin" class="w-4 h-4 text-blue-500 fill-blue-500 transform rotate-45"></i>` : '')}${isAdminLoggedIn ? `<button onclick="event.stopPropagation(); showQrCode('${n.id}', this.dataset.title)" data-title="${n.title.replace(/"/g, '&quot;')}" class="text-slate-400 hover:text-purple-600 transition" title="Genera QR Code"><i data-lucide="qr-code" class="w-4 h-4"></i></button><button onclick="event.stopPropagation(); editNotice('${n.id}')" class="text-slate-400 hover:text-blue-600 transition"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button onclick="event.stopPropagation(); deleteNoticePermanent('${n.id}')" class="text-slate-400 hover:text-red-600 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div>
     </div>
     <h3 class="text-[16px] md:text-base font-bold text-slate-800 mb-1 leading-tight line-clamp-1">${n.title}</h3>
     <div class="relative mb-2 html-content-view">
@@ -3894,7 +3895,8 @@
     cb.checked = normalizedCats.includes(cb.value);
     });
 
-    document.getElementById('newPinned').checked = notice.isPinned;    
+    document.getElementById('newPinned').checked = notice.isPinned;
+    document.getElementById('newHideFromHome').checked = notice.hideFromHome || false;    
     document.getElementById('newPopup').checked = notice.isPopup || false;
     document.getElementById('newPopupSummary').value = notice.popupSummary || '';
     document.getElementById('popupSummaryContainer').classList.toggle('hidden', !(notice.isPopup || false));
@@ -4038,7 +4040,8 @@
     }
 
     // Includi scheduledDate nei dati passati
-    const noticeData = { title, content, categories, isPinned, isPopup, popupSummary, isBanner, bannerColor, bannerIcon, displayDate, expirationDate, scheduledDate, timestamp: Date.now() };
+    const hideFromHome = document.getElementById('newHideFromHome').checked;
+    const noticeData = { title, content, categories, isPinned, isPopup, popupSummary, isBanner, bannerColor, bannerIcon, displayDate, expirationDate, scheduledDate, hideFromHome, timestamp: Date.now() };
     
     if (imageUrl) noticeData.imageUrl = imageUrl;
     else if (removeMediaFlags.cover) noticeData.imageUrl = null;
@@ -4496,6 +4499,7 @@
     // Default select info if none (visual reset handled by rendering)
     
     document.getElementById('newPinned').checked = false;    
+    document.getElementById('newHideFromHome').checked = false;
     document.getElementById('newPopup').checked = false;
     document.getElementById('newPopupSummary').value = '';
     document.getElementById('popupSummaryContainer').classList.add('hidden');
