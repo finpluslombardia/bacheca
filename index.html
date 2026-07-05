@@ -36,10 +36,10 @@
     html, body { background-color: #f8fafc !important; color: #1e293b !important; }
     @media (prefers-color-scheme: dark) { html:not(.dark), html:not(.dark) body { background-color: #f8fafc !important; color: #1e293b !important; } html:not(.dark) * { color-scheme: light !important; } }
     body { font-family: 'Inter', sans-serif; }
-    /* Mini Quill editor per configuratori corsi */
-    .mini-quill .ql-toolbar.ql-snow { border-radius: 8px 8px 0 0; border-color: #cbd5e1; padding: 4px 8px; background: #f8fafc; }
-    .mini-quill .ql-container.ql-snow { border-radius: 0 0 8px 8px; border-color: #cbd5e1; min-height: 80px; font-size: 14px; }
-    .mini-quill .ql-editor { min-height: 80px; padding: 8px 12px; }
+    .fmt-toolbar { display: flex; gap: 4px; margin-bottom: 4px; }
+    .fmt-btn { border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 6px; padding: 2px 8px; cursor: pointer; font-size: 13px; color: #334155; }
+    .fmt-btn:hover { background: #e2e8f0; }
+    .fmt-textarea { width: 100%; border: 1px solid #cbd5e1; border-radius: 0 0 8px 8px; padding: 8px 10px; min-height: 80px; font-size: 14px; outline: none; resize: vertical; font-family: inherit; border-top: none; }
     .fade-in { animation: fadeIn 0.3s ease-in-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     
@@ -922,7 +922,7 @@
 
     <div class="flex flex-wrap items-center gap-4 pt-4 border-t border-gray-100">
     <div class="flex items-center gap-2"><input type="checkbox" id="newPinned" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"><label for="newPinned" class="text-sm text-gray-700 font-medium">Metti in evidenza</label></div>
-    <div class="flex items-center gap-2"><input type="checkbox" id="newHideFromHome" class="w-4 h-4 text-slate-500 rounded focus:ring-slate-400"><label for="newHideFromHome" class="text-sm text-gray-700 font-medium" title="La notizia non apparirà in Tutti ma sarà visibile nelle sue categorie">Solo in categoria</label></div>
+    <div class="flex items-center gap-2"><input type="checkbox" id="newHideFromHome" class="w-4 h-4 text-slate-500 rounded focus:ring-slate-400"><label for="newHideFromHome" class="text-sm text-gray-700 font-medium">Solo in categoria</label></div>
     <div class="flex items-center gap-2"><input type="checkbox" id="newPopup" onchange="document.getElementById('popupSummaryContainer').classList.toggle('hidden', !this.checked)" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"><label for="newPopup" class="text-sm text-gray-700 font-medium">Mostra come Pop-up</label></div>
     <div class="flex items-center gap-2"><input type="checkbox" id="newBanner" class="w-4 h-4 text-red-600 rounded focus:ring-red-500"><label for="newBanner" class="text-sm text-gray-700 font-medium">Crea Banner in alto</label></div>
     <div class="flex items-center gap-2 md:ml-auto">
@@ -1042,17 +1042,32 @@
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 1</h4>
     <input type="text" id="aquaFitTitle1" placeholder="Titolo (es. Stagione 2025/26)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="aquaFitContent1" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="aquaFitContent1QuillWrap"></div>
+    <div class="fmt-toolbar">
+    <button type="button" class="fmt-btn" onclick="fmtApply('aquaFitContent1','bold')" title="Grassetto"><b>B</b></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('aquaFitContent1','italic')" title="Corsivo"><i>I</i></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('aquaFitContent1','underline')" title="Sottolineato"><u>U</u></button>
+    </div>
+    <textarea id="aquaFitContent1" rows="3" placeholder="Contenuto..." class="fmt-textarea focus:ring-2 focus:ring-indigo-500 focus:ring-inset"></textarea>
     </div>
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 2</h4>
     <input type="text" id="aquaFitTitle2" placeholder="Titolo (es. Giorni e orari)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="aquaFitContent2" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="aquaFitContent2QuillWrap"></div>
+    <div class="fmt-toolbar">
+    <button type="button" class="fmt-btn" onclick="fmtApply('aquaFitContent2','bold')" title="Grassetto"><b>B</b></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('aquaFitContent2','italic')" title="Corsivo"><i>I</i></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('aquaFitContent2','underline')" title="Sottolineato"><u>U</u></button>
+    </div>
+    <textarea id="aquaFitContent2" rows="3" placeholder="Contenuto..." class="fmt-textarea focus:ring-2 focus:ring-indigo-500 focus:ring-inset"></textarea>
     </div>
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 3</h4>
     <input type="text" id="aquaFitTitle3" placeholder="Titolo (es. Tariffe)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="aquaFitContent3" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="aquaFitContent3QuillWrap"></div>
+    <div class="fmt-toolbar">
+    <button type="button" class="fmt-btn" onclick="fmtApply('aquaFitContent3','bold')" title="Grassetto"><b>B</b></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('aquaFitContent3','italic')" title="Corsivo"><i>I</i></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('aquaFitContent3','underline')" title="Sottolineato"><u>U</u></button>
+    </div>
+    <textarea id="aquaFitContent3" rows="3" placeholder="Contenuto..." class="fmt-textarea focus:ring-2 focus:ring-indigo-500 focus:ring-inset"></textarea>
     </div>
     </div>
     <div class="p-6 border-t border-slate-100 bg-white">
@@ -1076,17 +1091,32 @@
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 1</h4>
     <input type="text" id="artTitle1" placeholder="Titolo (es. Stagione 2025/26)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="artContent1" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="artContent1QuillWrap"></div>
+    <div class="fmt-toolbar">
+    <button type="button" class="fmt-btn" onclick="fmtApply('artContent1','bold')" title="Grassetto"><b>B</b></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('artContent1','italic')" title="Corsivo"><i>I</i></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('artContent1','underline')" title="Sottolineato"><u>U</u></button>
+    </div>
+    <textarea id="artContent1" rows="3" placeholder="Contenuto..." class="fmt-textarea focus:ring-2 focus:ring-indigo-500 focus:ring-inset"></textarea>
     </div>
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 2</h4>
     <input type="text" id="artTitle2" placeholder="Titolo (es. Giorni e orari)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="artContent2" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="artContent2QuillWrap"></div>
+    <div class="fmt-toolbar">
+    <button type="button" class="fmt-btn" onclick="fmtApply('artContent2','bold')" title="Grassetto"><b>B</b></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('artContent2','italic')" title="Corsivo"><i>I</i></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('artContent2','underline')" title="Sottolineato"><u>U</u></button>
+    </div>
+    <textarea id="artContent2" rows="3" placeholder="Contenuto..." class="fmt-textarea focus:ring-2 focus:ring-indigo-500 focus:ring-inset"></textarea>
     </div>
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 3</h4>
     <input type="text" id="artTitle3" placeholder="Titolo (es. Tariffe)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="artContent3" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="artContent3QuillWrap"></div>
+    <div class="fmt-toolbar">
+    <button type="button" class="fmt-btn" onclick="fmtApply('artContent3','bold')" title="Grassetto"><b>B</b></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('artContent3','italic')" title="Corsivo"><i>I</i></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('artContent3','underline')" title="Sottolineato"><u>U</u></button>
+    </div>
+    <textarea id="artContent3" rows="3" placeholder="Contenuto..." class="fmt-textarea focus:ring-2 focus:ring-indigo-500 focus:ring-inset"></textarea>
     </div>
     </div>
     <div class="p-6 border-t border-slate-100 bg-white">
@@ -1110,17 +1140,32 @@
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 1</h4>
     <input type="text" id="aquaTitle1" placeholder="Titolo (es. Stagione 2025/26)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="aquaContent1" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="aquaContent1QuillWrap"></div>
+    <div class="fmt-toolbar">
+    <button type="button" class="fmt-btn" onclick="fmtApply('aquaContent1','bold')" title="Grassetto"><b>B</b></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('aquaContent1','italic')" title="Corsivo"><i>I</i></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('aquaContent1','underline')" title="Sottolineato"><u>U</u></button>
+    </div>
+    <textarea id="aquaContent1" rows="3" placeholder="Contenuto..." class="fmt-textarea focus:ring-2 focus:ring-indigo-500 focus:ring-inset"></textarea>
     </div>
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 2</h4>
     <input type="text" id="aquaTitle2" placeholder="Titolo (es. Giorni e orari)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="aquaContent2" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="aquaContent2QuillWrap"></div>
+    <div class="fmt-toolbar">
+    <button type="button" class="fmt-btn" onclick="fmtApply('aquaContent2','bold')" title="Grassetto"><b>B</b></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('aquaContent2','italic')" title="Corsivo"><i>I</i></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('aquaContent2','underline')" title="Sottolineato"><u>U</u></button>
+    </div>
+    <textarea id="aquaContent2" rows="3" placeholder="Contenuto..." class="fmt-textarea focus:ring-2 focus:ring-indigo-500 focus:ring-inset"></textarea>
     </div>
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 3</h4>
     <input type="text" id="aquaTitle3" placeholder="Titolo (es. Tariffe)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="aquaContent3" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="aquaContent3QuillWrap"></div>
+    <div class="fmt-toolbar">
+    <button type="button" class="fmt-btn" onclick="fmtApply('aquaContent3','bold')" title="Grassetto"><b>B</b></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('aquaContent3','italic')" title="Corsivo"><i>I</i></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('aquaContent3','underline')" title="Sottolineato"><u>U</u></button>
+    </div>
+    <textarea id="aquaContent3" rows="3" placeholder="Contenuto..." class="fmt-textarea focus:ring-2 focus:ring-indigo-500 focus:ring-inset"></textarea>
     </div>
     </div>
     <div class="p-6 border-t border-slate-100 bg-white">
@@ -1144,17 +1189,32 @@
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 1</h4>
     <input type="text" id="propTitle1" placeholder="Titolo (es. Stagione 2025/26)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="propContent1" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="propContent1QuillWrap"></div>
+    <div class="fmt-toolbar">
+    <button type="button" class="fmt-btn" onclick="fmtApply('propContent1','bold')" title="Grassetto"><b>B</b></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('propContent1','italic')" title="Corsivo"><i>I</i></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('propContent1','underline')" title="Sottolineato"><u>U</u></button>
+    </div>
+    <textarea id="propContent1" rows="3" placeholder="Contenuto..." class="fmt-textarea focus:ring-2 focus:ring-indigo-500 focus:ring-inset"></textarea>
     </div>
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 2</h4>
     <input type="text" id="propTitle2" placeholder="Titolo (es. Giorni e orari)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="propContent2" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="propContent2QuillWrap"></div>
+    <div class="fmt-toolbar">
+    <button type="button" class="fmt-btn" onclick="fmtApply('propContent2','bold')" title="Grassetto"><b>B</b></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('propContent2','italic')" title="Corsivo"><i>I</i></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('propContent2','underline')" title="Sottolineato"><u>U</u></button>
+    </div>
+    <textarea id="propContent2" rows="3" placeholder="Contenuto..." class="fmt-textarea focus:ring-2 focus:ring-indigo-500 focus:ring-inset"></textarea>
     </div>
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 3</h4>
     <input type="text" id="propTitle3" placeholder="Titolo (es. Tariffe)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="propContent3" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="propContent3QuillWrap"></div>
+    <div class="fmt-toolbar">
+    <button type="button" class="fmt-btn" onclick="fmtApply('propContent3','bold')" title="Grassetto"><b>B</b></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('propContent3','italic')" title="Corsivo"><i>I</i></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('propContent3','underline')" title="Sottolineato"><u>U</u></button>
+    </div>
+    <textarea id="propContent3" rows="3" placeholder="Contenuto..." class="fmt-textarea focus:ring-2 focus:ring-indigo-500 focus:ring-inset"></textarea>
     </div>
     </div>
     <div class="p-6 border-t border-slate-100 bg-white">
@@ -1178,17 +1238,32 @@
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 1</h4>
     <input type="text" id="masterTitle1" placeholder="Titolo (es. Stagione 2025/26)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="masterContent1" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="masterContent1QuillWrap"></div>
+    <div class="fmt-toolbar">
+    <button type="button" class="fmt-btn" onclick="fmtApply('masterContent1','bold')" title="Grassetto"><b>B</b></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('masterContent1','italic')" title="Corsivo"><i>I</i></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('masterContent1','underline')" title="Sottolineato"><u>U</u></button>
+    </div>
+    <textarea id="masterContent1" rows="3" placeholder="Contenuto..." class="fmt-textarea focus:ring-2 focus:ring-indigo-500 focus:ring-inset"></textarea>
     </div>
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 2</h4>
     <input type="text" id="masterTitle2" placeholder="Titolo (es. Giorni e orari)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="masterContent2" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="masterContent2QuillWrap"></div>
+    <div class="fmt-toolbar">
+    <button type="button" class="fmt-btn" onclick="fmtApply('masterContent2','bold')" title="Grassetto"><b>B</b></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('masterContent2','italic')" title="Corsivo"><i>I</i></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('masterContent2','underline')" title="Sottolineato"><u>U</u></button>
+    </div>
+    <textarea id="masterContent2" rows="3" placeholder="Contenuto..." class="fmt-textarea focus:ring-2 focus:ring-indigo-500 focus:ring-inset"></textarea>
     </div>
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 3</h4>
     <input type="text" id="masterTitle3" placeholder="Titolo (es. Tariffe)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="masterContent3" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="masterContent3QuillWrap"></div>
+    <div class="fmt-toolbar">
+    <button type="button" class="fmt-btn" onclick="fmtApply('masterContent3','bold')" title="Grassetto"><b>B</b></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('masterContent3','italic')" title="Corsivo"><i>I</i></button>
+    <button type="button" class="fmt-btn" onclick="fmtApply('masterContent3','underline')" title="Sottolineato"><u>U</u></button>
+    </div>
+    <textarea id="masterContent3" rows="3" placeholder="Contenuto..." class="fmt-textarea focus:ring-2 focus:ring-indigo-500 focus:ring-inset"></textarea>
     </div>
     </div>
     <div class="p-6 border-t border-slate-100 bg-white">
@@ -1360,23 +1435,6 @@
     renderFilters();    
     renderCategoryCheckboxes();    
     lucide.createIcons();
-
-    // Inizializza Quill su tutti i 15 editor dei configuratori corsi
-    const _qToolbar = [['bold','italic','underline'],'clean'];
-    ['aquaFitContent','artContent','aquaContent','propContent','masterContent'].forEach(prefix => {
-    [1,2,3].forEach(i => {
-        const ta = document.getElementById(prefix + i);
-        const wrap = document.getElementById(prefix + i + 'QuillWrap');
-        if (!ta || !wrap) return;
-        const q = new Quill(wrap, { theme: 'snow', modules: { toolbar: _qToolbar } });
-        // Carica valore iniziale dalla textarea
-        const v = ta.value || '';
-        q.root.innerHTML = v.includes('<') ? v : v.replace(/\n/g, '<br>');
-        // Sincronizza in tempo reale alla textarea nascosta (per il save)
-        q.on('text-change', () => { ta.value = q.root.innerHTML === '<p><br></p>' ? '' : q.root.innerHTML; });
-        wrap._quill = q;
-    });
-    });
     
     // Registrazione nuovi attributi per spaziatura Quill
     const Parchment = Quill.import('parchment');
@@ -1596,13 +1654,7 @@
     for(let i=0; i<3; i++) {
     const item = currentAcc[i] || {title:'', content:''};
     document.getElementById(`aquaFitTitle${i+1}`).value = item.title;
-    const _ta_aquaFit = document.getElementById(`aquaFitContent${i+1}`);
-    if (_ta_aquaFit) _ta_aquaFit.value = item.content;
-    const _wrap_aquaFit = document.getElementById(`aquaFitContent${i+1}QuillWrap`);
-    if (_wrap_aquaFit && _wrap_aquaFit._quill) {
-        const _c = item.content || '';
-        _wrap_aquaFit._quill.root.innerHTML = _c.includes('<') ? _c : _c.replace(/\n/g, '<br>');
-    }
+    document.getElementById(`aquaFitContent${i+1}`).value = item.content;
     }
     document.getElementById('aquafitnessModal').classList.remove('hidden');
     };
@@ -1649,13 +1701,7 @@
     for(let i=0; i<3; i++) {
     const item = currentAcc[i] || {title:'', content:''};
     document.getElementById(`artTitle${i+1}`).value = item.title;
-    const _ta_art = document.getElementById(`artContent${i+1}`);
-    if (_ta_art) _ta_art.value = item.content;
-    const _wrap_art = document.getElementById(`artContent${i+1}QuillWrap`);
-    if (_wrap_art && _wrap_art._quill) {
-        const _c = item.content || '';
-        _wrap_art._quill.root.innerHTML = _c.includes('<') ? _c : _c.replace(/\n/g, '<br>');
-    }
+    document.getElementById(`artContent${i+1}`).value = item.content;
     }
     document.getElementById('artisticoModal').classList.remove('hidden');
     };
@@ -1702,13 +1748,7 @@
     for(let i=0; i<3; i++) {
     const item = currentAcc[i] || {title:'', content:''};
     document.getElementById(`aquaTitle${i+1}`).value = item.title;
-    const _ta_aqua = document.getElementById(`aquaContent${i+1}`);
-    if (_ta_aqua) _ta_aqua.value = item.content;
-    const _wrap_aqua = document.getElementById(`aquaContent${i+1}QuillWrap`);
-    if (_wrap_aqua && _wrap_aqua._quill) {
-        const _c = item.content || '';
-        _wrap_aqua._quill.root.innerHTML = _c.includes('<') ? _c : _c.replace(/\n/g, '<br>');
-    }
+    document.getElementById(`aquaContent${i+1}`).value = item.content;
     }
     document.getElementById('aquagolModal').classList.remove('hidden');
     };
@@ -1755,13 +1795,7 @@
     for(let i=0; i<3; i++) {
     const item = currentAcc[i] || {title:'', content:''};
     document.getElementById(`propTitle${i+1}`).value = item.title;
-    const _ta_prop = document.getElementById(`propContent${i+1}`);
-    if (_ta_prop) _ta_prop.value = item.content;
-    const _wrap_prop = document.getElementById(`propContent${i+1}QuillWrap`);
-    if (_wrap_prop && _wrap_prop._quill) {
-        const _c = item.content || '';
-        _wrap_prop._quill.root.innerHTML = _c.includes('<') ? _c : _c.replace(/\n/g, '<br>');
-    }
+    document.getElementById(`propContent${i+1}`).value = item.content;
     }
     document.getElementById('propagandaModal').classList.remove('hidden');
     };
@@ -1808,13 +1842,7 @@
     for(let i=0; i<3; i++) {
     const item = currentAcc[i] || {title:'', content:''};
     document.getElementById(`masterTitle${i+1}`).value = item.title;
-    const _ta_master = document.getElementById(`masterContent${i+1}`);
-    if (_ta_master) _ta_master.value = item.content;
-    const _wrap_master = document.getElementById(`masterContent${i+1}QuillWrap`);
-    if (_wrap_master && _wrap_master._quill) {
-        const _c = item.content || '';
-        _wrap_master._quill.root.innerHTML = _c.includes('<') ? _c : _c.replace(/\n/g, '<br>');
-    }
+    document.getElementById(`masterContent${i+1}`).value = item.content;
     }
     document.getElementById('masterModal').classList.remove('hidden');
     };
@@ -2914,7 +2942,7 @@
     ${item.title || ''}
     <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform group-open:-rotate-180"></i>
     </summary>
-    <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed whitespace-pre-line">${item.content || ''}</div>
+    <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed html-content-view">${(() => { const c = item.content || ''; return c.includes('<') ? c : c.replace(/\n/g, '<br>'); })()}</div>
     </details>
     `;
     }).join('');
@@ -2957,7 +2985,7 @@
     ${item.title || ''}
     <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform group-open:-rotate-180"></i>
     </summary>
-    <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed whitespace-pre-line">${item.content || ''}</div>
+    <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed html-content-view">${(() => { const c = item.content || ''; return c.includes('<') ? c : c.replace(/\n/g, '<br>'); })()}</div>
     </details>
     `;
     }).join('');
@@ -3000,7 +3028,7 @@
     ${item.title || ''}
     <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform group-open:-rotate-180"></i>
     </summary>
-    <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed whitespace-pre-line">${item.content || ''}</div>
+    <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed html-content-view">${(() => { const c = item.content || ''; return c.includes('<') ? c : c.replace(/\n/g, '<br>'); })()}</div>
     </details>
     `;
     }).join('');
@@ -3043,7 +3071,7 @@
     ${item.title || ''}
     <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform group-open:-rotate-180"></i>
     </summary>
-    <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed whitespace-pre-line">${item.content || ''}</div>
+    <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed html-content-view">${(() => { const c = item.content || ''; return c.includes('<') ? c : c.replace(/\n/g, '<br>'); })()}</div>
     </details>
     `;
     }).join('');
@@ -3086,7 +3114,7 @@
     ${item.title || ''}
     <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform group-open:-rotate-180"></i>
     </summary>
-    <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed whitespace-pre-line">${item.content || ''}</div>
+    <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed html-content-view">${(() => { const c = item.content || ''; return c.includes('<') ? c : c.replace(/\n/g, '<br>'); })()}</div>
     </details>
     `;
     }).join('');
@@ -3475,6 +3503,21 @@
     if (type === 'attachment') document.getElementById('currentAttachmentBadge').classList.add('hidden');
     showToast("Elemento rimosso. Salva l'avviso per confermare.");
     }
+
+    // Formattazione testo nei menu a tendina corsi
+    window.fmtApply = function(textareaId, format) {
+    const ta = document.getElementById(textareaId);
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const sel = ta.value.substring(start, end);
+    const tags = { bold: ['<strong>','</strong>'], italic: ['<em>','</em>'], underline: ['<u>','</u>'] };
+    const [open, close] = tags[format];
+    ta.value = ta.value.substring(0, start) + open + sel + close + ta.value.substring(end);
+    ta.focus();
+    ta.selectionStart = start + open.length;
+    ta.selectionEnd = end + open.length;
+    };
 
     window.toggleAttachType = function(type) {
     if(type === 'file') { document.getElementById('attachFileInput').classList.remove('hidden'); document.getElementById('attachLinkInput').classList.add('hidden'); document.getElementById('btnFileType').classList.replace('bg-white','bg-slate-200'); document.getElementById('btnFileType').classList.replace('border','font-medium'); document.getElementById('btnLinkType').classList.replace('bg-slate-200','bg-white'); document.getElementById('btnLinkType').classList.add('border'); }    
