@@ -513,6 +513,8 @@
     }
 
         /* Mini Quill editor per configuratori corsi */
+    .mini-quill-editor .ql-snow .ql-tooltip { z-index: 9999; }
+    .mini-quill-editor .ql-snow a { color: #2563eb; text-decoration: underline; }
     .mini-quill-editor .ql-toolbar.ql-snow {
         border-radius: 8px 8px 0 0;
         border-color: #cbd5e1;
@@ -1801,7 +1803,7 @@
         if (editorEl.__quill) {
             editorEl.__quill.root.innerHTML = item.content || '';
         } else {
-            const q = new Quill(editorEl, { theme: 'snow', modules: { toolbar: [['bold','italic','underline','clean']] } });
+            const q = new Quill(editorEl, { theme: 'snow', modules: { toolbar: [['bold','italic','underline'],['link'],'clean'] } });
             q.root.innerHTML = item.content || '';
             editorEl.__quill = q;
         }
@@ -1860,7 +1862,7 @@
         if (editorEl_artistico.__quill) {
             editorEl_artistico.__quill.root.innerHTML = item.content || '';
         } else {
-            const q = new Quill(editorEl_artistico, { theme: 'snow', modules: { toolbar: [['bold','italic','underline','clean']] } });
+            const q = new Quill(editorEl_artistico, { theme: 'snow', modules: { toolbar: [['bold','italic','underline'],['link'],'clean'] } });
             q.root.innerHTML = item.content || '';
             editorEl_artistico.__quill = q;
         }
@@ -1919,7 +1921,7 @@
         if (editorEl_aquagol.__quill) {
             editorEl_aquagol.__quill.root.innerHTML = item.content || '';
         } else {
-            const q = new Quill(editorEl_aquagol, { theme: 'snow', modules: { toolbar: [['bold','italic','underline','clean']] } });
+            const q = new Quill(editorEl_aquagol, { theme: 'snow', modules: { toolbar: [['bold','italic','underline'],['link'],'clean'] } });
             q.root.innerHTML = item.content || '';
             editorEl_aquagol.__quill = q;
         }
@@ -1978,7 +1980,7 @@
         if (editorEl_propaganda.__quill) {
             editorEl_propaganda.__quill.root.innerHTML = item.content || '';
         } else {
-            const q = new Quill(editorEl_propaganda, { theme: 'snow', modules: { toolbar: [['bold','italic','underline','clean']] } });
+            const q = new Quill(editorEl_propaganda, { theme: 'snow', modules: { toolbar: [['bold','italic','underline'],['link'],'clean'] } });
             q.root.innerHTML = item.content || '';
             editorEl_propaganda.__quill = q;
         }
@@ -2037,7 +2039,7 @@
         if (editorEl_master.__quill) {
             editorEl_master.__quill.root.innerHTML = item.content || '';
         } else {
-            const q = new Quill(editorEl_master, { theme: 'snow', modules: { toolbar: [['bold','italic','underline','clean']] } });
+            const q = new Quill(editorEl_master, { theme: 'snow', modules: { toolbar: [['bold','italic','underline'],['link'],'clean'] } });
             q.root.innerHTML = item.content || '';
             editorEl_master.__quill = q;
         }
