@@ -1579,6 +1579,25 @@
     renderCategoryCheckboxes();    
     lucide.createIcons();
 
+    // Inizializza tutti gli editor Quill dei configuratori corsi al caricamento
+    // (devono esistere prima che i modali vengano aperti)
+    window._quillEditors = {};
+    const _quillConfigs = [
+    ['aquaFitContent1Editor'], ['aquaFitContent2Editor'], ['aquaFitContent3Editor'],
+    ['artContent1Editor'],     ['artContent2Editor'],     ['artContent3Editor'],
+    ['aquaContent1Editor'],    ['aquaContent2Editor'],    ['aquaContent3Editor'],
+    ['propContent1Editor'],    ['propContent2Editor'],    ['propContent3Editor'],
+    ['masterContent1Editor'],  ['masterContent2Editor'],  ['masterContent3Editor'],
+    ];
+    const _quillToolbar = [['bold','italic','underline'],['link'],'clean'];
+    _quillConfigs.forEach(([id]) => {
+    const el = document.getElementById(id);
+    if (el) {
+        const q = new Quill(el, { theme: 'snow', modules: { toolbar: _quillToolbar } });
+        window._quillEditors[id] = q;
+    }
+    });
+
     // Fade laterale: listener gestiti dal modulo ES
     
     // Registrazione nuovi attributi per spaziatura Quill
@@ -1798,24 +1817,17 @@
     const currentAcc = (hoursConfig.aquafitnessAccordion && hoursConfig.aquafitnessAccordion.some(item => item && item.title && item.title.trim() !== '')) ? hoursConfig.aquafitnessAccordion : defAcc;
 
     document.getElementById('aquafitnessModal').classList.remove('hidden');
-    setTimeout(() => {
+    // Imposta contenuto negli editor Quill già inizializzati
     for(let i=0; i<3; i++) {
     const item = currentAcc[i] || {title:'', content:''};
-    document.getElementById(`aquaFitTitle${i+1}`).value = item.title;
-    const el = document.getElementById(`aquaFitContent${i+1}Editor`);
-    if (el) {
-        // Distruggi e ricrea Quill per garantire toolbar e testo corretti
-        if (el.__quill) {
-        el.__quill = null;
-        el.innerHTML = '';
-        }
-        const q = new Quill(el, { theme: 'snow', modules: { toolbar: [['bold','italic','underline'],['link'],'clean'] } });
+    const titleEl = document.getElementById(`aquaFitTitle${i+1}`);
+    if (titleEl) titleEl.value = item.title;
+    const q = window._quillEditors[`aquaFitContent${i+1}Editor`];
+    if (q) {
         const c = item.content || '';
         q.root.innerHTML = c.includes('<') ? c : c.replace(/\n/g, '<br>');
-        el.__quill = q;
     }
     }
-    }, 50);
     };window.closeAquafitnessModal = function() {
     document.getElementById('aquafitnessModal').classList.add('hidden');
     };
@@ -1825,7 +1837,8 @@
     hoursConfig.aquafitnessAccordion = [];
     for(let i=0; i<3; i++) {
     const edEl = document.getElementById(`aquaFitContent${i+1}Editor`);
-    const rawHtml = edEl && edEl.__quill ? edEl.__quill.root.innerHTML : '';
+    const _qAF = window._quillEditors && window._quillEditors[`aquaFitContent${i+1}Editor`];
+    const rawHtml = _qAF ? _qAF.root.innerHTML : (edEl ? edEl.innerHTML : '');
     const html = rawHtml === '<p><br></p>' ? '' : rawHtml;
     hoursConfig.aquafitnessAccordion.push({
     title: document.getElementById(`aquaFitTitle${i+1}`).value,
@@ -1860,24 +1873,17 @@
     const currentAcc = (hoursConfig.artisticoAccordion && hoursConfig.artisticoAccordion.some(item => item && item.title && item.title.trim() !== '')) ? hoursConfig.artisticoAccordion : defAcc;
 
     document.getElementById('artisticoModal').classList.remove('hidden');
-    setTimeout(() => {
+    // Imposta contenuto negli editor Quill già inizializzati
     for(let i=0; i<3; i++) {
     const item = currentAcc[i] || {title:'', content:''};
-    document.getElementById(`artTitle${i+1}`).value = item.title;
-    const el = document.getElementById(`artContent${i+1}Editor`);
-    if (el) {
-        // Distruggi e ricrea Quill per garantire toolbar e testo corretti
-        if (el.__quill) {
-        el.__quill = null;
-        el.innerHTML = '';
-        }
-        const q = new Quill(el, { theme: 'snow', modules: { toolbar: [['bold','italic','underline'],['link'],'clean'] } });
+    const titleEl = document.getElementById(`artTitle${i+1}`);
+    if (titleEl) titleEl.value = item.title;
+    const q = window._quillEditors[`artContent${i+1}Editor`];
+    if (q) {
         const c = item.content || '';
         q.root.innerHTML = c.includes('<') ? c : c.replace(/\n/g, '<br>');
-        el.__quill = q;
     }
     }
-    }, 50);
     };window.closeArtisticoModal = function() {
     document.getElementById('artisticoModal').classList.add('hidden');
     };
@@ -1887,7 +1893,8 @@
     hoursConfig.artisticoAccordion = [];
     for(let i=0; i<3; i++) {
     const edSave_artistico = document.getElementById(`artContent${i+1}Editor`);
-    const rawHtml_artistico = edSave_artistico && edSave_artistico.__quill ? edSave_artistico.__quill.root.innerHTML : '';
+    const _qArt = window._quillEditors && window._quillEditors[`artContent${i+1}Editor`];
+    const rawHtml_artistico = _qArt ? _qArt.root.innerHTML : '';
     const html_artistico = rawHtml_artistico === '<p><br></p>' ? '' : rawHtml_artistico;
     hoursConfig.artisticoAccordion.push({
     title: document.getElementById(`artTitle${i+1}`).value,
@@ -1922,24 +1929,17 @@
     const currentAcc = (hoursConfig.aquagolAccordion && hoursConfig.aquagolAccordion.some(item => item && item.title && item.title.trim() !== '')) ? hoursConfig.aquagolAccordion : defAcc;
 
     document.getElementById('aquagolModal').classList.remove('hidden');
-    setTimeout(() => {
+    // Imposta contenuto negli editor Quill già inizializzati
     for(let i=0; i<3; i++) {
     const item = currentAcc[i] || {title:'', content:''};
-    document.getElementById(`aquaTitle${i+1}`).value = item.title;
-    const el = document.getElementById(`aquaContent${i+1}Editor`);
-    if (el) {
-        // Distruggi e ricrea Quill per garantire toolbar e testo corretti
-        if (el.__quill) {
-        el.__quill = null;
-        el.innerHTML = '';
-        }
-        const q = new Quill(el, { theme: 'snow', modules: { toolbar: [['bold','italic','underline'],['link'],'clean'] } });
+    const titleEl = document.getElementById(`aquaTitle${i+1}`);
+    if (titleEl) titleEl.value = item.title;
+    const q = window._quillEditors[`aquaContent${i+1}Editor`];
+    if (q) {
         const c = item.content || '';
         q.root.innerHTML = c.includes('<') ? c : c.replace(/\n/g, '<br>');
-        el.__quill = q;
     }
     }
-    }, 50);
     };window.closeAquagolModal = function() {
     document.getElementById('aquagolModal').classList.add('hidden');
     };
@@ -1949,7 +1949,8 @@
     hoursConfig.aquagolAccordion = [];
     for(let i=0; i<3; i++) {
     const edSave_aquagol = document.getElementById(`aquaContent${i+1}Editor`);
-    const rawHtml_aquagol = edSave_aquagol && edSave_aquagol.__quill ? edSave_aquagol.__quill.root.innerHTML : '';
+    const _qAgo = window._quillEditors && window._quillEditors[`aquaContent${i+1}Editor`];
+    const rawHtml_aquagol = _qAgo ? _qAgo.root.innerHTML : '';
     const html_aquagol = rawHtml_aquagol === '<p><br></p>' ? '' : rawHtml_aquagol;
     hoursConfig.aquagolAccordion.push({
     title: document.getElementById(`aquaTitle${i+1}`).value,
@@ -1984,24 +1985,17 @@
     const currentAcc = (hoursConfig.propagandaAccordion && hoursConfig.propagandaAccordion.some(item => item && item.title && item.title.trim() !== '')) ? hoursConfig.propagandaAccordion : defAcc;
 
     document.getElementById('propagandaModal').classList.remove('hidden');
-    setTimeout(() => {
+    // Imposta contenuto negli editor Quill già inizializzati
     for(let i=0; i<3; i++) {
     const item = currentAcc[i] || {title:'', content:''};
-    document.getElementById(`propTitle${i+1}`).value = item.title;
-    const el = document.getElementById(`propContent${i+1}Editor`);
-    if (el) {
-        // Distruggi e ricrea Quill per garantire toolbar e testo corretti
-        if (el.__quill) {
-        el.__quill = null;
-        el.innerHTML = '';
-        }
-        const q = new Quill(el, { theme: 'snow', modules: { toolbar: [['bold','italic','underline'],['link'],'clean'] } });
+    const titleEl = document.getElementById(`propTitle${i+1}`);
+    if (titleEl) titleEl.value = item.title;
+    const q = window._quillEditors[`propContent${i+1}Editor`];
+    if (q) {
         const c = item.content || '';
         q.root.innerHTML = c.includes('<') ? c : c.replace(/\n/g, '<br>');
-        el.__quill = q;
     }
     }
-    }, 50);
     };window.closePropagandaModal = function() {
     document.getElementById('propagandaModal').classList.add('hidden');
     };
@@ -2011,7 +2005,8 @@
     hoursConfig.propagandaAccordion = [];
     for(let i=0; i<3; i++) {
     const edSave_propaganda = document.getElementById(`propContent${i+1}Editor`);
-    const rawHtml_propaganda = edSave_propaganda && edSave_propaganda.__quill ? edSave_propaganda.__quill.root.innerHTML : '';
+    const _qProp = window._quillEditors && window._quillEditors[`propContent${i+1}Editor`];
+    const rawHtml_propaganda = _qProp ? _qProp.root.innerHTML : '';
     const html_propaganda = rawHtml_propaganda === '<p><br></p>' ? '' : rawHtml_propaganda;
     hoursConfig.propagandaAccordion.push({
     title: document.getElementById(`propTitle${i+1}`).value,
@@ -2046,24 +2041,17 @@
     const currentAcc = (hoursConfig.masterAccordion && hoursConfig.masterAccordion.some(item => item && item.title && item.title.trim() !== '')) ? hoursConfig.masterAccordion : defAcc;
 
     document.getElementById('masterModal').classList.remove('hidden');
-    setTimeout(() => {
+    // Imposta contenuto negli editor Quill già inizializzati
     for(let i=0; i<3; i++) {
     const item = currentAcc[i] || {title:'', content:''};
-    document.getElementById(`masterTitle${i+1}`).value = item.title;
-    const el = document.getElementById(`masterContent${i+1}Editor`);
-    if (el) {
-        // Distruggi e ricrea Quill per garantire toolbar e testo corretti
-        if (el.__quill) {
-        el.__quill = null;
-        el.innerHTML = '';
-        }
-        const q = new Quill(el, { theme: 'snow', modules: { toolbar: [['bold','italic','underline'],['link'],'clean'] } });
+    const titleEl = document.getElementById(`masterTitle${i+1}`);
+    if (titleEl) titleEl.value = item.title;
+    const q = window._quillEditors[`masterContent${i+1}Editor`];
+    if (q) {
         const c = item.content || '';
         q.root.innerHTML = c.includes('<') ? c : c.replace(/\n/g, '<br>');
-        el.__quill = q;
     }
     }
-    }, 50);
     };window.closeMasterModal = function() {
     document.getElementById('masterModal').classList.add('hidden');
     };
@@ -2073,7 +2061,8 @@
     hoursConfig.masterAccordion = [];
     for(let i=0; i<3; i++) {
     const edSave_master = document.getElementById(`masterContent${i+1}Editor`);
-    const rawHtml_master = edSave_master && edSave_master.__quill ? edSave_master.__quill.root.innerHTML : '';
+    const _qMast = window._quillEditors && window._quillEditors[`masterContent${i+1}Editor`];
+    const rawHtml_master = _qMast ? _qMast.root.innerHTML : '';
     const html_master = rawHtml_master === '<p><br></p>' ? '' : rawHtml_master;
     hoursConfig.masterAccordion.push({
     title: document.getElementById(`masterTitle${i+1}`).value,
