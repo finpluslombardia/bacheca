@@ -36,6 +36,10 @@
     html, body { background-color: #f8fafc !important; color: #1e293b !important; }
     @media (prefers-color-scheme: dark) { html:not(.dark), html:not(.dark) body { background-color: #f8fafc !important; color: #1e293b !important; } html:not(.dark) * { color-scheme: light !important; } }
     body { font-family: 'Inter', sans-serif; }
+    /* Mini Quill editor per configuratori corsi */
+    .mini-quill .ql-toolbar.ql-snow { border-radius: 8px 8px 0 0; border-color: #cbd5e1; padding: 4px 8px; background: #f8fafc; }
+    .mini-quill .ql-container.ql-snow { border-radius: 0 0 8px 8px; border-color: #cbd5e1; min-height: 80px; font-size: 14px; }
+    .mini-quill .ql-editor { min-height: 80px; padding: 8px 12px; }
     .fade-in { animation: fadeIn 0.3s ease-in-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     
@@ -1038,17 +1042,17 @@
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 1</h4>
     <input type="text" id="aquaFitTitle1" placeholder="Titolo (es. Stagione 2025/26)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="aquaFitContent1" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+    <textarea id="aquaFitContent1" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="aquaFitContent1QuillWrap"></div>
     </div>
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 2</h4>
     <input type="text" id="aquaFitTitle2" placeholder="Titolo (es. Giorni e orari)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="aquaFitContent2" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+    <textarea id="aquaFitContent2" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="aquaFitContent2QuillWrap"></div>
     </div>
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 3</h4>
     <input type="text" id="aquaFitTitle3" placeholder="Titolo (es. Tariffe)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="aquaFitContent3" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+    <textarea id="aquaFitContent3" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="aquaFitContent3QuillWrap"></div>
     </div>
     </div>
     <div class="p-6 border-t border-slate-100 bg-white">
@@ -1072,17 +1076,17 @@
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 1</h4>
     <input type="text" id="artTitle1" placeholder="Titolo (es. Stagione 2025/26)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="artContent1" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+    <textarea id="artContent1" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="artContent1QuillWrap"></div>
     </div>
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 2</h4>
     <input type="text" id="artTitle2" placeholder="Titolo (es. Giorni e orari)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="artContent2" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+    <textarea id="artContent2" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="artContent2QuillWrap"></div>
     </div>
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 3</h4>
     <input type="text" id="artTitle3" placeholder="Titolo (es. Tariffe)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="artContent3" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+    <textarea id="artContent3" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="artContent3QuillWrap"></div>
     </div>
     </div>
     <div class="p-6 border-t border-slate-100 bg-white">
@@ -1106,17 +1110,17 @@
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 1</h4>
     <input type="text" id="aquaTitle1" placeholder="Titolo (es. Stagione 2025/26)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="aquaContent1" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+    <textarea id="aquaContent1" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="aquaContent1QuillWrap"></div>
     </div>
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 2</h4>
     <input type="text" id="aquaTitle2" placeholder="Titolo (es. Giorni e orari)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="aquaContent2" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+    <textarea id="aquaContent2" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="aquaContent2QuillWrap"></div>
     </div>
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 3</h4>
     <input type="text" id="aquaTitle3" placeholder="Titolo (es. Tariffe)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="aquaContent3" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+    <textarea id="aquaContent3" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="aquaContent3QuillWrap"></div>
     </div>
     </div>
     <div class="p-6 border-t border-slate-100 bg-white">
@@ -1140,17 +1144,17 @@
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 1</h4>
     <input type="text" id="propTitle1" placeholder="Titolo (es. Stagione 2025/26)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="propContent1" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+    <textarea id="propContent1" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="propContent1QuillWrap"></div>
     </div>
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 2</h4>
     <input type="text" id="propTitle2" placeholder="Titolo (es. Giorni e orari)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="propContent2" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+    <textarea id="propContent2" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="propContent2QuillWrap"></div>
     </div>
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 3</h4>
     <input type="text" id="propTitle3" placeholder="Titolo (es. Tariffe)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="propContent3" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+    <textarea id="propContent3" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="propContent3QuillWrap"></div>
     </div>
     </div>
     <div class="p-6 border-t border-slate-100 bg-white">
@@ -1174,17 +1178,17 @@
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 1</h4>
     <input type="text" id="masterTitle1" placeholder="Titolo (es. Stagione 2025/26)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="masterContent1" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+    <textarea id="masterContent1" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="masterContent1QuillWrap"></div>
     </div>
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 2</h4>
     <input type="text" id="masterTitle2" placeholder="Titolo (es. Giorni e orari)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="masterContent2" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+    <textarea id="masterContent2" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="masterContent2QuillWrap"></div>
     </div>
     <div class="border-t border-slate-200 pt-4">
     <h4 class="font-bold text-slate-800 mb-3">Menu a tendina 3</h4>
     <input type="text" id="masterTitle3" placeholder="Titolo (es. Tariffe)" class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
-    <textarea id="masterContent3" rows="3" placeholder="Contenuto..." class="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+    <textarea id="masterContent3" rows="3" placeholder="Contenuto..." class="hidden"></textarea><div class="mini-quill" id="masterContent3QuillWrap"></div>
     </div>
     </div>
     <div class="p-6 border-t border-slate-100 bg-white">
@@ -1356,6 +1360,23 @@
     renderFilters();    
     renderCategoryCheckboxes();    
     lucide.createIcons();
+
+    // Inizializza Quill su tutti i 15 editor dei configuratori corsi
+    const _qToolbar = [['bold','italic','underline'],'clean'];
+    ['aquaFitContent','artContent','aquaContent','propContent','masterContent'].forEach(prefix => {
+    [1,2,3].forEach(i => {
+        const ta = document.getElementById(prefix + i);
+        const wrap = document.getElementById(prefix + i + 'QuillWrap');
+        if (!ta || !wrap) return;
+        const q = new Quill(wrap, { theme: 'snow', modules: { toolbar: _qToolbar } });
+        // Carica valore iniziale dalla textarea
+        const v = ta.value || '';
+        q.root.innerHTML = v.includes('<') ? v : v.replace(/\n/g, '<br>');
+        // Sincronizza in tempo reale alla textarea nascosta (per il save)
+        q.on('text-change', () => { ta.value = q.root.innerHTML === '<p><br></p>' ? '' : q.root.innerHTML; });
+        wrap._quill = q;
+    });
+    });
     
     // Registrazione nuovi attributi per spaziatura Quill
     const Parchment = Quill.import('parchment');
@@ -1575,7 +1596,13 @@
     for(let i=0; i<3; i++) {
     const item = currentAcc[i] || {title:'', content:''};
     document.getElementById(`aquaFitTitle${i+1}`).value = item.title;
-    document.getElementById(`aquaFitContent${i+1}`).value = item.content;
+    const _ta_aquaFit = document.getElementById(`aquaFitContent${i+1}`);
+    if (_ta_aquaFit) _ta_aquaFit.value = item.content;
+    const _wrap_aquaFit = document.getElementById(`aquaFitContent${i+1}QuillWrap`);
+    if (_wrap_aquaFit && _wrap_aquaFit._quill) {
+        const _c = item.content || '';
+        _wrap_aquaFit._quill.root.innerHTML = _c.includes('<') ? _c : _c.replace(/\n/g, '<br>');
+    }
     }
     document.getElementById('aquafitnessModal').classList.remove('hidden');
     };
@@ -1622,7 +1649,13 @@
     for(let i=0; i<3; i++) {
     const item = currentAcc[i] || {title:'', content:''};
     document.getElementById(`artTitle${i+1}`).value = item.title;
-    document.getElementById(`artContent${i+1}`).value = item.content;
+    const _ta_art = document.getElementById(`artContent${i+1}`);
+    if (_ta_art) _ta_art.value = item.content;
+    const _wrap_art = document.getElementById(`artContent${i+1}QuillWrap`);
+    if (_wrap_art && _wrap_art._quill) {
+        const _c = item.content || '';
+        _wrap_art._quill.root.innerHTML = _c.includes('<') ? _c : _c.replace(/\n/g, '<br>');
+    }
     }
     document.getElementById('artisticoModal').classList.remove('hidden');
     };
@@ -1669,7 +1702,13 @@
     for(let i=0; i<3; i++) {
     const item = currentAcc[i] || {title:'', content:''};
     document.getElementById(`aquaTitle${i+1}`).value = item.title;
-    document.getElementById(`aquaContent${i+1}`).value = item.content;
+    const _ta_aqua = document.getElementById(`aquaContent${i+1}`);
+    if (_ta_aqua) _ta_aqua.value = item.content;
+    const _wrap_aqua = document.getElementById(`aquaContent${i+1}QuillWrap`);
+    if (_wrap_aqua && _wrap_aqua._quill) {
+        const _c = item.content || '';
+        _wrap_aqua._quill.root.innerHTML = _c.includes('<') ? _c : _c.replace(/\n/g, '<br>');
+    }
     }
     document.getElementById('aquagolModal').classList.remove('hidden');
     };
@@ -1716,7 +1755,13 @@
     for(let i=0; i<3; i++) {
     const item = currentAcc[i] || {title:'', content:''};
     document.getElementById(`propTitle${i+1}`).value = item.title;
-    document.getElementById(`propContent${i+1}`).value = item.content;
+    const _ta_prop = document.getElementById(`propContent${i+1}`);
+    if (_ta_prop) _ta_prop.value = item.content;
+    const _wrap_prop = document.getElementById(`propContent${i+1}QuillWrap`);
+    if (_wrap_prop && _wrap_prop._quill) {
+        const _c = item.content || '';
+        _wrap_prop._quill.root.innerHTML = _c.includes('<') ? _c : _c.replace(/\n/g, '<br>');
+    }
     }
     document.getElementById('propagandaModal').classList.remove('hidden');
     };
@@ -1763,7 +1808,13 @@
     for(let i=0; i<3; i++) {
     const item = currentAcc[i] || {title:'', content:''};
     document.getElementById(`masterTitle${i+1}`).value = item.title;
-    document.getElementById(`masterContent${i+1}`).value = item.content;
+    const _ta_master = document.getElementById(`masterContent${i+1}`);
+    if (_ta_master) _ta_master.value = item.content;
+    const _wrap_master = document.getElementById(`masterContent${i+1}QuillWrap`);
+    if (_wrap_master && _wrap_master._quill) {
+        const _c = item.content || '';
+        _wrap_master._quill.root.innerHTML = _c.includes('<') ? _c : _c.replace(/\n/g, '<br>');
+    }
     }
     document.getElementById('masterModal').classList.remove('hidden');
     };
