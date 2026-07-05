@@ -1819,7 +1819,8 @@
     hoursConfig.aquafitnessAccordion = [];
     for(let i=0; i<3; i++) {
     const edEl = document.getElementById(`aquaFitContent${i+1}Editor`);
-    const html = edEl && edEl.__quill ? edEl.__quill.root.innerHTML : '';
+    const rawHtml = edEl && edEl.__quill ? edEl.__quill.root.innerHTML : '';
+    const html = rawHtml === '<p><br></p>' ? '' : rawHtml;
     hoursConfig.aquafitnessAccordion.push({
     title: document.getElementById(`aquaFitTitle${i+1}`).value,
     content: html
@@ -1877,7 +1878,8 @@
     hoursConfig.artisticoAccordion = [];
     for(let i=0; i<3; i++) {
     const edSave_artistico = document.getElementById(`artContent${i+1}Editor`);
-    const html_artistico = edSave_artistico && edSave_artistico.__quill ? edSave_artistico.__quill.root.innerHTML : '';
+    const rawHtml_artistico = edSave_artistico && edSave_artistico.__quill ? edSave_artistico.__quill.root.innerHTML : '';
+    const html_artistico = rawHtml_artistico === '<p><br></p>' ? '' : rawHtml_artistico;
     hoursConfig.artisticoAccordion.push({
     title: document.getElementById(`artTitle${i+1}`).value,
     content: html_artistico
@@ -1935,7 +1937,8 @@
     hoursConfig.aquagolAccordion = [];
     for(let i=0; i<3; i++) {
     const edSave_aquagol = document.getElementById(`aquaContent${i+1}Editor`);
-    const html_aquagol = edSave_aquagol && edSave_aquagol.__quill ? edSave_aquagol.__quill.root.innerHTML : '';
+    const rawHtml_aquagol = edSave_aquagol && edSave_aquagol.__quill ? edSave_aquagol.__quill.root.innerHTML : '';
+    const html_aquagol = rawHtml_aquagol === '<p><br></p>' ? '' : rawHtml_aquagol;
     hoursConfig.aquagolAccordion.push({
     title: document.getElementById(`aquaTitle${i+1}`).value,
     content: html_aquagol
@@ -1993,7 +1996,8 @@
     hoursConfig.propagandaAccordion = [];
     for(let i=0; i<3; i++) {
     const edSave_propaganda = document.getElementById(`propContent${i+1}Editor`);
-    const html_propaganda = edSave_propaganda && edSave_propaganda.__quill ? edSave_propaganda.__quill.root.innerHTML : '';
+    const rawHtml_propaganda = edSave_propaganda && edSave_propaganda.__quill ? edSave_propaganda.__quill.root.innerHTML : '';
+    const html_propaganda = rawHtml_propaganda === '<p><br></p>' ? '' : rawHtml_propaganda;
     hoursConfig.propagandaAccordion.push({
     title: document.getElementById(`propTitle${i+1}`).value,
     content: html_propaganda
@@ -2051,7 +2055,8 @@
     hoursConfig.masterAccordion = [];
     for(let i=0; i<3; i++) {
     const edSave_master = document.getElementById(`masterContent${i+1}Editor`);
-    const html_master = edSave_master && edSave_master.__quill ? edSave_master.__quill.root.innerHTML : '';
+    const rawHtml_master = edSave_master && edSave_master.__quill ? edSave_master.__quill.root.innerHTML : '';
+    const html_master = rawHtml_master === '<p><br></p>' ? '' : rawHtml_master;
     hoursConfig.masterAccordion.push({
     title: document.getElementById(`masterTitle${i+1}`).value,
     content: html_master
