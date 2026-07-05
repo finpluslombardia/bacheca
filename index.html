@@ -3210,6 +3210,9 @@
     async function renderNotices() {
     // --- GESTIONE HEADER CATEGORIE SPECIFICHE (Antierrore e con Fallback forzato) ---
     try {
+    // Ricarica hoursConfig fresco da Firestore solo per le pagine con accordion
+    const corsiFilters = ['corsi_aquafitness','corsi_artistico','corsi_aquagol','corsi_propaganda','corsi_master'];
+    if (corsiFilters.includes(currentFilter)) await fetchHoursConfig();
     // --- GESTIONE HEADER CATEGORIA: AQUAFITNESS ---
     const aquafitnessHeader = document.getElementById('aquafitnessCategoryHeader');
     if (aquafitnessHeader) {
