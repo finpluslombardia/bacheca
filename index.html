@@ -1782,7 +1782,8 @@
     }
 
     // --- AQUAFITNESS CONFIGURATOR ---
-    window.openAquafitnessModal = function() {
+    window.openAquafitnessModal = async function() {
+    await fetchHoursConfig(); // Assicura dati aggiornati da Firestore
     // Default texts per Aquafitness
     const defDesc = "L'Aquafitness unisce i benefici dell'acqua a un allenamento cardiovascolare e tonificante. Ideale per tenersi in forma divertendosi a tempo di musica, senza stressare le articolazioni.";
     const defAcc = [
@@ -1843,7 +1844,8 @@
     };
 
     // --- ARTISTICO CONFIGURATOR ---
-    window.openArtisticoModal = function() {
+    window.openArtisticoModal = async function() {
+    await fetchHoursConfig(); // Assicura dati aggiornati da Firestore
     // Default texts
     const defDesc = "Hai mai sognato di ballare sott'acqua o di fare acrobazie come se stessi volando? Allora il Nuoto Artistico (una volta chiamato Nuoto Sincronizzato) è lo sport perfetto per te! Imparerai a scoprire che in acqua tutto è possibile e trasformerai i tuoi movimenti in magia.";
     const defAcc = [
@@ -1904,7 +1906,8 @@
     };
 
     // --- AQUAGOL CONFIGURATOR ---
-    window.openAquagolModal = function() {
+    window.openAquagolModal = async function() {
+    await fetchHoursConfig(); // Assicura dati aggiornati da Firestore
     // Default texts per Aquagol
     const defDesc = "L'Aquagol è l'attività propedeutica alla Pallanuoto. Un gioco di squadra in acqua che sviluppa le capacità natatorie unendole al divertimento con la palla. Impara a fare passaggi, tiri e a giocare insieme ai tuoi compagni!";
     const defAcc = [
@@ -1965,7 +1968,8 @@
     };
 
     // --- PROPAGANDA CONFIGURATOR ---
-    window.openPropagandaModal = function() {
+    window.openPropagandaModal = async function() {
+    await fetchHoursConfig(); // Assicura dati aggiornati da Firestore
     // Default texts per Propaganda
     const defDesc = "Il settore Propaganda è l'ideale per i ragazzi che vogliono vivere il nuoto a livello pre-agonistico. Un percorso per perfezionare gli stili in un ambiente sano e competitivo senza l'impegno agonistico estremo.";
     const defAcc = [
@@ -2026,7 +2030,8 @@
     };
 
     // --- MASTER CONFIGURATOR ---
-    window.openMasterModal = function() {
+    window.openMasterModal = async function() {
+    await fetchHoursConfig(); // Assicura dati aggiornati da Firestore
     // Default texts per Master
     const defDesc = "Il nuoto Master è dedicato a chi desidera continuare a nuotare e competere, unendo la passione per questo sport all'allenamento in un gruppo affiatato. Se vuoi metterti alla prova e partecipare alle gare, questo è il tuo posto!";
     const defAcc = [
