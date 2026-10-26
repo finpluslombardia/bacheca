@@ -554,7 +554,8 @@
     html.dark .cc-muted { color: #94a3b8; }
     html.dark .cc-link { color: #2dd4bf; }
     html.dark .cc-icon { color: #2dd4bf; }
-        /* === MENU CATEGORIE: tab desktop + drawer mobile === */
+        .admin-controls:not(:has(> button:not(.hidden))) { margin-bottom: 0; }
+    /* === MENU CATEGORIE: tab desktop + drawer mobile === */
     @media (max-width: 767px) {
     .cat-desktop-only { display: none !important; }
     #subCategoryFiltersContainer { display: none !important; }
@@ -697,9 +698,9 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full relative z-10">
+    <main class="max-w-6xl mx-auto px-4 pt-5 pb-8 flex-grow w-full relative z-10">
     <!-- Controlli Admin (separati dal banner pubblico) -->
-    <div class="flex justify-end items-center gap-3 mb-6">
+    <div class="admin-controls flex justify-end items-center gap-3 mb-6">
     <div id="loadingIndicator" class="hidden"><div class="loader"></div></div>
     <button id="archiveToggleBtn" onclick="toggleArchiveView()" class="hidden flex items-center gap-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-full text-sm font-medium transition"><i data-lucide="archive" class="w-4 h-4"></i><span id="archiveBtnText">Mostra Archivio</span></button>
     <button id="addNoticeBtn" onclick="openNoticeModal()" class="hidden flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-full shadow-md transition font-medium"><i data-lucide="plus" class="w-5 h-5"></i>Nuovo</button>
@@ -3677,7 +3678,7 @@
     return (n.isBanner || cats.includes('urgent')) && !n.archived && !isExpired && !isScheduled;
     });
 
-    if (bannerNotices.length > 0) {
+    if (bannerNotices.length > 0 && currentFilter === 'all') {
     // Imposta il colore del banner in base alla prima notizia
     const theme = bannerNotices[0].bannerColor || 'red';
     let themeClasses = 'bg-red-50 text-red-800 border-red-500';
