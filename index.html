@@ -538,6 +538,22 @@
     html.dark .dd-item { color: #cbd5e1; }
     html.dark .dd-item:hover { background-color: #334155; color: #c7d2fe; }
     html.dark .dd-item.active { background-color: #3730a3; color: #e0e7ff; }
+        .contact-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.25rem; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
+    .contact-map { min-height: 360px; }
+    .cc-row { display: flex; gap: 0.9rem; align-items: flex-start; }
+    .cc-icon { width: 22px; height: 22px; flex-shrink: 0; margin-top: 2px; color: #0d9488; }
+    .cc-title { color: #1e293b; }
+    .cc-text { color: #334155; }
+    .cc-muted { color: #64748b; }
+    .cc-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; color: #94a3b8; margin-bottom: 0.1rem; }
+    .cc-link { color: #0f766e; }
+    .cc-link:hover { text-decoration: underline; }
+    html.dark .contact-card { background-color: #1e293b; border-color: #334155; }
+    html.dark .cc-title { color: #f1f5f9; }
+    html.dark .cc-text { color: #e2e8f0; }
+    html.dark .cc-muted { color: #94a3b8; }
+    html.dark .cc-link { color: #2dd4bf; }
+    html.dark .cc-icon { color: #2dd4bf; }
         /* === MENU CATEGORIE: tab desktop + drawer mobile === */
     @media (max-width: 767px) {
     .cat-desktop-only { display: none !important; }
@@ -771,6 +787,58 @@
 
     <!-- Stato Vuoto -->
     <div id="emptyState" class="hidden col-span-full py-12 flex flex-col items-center justify-center text-slate-400 bg-white dark:bg-slate-800 rounded-xl border border-dashed border-slate-200 mt-6"><i data-lucide="megaphone" class="w-12 h-12 mb-4 opacity-20"></i><p class="text-lg" id="emptyStateText">Nessun avviso trovato.</p></div>
+    <!-- PAGINA CONTATTI -->
+    <section id="contactPage" class="hidden fade-in">
+    <h2 class="cc-title text-2xl font-bold mb-1">Come arrivare e contatti</h2>
+    <p class="cc-muted mb-6">Centro Federale Lampugnano — Fin Plus Lombardia S.S.D. a r.l.</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+    <div class="contact-card space-y-5">
+    <div class="cc-row">
+    <i data-lucide="map-pin" class="cc-icon"></i>
+    <div>
+    <p class="cc-label">Indirizzo</p>
+    <p class="cc-text font-semibold">Via Lampugnano 76</p>
+    <p class="cc-muted text-sm">20151 Milano (MI)</p>
+    <a href="https://www.google.com/maps/search/?api=1&query=Via+Lampugnano+76+20151+Milano" target="_blank" rel="noopener" class="cc-link text-sm">Apri su Google Maps</a>
+    </div>
+    </div>
+    <div class="cc-row">
+    <i data-lucide="phone" class="cc-icon"></i>
+    <div>
+    <p class="cc-label">Telefono</p>
+    <a href="tel:0221061258" class="cc-link font-semibold">02.21061258</a>
+    </div>
+    </div>
+    <div class="cc-row">
+    <i data-lucide="mail" class="cc-icon"></i>
+    <div>
+    <p class="cc-label">Email</p>
+    <a href="mailto:cflampugnano@federnuoto.it" class="cc-link font-semibold break-all">cflampugnano@federnuoto.it</a>
+    </div>
+    </div>
+    <div class="cc-row">
+    <i data-lucide="message-circle" class="cc-icon"></i>
+    <div>
+    <p class="cc-label">WhatsApp</p>
+    <a href="https://wa.me/message/SIT75DBXZR2EF1" target="_blank" rel="noopener" class="cc-link font-semibold">Scrivici su WhatsApp</a>
+    </div>
+    </div>
+    <div class="cc-row">
+    <i data-lucide="bus" class="cc-icon"></i>
+    <div>
+    <p class="cc-label">Come arrivare</p>
+    <p class="cc-text text-sm"><strong>M1</strong> Uruguay · 5 min a piedi</p>
+    <p class="cc-text text-sm"><strong>Bus 40, 68, 69</strong> · 2 min a piedi</p>
+    <p class="cc-text text-sm"><strong>Bus 64</strong> · 5 min a piedi</p>
+    </div>
+    </div>
+    </div>
+    <div class="contact-card contact-map p-0 overflow-hidden">
+    <iframe title="Mappa Centro Federale Lampugnano" src="https://www.google.com/maps?q=Via+Lampugnano+76,+20151+Milano&output=embed" width="100%" height="100%" style="border:0; min-height: 360px; display:block;" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+    </div>
+    </div>
+    </section>
+
     </main>
     
     <!-- FASCIA CONTATTI & SOCIAL -->
@@ -1594,7 +1662,7 @@
     // CHECK CATEGORY IN URL
     const urlParams = new URLSearchParams(window.location.search);
     const urlCat = urlParams.get('cat');
-    if (urlCat && CATEGORIES[urlCat]) {
+    if (urlCat && (CATEGORIES[urlCat] || urlCat === 'contatti')) {
     currentFilter = urlCat;
     }
 
@@ -1602,7 +1670,7 @@
     window.addEventListener('popstate', () => {
     const params = new URLSearchParams(window.location.search);
     const cat = params.get('cat');
-    currentFilter = (cat && CATEGORIES[cat]) ? cat : 'all';
+    currentFilter = (cat && (CATEGORIES[cat] || cat === 'contatti')) ? cat : 'all';
     
     // Check for shared notice ID on popstate as well
     const id = params.get('id');
@@ -3195,7 +3263,7 @@
     const CATEGORY_ACCENTS = {
     all: ['#475569', '#cbd5e1'], info: ['#2563eb', '#60a5fa'], news: ['#059669', '#34d399'],
     promo: ['#db2777', '#f472b6'], nuoto_libero: ['#0891b2', '#22d3ee'],
-    corsi: ['#4f46e5', '#818cf8'], summer: ['#ea580c', '#fb923c']
+    corsi: ['#4f46e5', '#818cf8'], summer: ['#ea580c', '#fb923c'], contatti: ['#0d9488', '#2dd4bf']
     };
     function accentStyle(key) {
     const pair = CATEGORY_ACCENTS[key] || CATEGORY_ACCENTS.all;
@@ -3206,6 +3274,10 @@
     const CORSI_SUBS = ['corsi', 'corsi_scuola', 'corsi_aquafitness', 'corsi_propaganda', 'corsi_artistico', 'corsi_aquagol', 'corsi_master'];
     let mobileCorsiOpen = false;
 
+    function menuOrderList() {
+    return ['all', ...getEffectiveCategoryOrder().filter(k => k !== 'all')];
+    }
+
     function renderFilters() {
     const container = document.getElementById('categoryFiltersContainer');
     const subContainer = document.getElementById('subCategoryFiltersContainer');
@@ -3214,7 +3286,7 @@
     const currentScroll = container.scrollLeft; // Save scroll position
     
     // USE CUSTOM ORDER
-    const order = getEffectiveCategoryOrder();
+    const order = menuOrderList();
 
     const html = order.map(key => {
     const cat = CATEGORIES[key];
@@ -3225,7 +3297,8 @@
     return `<button onclick="setFilter('${key}')" class="cat-tab${isActive ? ' active' : ''}" style="${accentStyle(key)}"${hover}><i data-lucide="${cat.icon}"></i><span>${cat.label}</span>${caret}</button>`;
     }).join('');
     
-    container.innerHTML = html;
+    const contactTab = `<button onclick="setFilter('contatti')" class="cat-tab${currentFilter === 'contatti' ? ' active' : ''}" style="${accentStyle('contatti')}"><i data-lucide="map-pin"></i><span>Contatti</span></button>`;
+    container.innerHTML = html + contactTab;
     container.scrollLeft = currentScroll; // Restore scroll position
 
     // --- DROPDOWN CORSI (desktop, al passaggio del mouse) ---
@@ -3243,7 +3316,8 @@
     const mobileLabel = document.getElementById('mobileMenuLabel');
     if (mobileLabel) {
     const cur = CATEGORIES[currentFilter];
-    if (currentFilter.startsWith('corsi_') && cur) mobileLabel.textContent = 'Corsi · ' + cur.label;
+    if (currentFilter === 'contatti') mobileLabel.textContent = 'Contatti';
+    else if (currentFilter.startsWith('corsi_') && cur) mobileLabel.textContent = 'Corsi · ' + cur.label;
     else mobileLabel.textContent = cur ? cur.label : 'Home';
     }
     renderMobileMenuList();
@@ -3275,7 +3349,7 @@
     function renderMobileMenuList() {
     const list = document.getElementById('mobileMenuList');
     if (!list) return;
-    const order = getEffectiveCategoryOrder();
+    const order = menuOrderList();
     list.innerHTML = order.map(key => {
     const cat = CATEGORIES[key];
     const style = accentStyle(key);
@@ -3288,7 +3362,7 @@
     return `<button type="button" onclick="toggleMobileCorsi()" class="mobile-item${isActive ? ' active' : ''}" style="${style}" aria-expanded="${mobileCorsiOpen}"><i data-lucide="${cat.icon}"></i><span>${cat.label}</span><i data-lucide="chevron-down" class="mobile-chevron${mobileCorsiOpen ? ' open' : ''}"></i></button>${subs}`;
     }
     return `<button type="button" onclick="selectMobileFilter('${key}')" class="mobile-item${currentFilter === key ? ' active' : ''}" style="${style}"><i data-lucide="${cat.icon}"></i><span>${cat.label}</span></button>`;
-    }).join('');
+    }).join('') + `<button type="button" onclick="selectMobileFilter('contatti')" class="mobile-item${currentFilter === 'contatti' ? ' active' : ''}" style="${accentStyle('contatti')}"><i data-lucide="map-pin"></i><span>Contatti</span></button>`;
     }
     function openMobileMenu() {
     const m = document.getElementById('mobileMenu');
@@ -3633,6 +3707,16 @@
     // --- FINE GESTIONE BANNER AVVISI ---
 
     const grid = document.getElementById('noticesGrid'); const empty = document.getElementById('emptyState');
+
+    // --- PAGINA CONTATTI (sezione a parte, senza avvisi) ---
+    const contactPage = document.getElementById('contactPage');
+    if (contactPage) contactPage.classList.toggle('hidden', currentFilter !== 'contatti');
+    if (currentFilter === 'contatti') {
+    grid.innerHTML = '';
+    empty.classList.add('hidden');
+    lucide.createIcons();
+    return;
+    }
     
     // Filtro logica scadenza + archivio + Programmazione (REVISIONE SICUREZZA DATI)
     let filtered = notices.filter(n => {
