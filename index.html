@@ -376,8 +376,7 @@
     }
     html.dark #categoryFiltersContainer,
     html.dark #subCategoryFiltersContainer { background-color: #1e293b; border-color: #334155; }
-    html.dark #categoryFiltersContainer button,
-    html.dark #subCategoryFiltersContainer button { background-color: #1e293b !important; border-color: #334155 !important; color: #cbd5e1 !important; }
+    
 
     /* Card avvisi */
     html.dark .card-image-container { background-color: #334155 !important; }
@@ -530,6 +529,60 @@
     padding: 8px 12px;
     }
 
+        /* === MENU CATEGORIE: tab desktop + drawer mobile === */
+    @media (max-width: 767px) {
+    .cat-desktop-only { display: none !important; }
+    #subCategoryFiltersContainer { display: none !important; }
+    }
+    @media (min-width: 768px) {
+    .cat-mobile-only { display: none !important; }
+    #mobileMenu { display: none !important; }
+    }
+    .cat-tab {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.95rem 1rem; font-size: 0.875rem; font-weight: 600;
+    color: #64748b; background: transparent; white-space: nowrap; flex-shrink: 0; cursor: pointer;
+    border: 0; border-bottom: 3px solid transparent; border-radius: 0.5rem 0.5rem 0 0;
+    transition: color .15s, background-color .15s, border-color .15s;
+    }
+    .cat-tab svg { width: 18px; height: 18px; opacity: .75; }
+    .cat-tab:hover { color: var(--accent); background-color: var(--accent-soft); }
+    .cat-tab:hover svg { opacity: 1; }
+    .cat-tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
+    .cat-tab.active svg { opacity: 1; }
+    .sub-tab {
+    padding: 0.35rem 0.9rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;
+    color: #64748b; background: transparent; border: 0; white-space: nowrap; flex-shrink: 0; cursor: pointer;
+    transition: color .15s, background-color .15s;
+    }
+    .sub-tab:hover { color: #4f46e5; background-color: #eef2ff; }
+    .sub-tab.active { color: #3730a3; background-color: #e0e7ff; font-weight: 700; }
+    .mobile-item {
+    width: 100%; display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.8rem 1rem; text-align: left; font-size: 0.95rem; font-weight: 600;
+    color: #334155; background: transparent; border: 0; border-left: 4px solid transparent; cursor: pointer;
+    }
+    .mobile-item svg { width: 20px; height: 20px; flex-shrink: 0; color: #94a3b8; }
+    .mobile-item.active { color: var(--accent); background-color: var(--accent-soft); border-left-color: var(--accent); font-weight: 700; }
+    .mobile-item.active svg { color: var(--accent); }
+    .mobile-sub { padding-left: 3.25rem; font-size: 0.875rem; font-weight: 500; }
+    .mobile-sub.active { font-weight: 700; }
+    .mobile-chevron { margin-left: auto; transition: transform .2s; }
+    .mobile-chevron.open { transform: rotate(180deg); }
+    html.dark #categoryFadeWrapper { background-color: #1e293b; }
+    html.dark .cat-tab { color: #94a3b8; }
+    html.dark .cat-tab:hover { color: var(--accent-dk); }
+    html.dark .cat-tab.active { color: var(--accent-dk); border-bottom-color: var(--accent-dk); }
+    html.dark .sub-tab { color: #94a3b8; }
+    html.dark .sub-tab:hover { color: #c7d2fe; background-color: #334155; }
+    html.dark .sub-tab.active { color: #c7d2fe; background-color: #3730a3; }
+    html.dark .mobile-menu-btn { background-color: #1e293b; border-color: #334155; color: #e2e8f0; }
+    html.dark .mobile-drawer-panel { background-color: #1e293b; }
+    html.dark .mobile-drawer-head { border-color: #334155; }
+    html.dark .mobile-drawer-head span { color: #f1f5f9; }
+    html.dark .mobile-item { color: #cbd5e1; }
+    html.dark .mobile-item.active { color: var(--accent-dk); }
+    html.dark .mobile-item.active svg { color: var(--accent-dk); }
     </style>
     
     <script>
@@ -595,19 +648,31 @@
     </div>
     </div>
 
-    <!-- BANNER CATEGORIE UNIFICATO (Scroll orizzontale su mobile) -->
-    <div class="bg-white dark:bg-slate-900 border-b border-slate-200 py-3 shadow-sm relative z-10" style="background-color: #ffffff;">
-    <div class="max-w-6xl mx-auto px-4">
+    <!-- BANNER CATEGORIE UNIFICATO (Desktop: tab / Mobile: bottone menu) -->
+    <div class="bg-white dark:bg-slate-900 border-b border-slate-200 shadow-sm relative z-10" style="background-color: #ffffff;">
+    <!-- DESKTOP: tab -->
+    <div class="max-w-6xl mx-auto px-4 cat-desktop-only">
     <div class="scroll-fade-wrapper" id="categoryFadeWrapper">
-    <div class="flex gap-3 overflow-x-auto no-scrollbar pb-1 items-center" id="categoryFiltersContainer">
-    <!-- Generato via JS: Qui finiranno tutti i box (Urgenti, Info, Corsi, Novità, ecc.) -->
-    </div>
-    </div><!-- /scroll-fade-wrapper -->
-
-    <!-- CONTAINER SOTTOCATEGORIE (NEW) -->
-    <div id="subCategoryFiltersContainer" class="hidden mt-3 pt-3 border-t border-slate-100 flex gap-2 overflow-x-auto no-scrollbar items-center transition-all duration-300">
+    <div class="flex gap-1 overflow-x-auto no-scrollbar items-stretch" id="categoryFiltersContainer">
     <!-- Generato via JS -->
     </div>
+    </div><!-- /scroll-fade-wrapper -->
+    </div>
+
+    <!-- MOBILE: bottone menu -->
+    <div class="max-w-6xl mx-auto px-4 py-2 cat-mobile-only">
+    <button id="mobileMenuBtn" type="button" onclick="toggleMobileMenu()" aria-label="Apri il menu delle categorie" aria-haspopup="true" class="mobile-menu-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 active:bg-slate-50">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+    <span class="flex flex-col items-start leading-tight">
+    <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Menu</span>
+    <span id="mobileMenuLabel" class="text-sm font-bold">Tutti</span>
+    </span>
+    </button>
+    </div>
+
+    <!-- SOTTOCATEGORIE (solo desktop) -->
+    <div id="subCategoryFiltersContainer" class="hidden border-t border-slate-100 transition-all duration-300">
+    <!-- Generato via JS -->
     </div>
     </div>
 
@@ -808,6 +873,20 @@
     <p class="mt-3"><a href="https://drive.google.com/file/d/19L41fCby1vS0VHBSSoVjgSL7Ou2CgU6Z/view?usp=sharing" target="_blank" class="hover:text-blue-600 transition underline decoration-dotted font-medium">Privacy & Cookie Policy</a></p>
     </div>
     </footer>
+
+    <!-- MENU MOBILE (drawer) -->
+    <div id="mobileMenu" class="hidden fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Menu categorie">
+    <div class="absolute inset-0 bg-black/50" onclick="closeMobileMenu()"></div>
+    <div class="mobile-drawer-panel absolute left-0 top-0 bottom-0 w-80 max-w-[85%] bg-white shadow-2xl flex flex-col">
+    <div class="mobile-drawer-head flex items-center justify-between px-4 py-3 border-b border-slate-200">
+    <span class="font-bold text-slate-800">Menu</span>
+    <button type="button" onclick="closeMobileMenu()" aria-label="Chiudi menu" class="p-2 rounded-lg text-slate-500 hover:bg-slate-100">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+    </button>
+    </div>
+    <nav id="mobileMenuList" class="flex-1 overflow-y-auto py-2"></nav>
+    </div>
+    </div>
 
     <!-- TOAST NOTIFICATION (Modificato z-index per stare sopra i modali) -->
     <div id="toast" class="fixed bottom-6 left-1/2 bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 z-[100] pointer-events-none">
@@ -3102,6 +3181,20 @@
     });
     }
 
+    const CATEGORY_ACCENTS = {
+    all: ['#475569', '#cbd5e1'], info: ['#2563eb', '#60a5fa'], news: ['#059669', '#34d399'],
+    promo: ['#db2777', '#f472b6'], nuoto_libero: ['#0891b2', '#22d3ee'],
+    corsi: ['#4f46e5', '#818cf8'], summer: ['#ea580c', '#fb923c']
+    };
+    function accentStyle(key) {
+    const pair = CATEGORY_ACCENTS[key] || CATEGORY_ACCENTS.all;
+    const h = pair[0].replace('#', '');
+    const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
+    return `--accent:${pair[0]};--accent-soft:rgba(${r},${g},${b},0.10);--accent-dk:${pair[1]};`;
+    }
+    const CORSI_SUBS = ['corsi', 'corsi_scuola', 'corsi_aquafitness', 'corsi_propaganda', 'corsi_artistico', 'corsi_aquagol', 'corsi_master'];
+    let mobileCorsiOpen = false;
+
     function renderFilters() {
     const container = document.getElementById('categoryFiltersContainer');
     const subContainer = document.getElementById('subCategoryFiltersContainer');
@@ -3114,58 +3207,97 @@
 
     const html = order.map(key => {
     const cat = CATEGORIES[key];
-    // MODIFICA: Mantiene "Corsi" attivo nel menu principale anche se si naviga nelle sue sottocategorie
+    // Mantiene "Corsi" attivo nel menu principale anche se si naviga nelle sue sottocategorie
     const isActive = currentFilter === key || (key === 'corsi' && currentFilter.startsWith('corsi_'));
-    
-    // Stile dinamico
-    let classes = `flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-all shadow-sm group whitespace-nowrap shrink-0 cursor-pointer ${cat.border} ${cat.bg} ${cat.text} ${cat.hoverBorder} ${cat.hoverBg} ${cat.hoverText}`;
-    
-    if (isActive) {
-    classes = `flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-all shadow-md transform scale-[1.02] whitespace-nowrap shrink-0 cursor-pointer ${cat.activeBorder} ${cat.activeBg} ${cat.activeText} ring-1 ${cat.activeRing}`;
-    }
-
-    // Colore icona dinamico (più scuro se attivo)
-    let iconClasses = `p-1 rounded-full transition-transform group-hover:scale-110 ${cat.iconBg || 'bg-slate-100'} ${cat.iconColor || 'text-slate-600'}`;
-
-    return `
-    <button onclick="setFilter('${key}')" class="${classes}">
-    <div class="${iconClasses}">
-    <i data-lucide="${cat.icon}" class="w-4 h-4"></i>
-    </div>
-    <span class="font-bold text-sm">${cat.label}</span>
-    </button>
-    `;
+    return `<button onclick="setFilter('${key}')" class="cat-tab${isActive ? ' active' : ''}" style="${accentStyle(key)}"><i data-lucide="${cat.icon}"></i><span>${cat.label}</span></button>`;
     }).join('');
     
     container.innerHTML = html;
     container.scrollLeft = currentScroll; // Restore scroll position
 
-    // --- RENDER SOTTOCATEGORIE CORSI ---
+    // --- RENDER SOTTOCATEGORIE CORSI (desktop) ---
     if (subContainer) {
     if (currentFilter.startsWith('corsi')) {
-    const subCats = ['corsi', 'corsi_scuola', 'corsi_aquafitness', 'corsi_propaganda', 'corsi_artistico', 'corsi_aquagol', 'corsi_master'];
-    const subHtml = subCats.map(key => {
-    const isSubActive = currentFilter === key;
+    const subHtml = CORSI_SUBS.map(key => {
     const label = key === 'corsi' ? "Tutti i Corsi" : CATEGORIES[key].label;
-    
-    let subClasses = "px-4 py-1.5 rounded-full border border-indigo-200 bg-white text-indigo-600 hover:bg-indigo-50 text-xs font-semibold whitespace-nowrap shrink-0 transition-colors shadow-sm";
-    if (isSubActive) {
-    subClasses = "px-4 py-1.5 rounded-full border border-indigo-500 bg-indigo-100 text-indigo-800 text-xs font-bold whitespace-nowrap shrink-0 shadow-md ring-1 ring-indigo-200";
-    }
-    
-    return `<button onclick="setFilter('${key}')" class="${subClasses}">${label}</button>`;
+    return `<button onclick="setFilter('${key}')" class="sub-tab${currentFilter === key ? ' active' : ''}">${label}</button>`;
     }).join('');
-    
-    subContainer.innerHTML = subHtml;
+    subContainer.innerHTML = `<div class="max-w-6xl mx-auto px-4 py-2 flex gap-1 overflow-x-auto no-scrollbar items-center">${subHtml}</div>`;
     subContainer.classList.remove('hidden');
     } else {
     subContainer.classList.add('hidden');
     }
     }
 
+    // --- ETICHETTA BOTTONE MOBILE ---
+    const mobileLabel = document.getElementById('mobileMenuLabel');
+    if (mobileLabel) {
+    const cur = CATEGORIES[currentFilter];
+    if (currentFilter.startsWith('corsi_') && cur) mobileLabel.textContent = 'Corsi · ' + cur.label;
+    else mobileLabel.textContent = cur ? cur.label : 'Tutti';
+    }
+    renderMobileMenuList();
+
     lucide.createIcons();
     setTimeout(updateCategoryFade, 50);
     }
+
+    // --- MENU MOBILE (drawer) ---
+    function renderMobileMenuList() {
+    const list = document.getElementById('mobileMenuList');
+    if (!list) return;
+    const order = getEffectiveCategoryOrder();
+    list.innerHTML = order.map(key => {
+    const cat = CATEGORIES[key];
+    const style = accentStyle(key);
+    if (key === 'corsi') {
+    const isActive = currentFilter.startsWith('corsi');
+    const subs = mobileCorsiOpen ? CORSI_SUBS.map(sk => {
+    const label = sk === 'corsi' ? 'Tutti i Corsi' : CATEGORIES[sk].label;
+    return `<button type="button" onclick="selectMobileFilter('${sk}')" class="mobile-item mobile-sub${currentFilter === sk ? ' active' : ''}" style="${style}"><span>${label}</span></button>`;
+    }).join('') : '';
+    return `<button type="button" onclick="toggleMobileCorsi()" class="mobile-item${isActive ? ' active' : ''}" style="${style}" aria-expanded="${mobileCorsiOpen}"><i data-lucide="${cat.icon}"></i><span>${cat.label}</span><i data-lucide="chevron-down" class="mobile-chevron${mobileCorsiOpen ? ' open' : ''}"></i></button>${subs}`;
+    }
+    return `<button type="button" onclick="selectMobileFilter('${key}')" class="mobile-item${currentFilter === key ? ' active' : ''}" style="${style}"><i data-lucide="${cat.icon}"></i><span>${cat.label}</span></button>`;
+    }).join('');
+    }
+    function openMobileMenu() {
+    const m = document.getElementById('mobileMenu');
+    if (!m) return;
+    mobileCorsiOpen = currentFilter.startsWith('corsi');
+    renderMobileMenuList();
+    lucide.createIcons();
+    m.classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+    const btn = document.getElementById('mobileMenuBtn');
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+    }
+    function closeMobileMenu() {
+    const m = document.getElementById('mobileMenu');
+    if (!m || m.classList.contains('hidden')) return;
+    m.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+    const btn = document.getElementById('mobileMenuBtn');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+    function toggleMobileMenu() {
+    const m = document.getElementById('mobileMenu');
+    if (m && m.classList.contains('hidden')) openMobileMenu(); else closeMobileMenu();
+    }
+    function toggleMobileCorsi() {
+    mobileCorsiOpen = !mobileCorsiOpen;
+    renderMobileMenuList();
+    lucide.createIcons();
+    }
+    function selectMobileFilter(key) {
+    closeMobileMenu();
+    setFilter(key);
+    }
+    window.openMobileMenu = openMobileMenu; window.closeMobileMenu = closeMobileMenu;
+    window.toggleMobileMenu = toggleMobileMenu; window.toggleMobileCorsi = toggleMobileCorsi;
+    window.selectMobileFilter = selectMobileFilter;
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMobileMenu(); });
+    window.addEventListener('resize', () => { if (window.innerWidth >= 768) closeMobileMenu(); }, { passive: true });
 
     function updateHighlightButtons() {
     // Deprecato con il nuovo banner unificato, ma lasciato vuoto per sicurezza
