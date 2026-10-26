@@ -568,6 +568,14 @@
     html.dark .faq-item[open] summary { color: #2dd4bf; }
     html.dark .faq-item p { color: #cbd5e1; }
     html.dark .faq-head-icon { color: #2dd4bf; }
+        .faq-item summary .faq-q { flex: 1; }
+    .faq-actions { display: inline-flex; gap: 0.25rem; }
+    .faq-act { padding: 0.3rem; border-radius: 0.4rem; color: #94a3b8; background: transparent; border: 0; cursor: pointer; }
+    .faq-act:hover { background-color: #f1f5f9; color: #334155; }
+    .faq-act svg { width: 18px; height: 18px; }
+    html.dark .faq-act:hover { background-color: #334155; color: #e2e8f0; }
+    html.dark .faq-modal-box { background-color: #1e293b; color: #e2e8f0; }
+    html.dark .faq-field { background-color: #0f172a; color: #e2e8f0; border-color: #334155; }
         /* === MENU CATEGORIE: tab desktop + drawer mobile === */
     @media (max-width: 767px) {
     .cat-desktop-only { display: none !important; }
@@ -805,6 +813,7 @@
     <section id="faqSection" class="hidden mt-10 fade-in">
     <h2 class="cc-title text-xl font-bold mb-4 flex items-center gap-2"><i data-lucide="help-circle" class="w-6 h-6 faq-head-icon"></i>Domande frequenti</h2>
     <div id="faqList" class="space-y-3"></div>
+    <div id="faqAddBar" class="hidden mt-3"><button type="button" onclick="openFaqModal()" class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full shadow-sm transition text-sm font-medium"><i data-lucide="plus" class="w-4 h-4"></i>Aggiungi domanda</button></div>
     <p class="cc-muted text-sm mt-4">Non trovi la risposta? Chiamaci al <a href="tel:0221061258" class="cc-link font-semibold">02.21061258</a> o scrivi a <a href="mailto:cflampugnano@federnuoto.it" class="cc-link font-semibold">cflampugnano@federnuoto.it</a>.</p>
     </section>
 
@@ -985,6 +994,21 @@
     </button>
     </div>
     <nav id="mobileMenuList" class="flex-1 overflow-y-auto py-2"></nav>
+    </div>
+    </div>
+
+    <!-- MODALE FAQ (admin) -->
+    <div id="faqModal" class="hidden fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
+    <div class="faq-modal-box bg-white rounded-2xl shadow-2xl w-full max-w-lg p-5">
+    <h3 id="faqModalTitle" class="text-lg font-bold mb-4">Modifica domanda</h3>
+    <label class="block text-sm font-semibold mb-1" for="faqQuestionInput">Domanda</label>
+    <input id="faqQuestionInput" type="text" class="faq-field w-full border border-slate-300 rounded-lg px-3 py-2 mb-3" maxlength="200">
+    <label class="block text-sm font-semibold mb-1" for="faqAnswerInput">Risposta</label>
+    <textarea id="faqAnswerInput" rows="6" class="faq-field w-full border border-slate-300 rounded-lg px-3 py-2 mb-4" maxlength="2000"></textarea>
+    <div class="flex justify-end gap-3">
+    <button type="button" onclick="closeFaqModal()" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">Annulla</button>
+    <button type="button" onclick="saveFaq()" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium">Salva</button>
+    </div>
     </div>
     </div>
 
@@ -1644,6 +1668,7 @@
     vascaEsterna: { visible: false }, // default invisibile
     corsi: { status: 'regular' }, // Default: Regolari
     categoryOrder: [], // NEW: Ordine categorie personalizzato
+    faq: {}, // FAQ modificate dall'admin per sezione (se assente: testi di default)
     summerEmptyMessage: '', // NEW: Messaggio personalizzato vuoto estivo
     widgetOrder: ['segreteria', 'nuoto', 'corsi', 'vascaEsterna'], // Ordine widget status bar
     widgetVisible: { segreteria: true, nuoto: true, corsi: true, vascaEsterna: false } // Visibilità widget
@@ -1718,6 +1743,7 @@
     });
 
     function updateAdminUI(isAdmin) {
+    try { renderFaq(); } catch (e) {}
     const adminControls = document.getElementById('adminControls');
     const addBtn = document.getElementById('addNoticeBtn');
     const archiveBtn = document.getElementById('archiveToggleBtn');
@@ -2356,6 +2382,7 @@
     if(data.specialHours) hoursConfig.specialHours = data.specialHours;
     // Load category order if exists, otherwise empty (will use defaults in render)
     if(data.categoryOrder) hoursConfig.categoryOrder = data.categoryOrder;
+    if(data.faq) hoursConfig.faq = data.faq;
     if(data.summerEmptyMessage) hoursConfig.summerEmptyMessage = data.summerEmptyMessage;
     if(data.widgetOrder) hoursConfig.widgetOrder = data.widgetOrder;
     if(data.widgetVisible) hoursConfig.widgetVisible = data.widgetVisible;
@@ -3516,17 +3543,70 @@
     { q: "Cosa devo portare?", a: "In genere: costume, cuffia, ciabatte, telo. Se si usa la vasca esterna conviene aggiungere crema solare e cappellino." }
     ]
     };
+    function getFaqItems(key) {
+    if (!FAQ_DATA[key]) return [];
+    const saved = hoursConfig.faq && hoursConfig.faq[key];
+    return Array.isArray(saved) ? saved : FAQ_DATA[key];
+    }
     function renderFaq() {
     const sec = document.getElementById('faqSection');
     const list = document.getElementById('faqList');
     if (!sec || !list) return;
-    const items = FAQ_DATA[currentFilter] || [];
-    if (items.length === 0 || showArchived || currentSearch !== '') { sec.classList.add('hidden'); return; }
+    const addBar = document.getElementById('faqAddBar');
+    const items = getFaqItems(currentFilter);
+    const isFaqPage = !!FAQ_DATA[currentFilter];
+    if (!isFaqPage || showArchived || currentSearch !== '' || (items.length === 0 && !isAdminLoggedIn)) { sec.classList.add('hidden'); return; }
     const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
-    list.innerHTML = items.map(f => `<details class="faq-item"><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('');
+    list.innerHTML = items.map((f, i) => {
+    const actions = isAdminLoggedIn ? `<span class="faq-actions"><button type="button" class="faq-act" title="Modifica" onclick="event.preventDefault();event.stopPropagation();openFaqModal(${i})"><i data-lucide="pencil"></i></button><button type="button" class="faq-act" title="Elimina" onclick="event.preventDefault();event.stopPropagation();deleteFaq(${i})"><i data-lucide="trash-2"></i></button></span>` : '';
+    return `<details class="faq-item"><summary><span class="faq-q">${esc(f.q)}</span>${actions}</summary><p>${esc(f.a)}</p></details>`;
+    }).join('');
+    if (addBar) addBar.classList.toggle('hidden', !isAdminLoggedIn);
     sec.classList.remove('hidden');
     lucide.createIcons();
     }
+
+    // --- FAQ: modifica da admin ---
+    let faqEditIndex = -1;
+    function openFaqModal(idx) {
+    const items = getFaqItems(currentFilter);
+    faqEditIndex = (typeof idx === 'number') ? idx : -1;
+    const item = faqEditIndex >= 0 ? items[faqEditIndex] : { q: '', a: '' };
+    document.getElementById('faqModalTitle').textContent = faqEditIndex >= 0 ? 'Modifica domanda' : 'Nuova domanda';
+    document.getElementById('faqQuestionInput').value = item.q || '';
+    document.getElementById('faqAnswerInput').value = item.a || '';
+    document.getElementById('faqModal').classList.remove('hidden');
+    setTimeout(() => document.getElementById('faqQuestionInput').focus(), 50);
+    }
+    function closeFaqModal() { document.getElementById('faqModal').classList.add('hidden'); }
+    async function persistFaq(mutator) {
+    try {
+    await fetchHoursConfig(); // parte sempre dai dati più recenti
+    const list = getFaqItems(currentFilter).map(f => ({ q: f.q, a: f.a }));
+    mutator(list);
+    if (!hoursConfig.faq) hoursConfig.faq = {};
+    hoursConfig.faq[currentFilter] = list;
+    await setDoc(doc(db, CONFIG_COLLECTION, HOURS_DOC_ID), hoursConfig);
+    showToast("FAQ salvate");
+    } catch (err) {
+    console.error(err);
+    showToast("Errore salvataggio FAQ: " + err.message, true);
+    }
+    renderFaq();
+    }
+    async function saveFaq() {
+    const q = document.getElementById('faqQuestionInput').value.trim();
+    const a = document.getElementById('faqAnswerInput').value.trim();
+    if (!q || !a) { showToast("Compila domanda e risposta", true); return; }
+    const idx = faqEditIndex;
+    closeFaqModal();
+    await persistFaq(list => { if (idx >= 0 && idx < list.length) list[idx] = { q, a }; else list.push({ q, a }); });
+    }
+    async function deleteFaq(idx) {
+    if (!confirm("Eliminare questa domanda?")) return;
+    await persistFaq(list => { list.splice(idx, 1); });
+    }
+    window.openFaqModal = openFaqModal; window.closeFaqModal = closeFaqModal; window.saveFaq = saveFaq; window.deleteFaq = deleteFaq;
 
     async function renderNotices() {
     // --- GESTIONE HEADER CATEGORIE SPECIFICHE (Antierrore e con Fallback forzato) ---
