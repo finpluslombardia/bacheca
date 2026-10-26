@@ -529,6 +529,15 @@
     padding: 8px 12px;
     }
 
+        .notice-box a { text-decoration: underline; }
+    html.dark .notice-box { background-color: #1e293b !important; color: #e2e8f0 !important; }
+    .dd-item { display: block; width: 100%; text-align: left; padding: 0.55rem 1rem; font-size: 0.875rem; font-weight: 500; color: #475569; background: transparent; border: 0; cursor: pointer; }
+    .dd-item:hover { background-color: #eef2ff; color: #4f46e5; }
+    .dd-item.active { background-color: #e0e7ff; color: #3730a3; font-weight: 700; }
+    html.dark #corsiDropdown { background-color: #1e293b; border-color: #334155; }
+    html.dark .dd-item { color: #cbd5e1; }
+    html.dark .dd-item:hover { background-color: #334155; color: #c7d2fe; }
+    html.dark .dd-item.active { background-color: #3730a3; color: #e0e7ff; }
         /* === MENU CATEGORIE: tab desktop + drawer mobile === */
     @media (max-width: 767px) {
     .cat-desktop-only { display: none !important; }
@@ -546,6 +555,7 @@
     transition: color .15s, background-color .15s, border-color .15s;
     }
     .cat-tab svg { width: 18px; height: 18px; opacity: .75; }
+    .cat-tab .cat-caret { width: 14px; height: 14px; margin-left: -0.15rem; }
     .cat-tab:hover { color: var(--accent); background-color: var(--accent-soft); }
     .cat-tab:hover svg { opacity: 1; }
     .cat-tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
@@ -622,13 +632,6 @@
     </div>
     </header>
 
-    <!-- BANNER AVVISI URGENTI (FISSO) -->
-    <div id="urgentTickerContainer" class="hidden w-full bg-red-600 text-white py-2.5 z-20 relative shadow-md border-b border-red-700">
-    <div id="urgentTickerContent" class="max-w-6xl mx-auto px-4 flex flex-wrap justify-center items-center gap-x-4 gap-y-2 text-sm font-bold tracking-wide text-center">
-    <!-- Generato via JS -->
-    </div>
-    </div>
-
     <!-- STATUS BAR (NEW) -->
     <div class="bg-blue-950 text-slate-200 text-xs md:text-sm py-2 px-4 shadow-md border-b border-blue-900">
     <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
@@ -649,14 +652,15 @@
     </div>
 
     <!-- BANNER CATEGORIE UNIFICATO (Desktop: tab / Mobile: bottone menu) -->
-    <div class="bg-white dark:bg-slate-900 border-b border-slate-200 shadow-sm relative z-10" style="background-color: #ffffff;">
+    <div class="bg-white dark:bg-slate-900 border-b border-slate-200 shadow-sm relative z-10" style="background-color: #ffffff; z-index: 15;">
     <!-- DESKTOP: tab -->
-    <div class="max-w-6xl mx-auto px-4 cat-desktop-only">
+    <div class="max-w-6xl mx-auto px-4 cat-desktop-only relative">
     <div class="scroll-fade-wrapper" id="categoryFadeWrapper">
     <div class="flex gap-1 overflow-x-auto no-scrollbar items-stretch" id="categoryFiltersContainer">
     <!-- Generato via JS -->
     </div>
     </div><!-- /scroll-fade-wrapper -->
+    <div id="corsiDropdown" class="hidden absolute top-full z-30 min-w-[210px] bg-white border border-slate-200 rounded-xl shadow-lg py-1" onmouseenter="cancelHideCorsi()" onmouseleave="scheduleHideCorsi()"></div>
     </div>
 
     <!-- MOBILE: bottone menu -->
@@ -665,7 +669,7 @@
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
     <span class="flex flex-col items-start leading-tight">
     <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Menu</span>
-    <span id="mobileMenuLabel" class="text-sm font-bold">Tutti</span>
+    <span id="mobileMenuLabel" class="text-sm font-bold">Home</span>
     </span>
     </button>
     </div>
@@ -688,6 +692,13 @@
     <!-- Banner Archivio -->
     <div id="archiveBanner" class="hidden mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r shadow-sm">
     <div class="flex items-center"><i data-lucide="archive" class="w-5 h-5 text-yellow-500 mr-2"></i><p class="text-sm text-yellow-700 font-bold">Stai visualizzando l'archivio storico o gli avvisi scaduti</p></div>
+    </div>
+
+    <!-- AVVISO IN EVIDENZA (box prima delle notizie) -->
+    <div id="urgentTickerContainer" class="hidden">
+    <div id="urgentTickerContent" class="px-4 py-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-semibold">
+    <!-- Generato via JS -->
+    </div>
     </div>
 
     <!-- HEADER CATEGORIA: AQUAFITNESS (NEW) -->
@@ -1216,7 +1227,7 @@
 
     <div class="flex flex-wrap items-center gap-4 pt-4 border-t border-gray-100">
     <div class="flex items-center gap-2"><input type="checkbox" id="newPinned" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"><label for="newPinned" class="text-sm text-gray-700 font-medium">Metti in evidenza</label></div>
-    <div class="flex items-center gap-2"><input type="checkbox" id="newHideFromHome" class="w-4 h-4 text-slate-500 rounded focus:ring-slate-400"><label for="newHideFromHome" class="text-sm text-gray-700 font-medium" title="La notizia non apparirà in &quot;Tutti&quot; ma sarà visibile nelle sue categorie">Solo in categoria</label></div>
+    <div class="flex items-center gap-2"><input type="checkbox" id="newHideFromHome" class="w-4 h-4 text-slate-500 rounded focus:ring-slate-400"><label for="newHideFromHome" class="text-sm text-gray-700 font-medium" title="La notizia non apparirà in &quot;Home&quot; ma sarà visibile nelle sue categorie">Solo in categoria</label></div>
     <div class="flex items-center gap-2"><input type="checkbox" id="newPopup" onchange="document.getElementById('popupSummaryContainer').classList.toggle('hidden', !this.checked)" class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"><label for="newPopup" class="text-sm text-gray-700 font-medium">Mostra come Pop-up</label></div>
     <div class="flex items-center gap-2"><input type="checkbox" id="newBanner" class="w-4 h-4 text-red-600 rounded focus:ring-red-500"><label for="newBanner" class="text-sm text-gray-700 font-medium">Crea Banner in alto</label></div>
     <div class="flex items-center gap-2 md:ml-auto">
@@ -1557,7 +1568,7 @@
 
     // AGGIORNATE CATEGORIE CON STILE ICONA/COLORE
     const CATEGORIES = {
-    all: { label: "Tutti", icon: "layout-grid", color: "slate", border: "border-slate-200", bg: "bg-white", text: "text-slate-600", hoverBorder: "hover:border-slate-300", hoverBg: "hover:bg-slate-50", activeBorder: "border-slate-500", activeBg: "bg-slate-100", activeRing: "ring-slate-200" },
+    all: { label: "Home", icon: "house", color: "slate", border: "border-slate-200", bg: "bg-white", text: "text-slate-600", hoverBorder: "hover:border-slate-300", hoverBg: "hover:bg-slate-50", activeBorder: "border-slate-500", activeBg: "bg-slate-100", activeRing: "ring-slate-200" },
     
     info: { label: "Info", icon: "info", color: "blue", border: "border-slate-200", bg: "bg-white", text: "text-slate-600", hoverBorder: "hover:border-blue-300", hoverBg: "hover:bg-blue-50", hoverText: "hover:text-blue-700", activeBorder: "border-blue-500", activeBg: "bg-blue-50", activeText: "text-blue-800", activeRing: "ring-blue-200", iconBg: "bg-blue-100", iconColor: "text-blue-600" },
     
@@ -3209,32 +3220,31 @@
     const cat = CATEGORIES[key];
     // Mantiene "Corsi" attivo nel menu principale anche se si naviga nelle sue sottocategorie
     const isActive = currentFilter === key || (key === 'corsi' && currentFilter.startsWith('corsi_'));
-    return `<button onclick="setFilter('${key}')" class="cat-tab${isActive ? ' active' : ''}" style="${accentStyle(key)}"><i data-lucide="${cat.icon}"></i><span>${cat.label}</span></button>`;
+    const hover = key === 'corsi' ? ` onmouseenter="showCorsiDropdown(this)" onmouseleave="scheduleHideCorsi()"` : '';
+    const caret = key === 'corsi' ? '<i data-lucide="chevron-down" class="cat-caret"></i>' : '';
+    return `<button onclick="setFilter('${key}')" class="cat-tab${isActive ? ' active' : ''}" style="${accentStyle(key)}"${hover}><i data-lucide="${cat.icon}"></i><span>${cat.label}</span>${caret}</button>`;
     }).join('');
     
     container.innerHTML = html;
     container.scrollLeft = currentScroll; // Restore scroll position
 
-    // --- RENDER SOTTOCATEGORIE CORSI (desktop) ---
-    if (subContainer) {
-    if (currentFilter.startsWith('corsi')) {
-    const subHtml = CORSI_SUBS.map(key => {
-    const label = key === 'corsi' ? "Tutti i Corsi" : CATEGORIES[key].label;
-    return `<button onclick="setFilter('${key}')" class="sub-tab${currentFilter === key ? ' active' : ''}">${label}</button>`;
+    // --- DROPDOWN CORSI (desktop, al passaggio del mouse) ---
+    const dd = document.getElementById('corsiDropdown');
+    if (dd) {
+    dd.innerHTML = CORSI_SUBS.map(key => {
+    const label = key === 'corsi' ? 'Tutti i Corsi' : CATEGORIES[key].label;
+    return `<button type="button" onclick="setFilter('${key}')" class="dd-item${currentFilter === key ? ' active' : ''}">${label}</button>`;
     }).join('');
-    subContainer.innerHTML = `<div class="max-w-6xl mx-auto px-4 py-2 flex gap-1 overflow-x-auto no-scrollbar items-center">${subHtml}</div>`;
-    subContainer.classList.remove('hidden');
-    } else {
-    subContainer.classList.add('hidden');
+    dd.classList.add('hidden');
     }
-    }
+    if (subContainer) subContainer.classList.add('hidden');
 
     // --- ETICHETTA BOTTONE MOBILE ---
     const mobileLabel = document.getElementById('mobileMenuLabel');
     if (mobileLabel) {
     const cur = CATEGORIES[currentFilter];
     if (currentFilter.startsWith('corsi_') && cur) mobileLabel.textContent = 'Corsi · ' + cur.label;
-    else mobileLabel.textContent = cur ? cur.label : 'Tutti';
+    else mobileLabel.textContent = cur ? cur.label : 'Home';
     }
     renderMobileMenuList();
 
@@ -3242,7 +3252,26 @@
     setTimeout(updateCategoryFade, 50);
     }
 
-    // --- MENU MOBILE (drawer) ---
+    let corsiHideTimer = null;
+    function cancelHideCorsi() { clearTimeout(corsiHideTimer); }
+    function scheduleHideCorsi() {
+    clearTimeout(corsiHideTimer);
+    corsiHideTimer = setTimeout(() => {
+    const dd = document.getElementById('corsiDropdown');
+    if (dd) dd.classList.add('hidden');
+    }, 180);
+    }
+    function showCorsiDropdown(tabEl) {
+    const dd = document.getElementById('corsiDropdown');
+    if (!dd || !tabEl) return;
+    clearTimeout(corsiHideTimer);
+    const parent = dd.parentElement.getBoundingClientRect();
+    const t = tabEl.getBoundingClientRect();
+    dd.style.left = Math.max(0, t.left - parent.left) + 'px';
+    dd.classList.remove('hidden');
+    }
+    window.showCorsiDropdown = showCorsiDropdown; window.scheduleHideCorsi = scheduleHideCorsi; window.cancelHideCorsi = cancelHideCorsi;
+        // --- MENU MOBILE (drawer) ---
     function renderMobileMenuList() {
     const list = document.getElementById('mobileMenuList');
     if (!list) return;
@@ -3577,19 +3606,19 @@
     if (bannerNotices.length > 0) {
     // Imposta il colore del banner in base alla prima notizia
     const theme = bannerNotices[0].bannerColor || 'red';
-    let themeClasses = 'bg-red-600 text-white border-red-700';
+    let themeClasses = 'bg-red-50 text-red-800 border-red-500';
     let defaultIcon = 'alert-triangle';
     
-    if (theme === 'blue') { themeClasses = 'bg-blue-600 text-white border-blue-700'; defaultIcon = 'info'; }
-    else if (theme === 'green') { themeClasses = 'bg-emerald-600 text-white border-emerald-700'; defaultIcon = 'check-circle'; }
-    else if (theme === 'yellow') { themeClasses = 'bg-yellow-400 text-slate-900 border-yellow-500'; defaultIcon = 'alert-circle'; }
-    else if (theme === 'orange') { themeClasses = 'bg-orange-500 text-white border-orange-600'; defaultIcon = 'alert-octagon'; }
-    else if (theme === 'purple') { themeClasses = 'bg-purple-600 text-white border-purple-700'; defaultIcon = 'bell'; }
-    else if (theme === 'pink') { themeClasses = 'bg-pink-600 text-white border-pink-700'; defaultIcon = 'heart'; }
-    else if (theme === 'cyan') { themeClasses = 'bg-cyan-500 text-slate-900 border-cyan-600'; defaultIcon = 'droplets'; }
-    else if (theme === 'slate') { themeClasses = 'bg-slate-800 text-white border-slate-900'; defaultIcon = 'megaphone'; }
+    if (theme === 'blue') { themeClasses = 'bg-blue-50 text-blue-800 border-blue-500'; defaultIcon = 'info'; }
+    else if (theme === 'green') { themeClasses = 'bg-emerald-50 text-emerald-800 border-emerald-500'; defaultIcon = 'check-circle'; }
+    else if (theme === 'yellow') { themeClasses = 'bg-yellow-50 text-yellow-900 border-yellow-400'; defaultIcon = 'alert-circle'; }
+    else if (theme === 'orange') { themeClasses = 'bg-orange-50 text-orange-800 border-orange-500'; defaultIcon = 'alert-octagon'; }
+    else if (theme === 'purple') { themeClasses = 'bg-purple-50 text-purple-800 border-purple-500'; defaultIcon = 'bell'; }
+    else if (theme === 'pink') { themeClasses = 'bg-pink-50 text-pink-800 border-pink-500'; defaultIcon = 'heart'; }
+    else if (theme === 'cyan') { themeClasses = 'bg-cyan-50 text-cyan-900 border-cyan-500'; defaultIcon = 'droplets'; }
+    else if (theme === 'slate') { themeClasses = 'bg-slate-100 text-slate-800 border-slate-600'; defaultIcon = 'megaphone'; }
     
-    tickerContainer.className = `w-full py-2.5 z-20 relative shadow-md border-b ${themeClasses}`;
+    tickerContainer.className = `notice-box mb-6 rounded-xl border-l-4 shadow-sm ${themeClasses}`;
 
     const tickerItems = bannerNotices.map(n =>     
     `<span class="cursor-pointer hover:underline flex items-center gap-1.5" onclick="viewNotice('${n.id}')">
