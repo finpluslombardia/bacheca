@@ -555,7 +555,20 @@
     html.dark .cc-link { color: #2dd4bf; }
     html.dark .cc-icon { color: #2dd4bf; }
         .admin-controls:not(:has(> button:not(.hidden))) { margin-bottom: 0; }
-    /* === MENU CATEGORIE: tab desktop + drawer mobile === */
+    .faq-item { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.75rem; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+    .faq-item summary { list-style: none; cursor: pointer; padding: 0.9rem 1.1rem; font-weight: 600; color: #1e293b; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-size: 1.4rem; line-height: 1; color: #64748b; flex-shrink: 0; }
+    .faq-item[open] summary::after { content: '\2212'; }
+    .faq-item[open] summary { color: #0f766e; }
+    .faq-item p { padding: 0 1.1rem 1rem; color: #475569; font-size: 0.925rem; line-height: 1.55; }
+    .faq-head-icon { color: #0d9488; }
+    html.dark .faq-item { background-color: #1e293b; border-color: #334155; }
+    html.dark .faq-item summary { color: #f1f5f9; }
+    html.dark .faq-item[open] summary { color: #2dd4bf; }
+    html.dark .faq-item p { color: #cbd5e1; }
+    html.dark .faq-head-icon { color: #2dd4bf; }
+        /* === MENU CATEGORIE: tab desktop + drawer mobile === */
     @media (max-width: 767px) {
     .cat-desktop-only { display: none !important; }
     #subCategoryFiltersContainer { display: none !important; }
@@ -788,6 +801,13 @@
 
     <!-- Stato Vuoto -->
     <div id="emptyState" class="hidden col-span-full py-12 flex flex-col items-center justify-center text-slate-400 bg-white dark:bg-slate-800 rounded-xl border border-dashed border-slate-200 mt-6"><i data-lucide="megaphone" class="w-12 h-12 mb-4 opacity-20"></i><p class="text-lg" id="emptyStateText">Nessun avviso trovato.</p></div>
+    <!-- FAQ (Corsi, Nuoto Libero, Attività Estive) -->
+    <section id="faqSection" class="hidden mt-10 fade-in">
+    <h2 class="cc-title text-xl font-bold mb-4 flex items-center gap-2"><i data-lucide="help-circle" class="w-6 h-6 faq-head-icon"></i>Domande frequenti</h2>
+    <div id="faqList" class="space-y-3"></div>
+    <p class="cc-muted text-sm mt-4">Non trovi la risposta? Chiamaci al <a href="tel:0221061258" class="cc-link font-semibold">02.21061258</a> o scrivi a <a href="mailto:cflampugnano@federnuoto.it" class="cc-link font-semibold">cflampugnano@federnuoto.it</a>.</p>
+    </section>
+
     <!-- PAGINA CONTATTI -->
     <section id="contactPage" class="hidden fade-in">
     <h2 class="cc-title text-2xl font-bold mb-1">Come arrivare e contatti</h2>
@@ -3443,6 +3463,71 @@
     }
 
     // Funzione asincrona per renderizzare la griglia
+    // --- FAQ per sezione (testi modificabili qui) ---
+    const FAQ_CORSI_COMUNI = [
+    { q: "Come mi iscrivo a un corso?", a: "Le iscrizioni si effettuano in segreteria. Gli orari di apertura sono indicati nel widget \"Segreteria\" in alto; per informazioni puoi anche telefonare o scrivere una email." },
+    { q: "Cosa devo portare alla prima lezione?", a: "In genere: costume, cuffia, ciabatte, accappatoio o telo e quanto serve per la doccia. Gli occhialini sono a scelta." },
+    { q: "Come vengo avvisato se una lezione cambia o non si svolge?", a: "Controlla il widget \"Corsi Nuoto\" in alto e gli avvisi nella Home: ogni variazione di calendario viene pubblicata lì." }
+    ];
+    const FAQ_DATA = {
+    corsi: [
+    { q: "Dove trovo giorni, orari e tariffe dei corsi?", a: "Nella pagina di ciascun corso (Scuola Nuoto, Aquafitness, Propaganda, Artistico, Aquagol, Master) trovi i menu a tendina con stagione, giorni e orari, tariffe. Dal menu \"Corsi\" scegli quello che ti interessa." },
+    { q: "Come scelgo il corso giusto?", a: "Dipende da età, livello e obiettivo. Se hai dubbi, contatta la segreteria: ti indicheremo il corso più adatto." },
+    ...FAQ_CORSI_COMUNI
+    ],
+    corsi_scuola: [
+    { q: "Serve saper già nuotare per iscriversi?", a: "No: i corsi accolgono anche chi parte da zero. Per essere inserito nel gruppo giusto, in base all'età e al livello in acqua, contatta la segreteria." },
+    ...FAQ_CORSI_COMUNI
+    ],
+    corsi_aquafitness: [
+    { q: "L'Aquafitness è adatto a tutti?", a: "È un allenamento cardiovascolare e tonificante che non stressa le articolazioni, quindi adatto a molte età e livelli di preparazione." },
+    { q: "Serve saper nuotare?", a: "In genere non è necessario, ma dipende dalla vasca utilizzata: conferma con la segreteria al momento dell'iscrizione." },
+    ...FAQ_CORSI_COMUNI
+    ],
+    corsi_propaganda: [
+    { q: "Cos'è il corso Propaganda?", a: "È un percorso per bambini e ragazzi che vogliono avvicinarsi al nuoto in modo più sportivo, come passo successivo alla scuola nuoto. Per sapere se tuo figlio è pronto, chiedi alla segreteria." },
+    ...FAQ_CORSI_COMUNI
+    ],
+    corsi_artistico: [
+    { q: "Cos'è il nuoto artistico?", a: "È una disciplina che unisce nuoto, ginnastica, danza e musica. Si pratica in acqua con coreografie individuali o di squadra." },
+    { q: "Serve già avere dimestichezza con l'acqua?", a: "Una buona confidenza in acqua aiuta. Contatta la segreteria per capire da quale gruppo iniziare." },
+    ...FAQ_CORSI_COMUNI
+    ],
+    corsi_aquagol: [
+    { q: "Cos'è l'Aquagol?", a: "È una disciplina di squadra che avvicina al gioco della pallanuoto: si impara a nuotare, passare e tirare in modo divertente, in gruppo." },
+    ...FAQ_CORSI_COMUNI
+    ],
+    corsi_master: [
+    { q: "Chi può partecipare ai corsi Master?", a: "I Master sono rivolti ad adulti che vogliono allenarsi nel nuoto, anche senza intenti agonistici. Per i dettagli su età minima e livello richiesto, rivolgiti alla segreteria." },
+    { q: "Per partecipare alle gare cosa serve?", a: "Per le gare è richiesto il tesseramento e l'idoneità medica prevista dalla federazione. Chiedi in segreteria i documenti necessari." },
+    ...FAQ_CORSI_COMUNI
+    ],
+    nuoto_libero: [
+    { q: "Dove trovo gli orari del nuoto libero?", a: "Nel widget \"Nuoto Libero\" in alto vedi se la vasca è aperta o chiusa in questo momento; il piano completo è pubblicato negli avvisi di questa sezione." },
+    { q: "Il piano vasca può cambiare?", a: "Sì, può subire variazioni (eventi, corsi, manutenzioni). Le modifiche vengono comunicate negli avvisi della Home e di questa sezione." },
+    { q: "Cos'è il nuoto libero controllato?", a: "Sono corsie programmate per il nuoto libero con orari dedicati. Trovi la tabella \"Corsie disponibili\" tra gli avvisi di questa pagina." },
+    { q: "Cosa devo portare?", a: "In genere: costume, cuffia, ciabatte, telo o accappatoio. Prima di entrare in vasca è richiesta la doccia." },
+    { q: "Come funzionano ingressi e abbonamenti?", a: "Per tariffe, ingressi singoli e abbonamenti rivolgiti alla segreteria." }
+    ],
+    summer: [
+    { q: "Cosa sono le Attività Estive?", a: "Sono le proposte del Centro per il periodo estivo. Periodi, attività e novità vengono pubblicati in questa sezione." },
+    { q: "Quando aprono le iscrizioni?", a: "La data di apertura viene comunicata con un avviso in questa sezione e nella Home." },
+    { q: "Come mi iscrivo?", a: "Le iscrizioni si effettuano in segreteria; per informazioni puoi anche chiamare o scrivere una email." },
+    { q: "Cosa devo portare?", a: "In genere: costume, cuffia, ciabatte, telo. Se si usa la vasca esterna conviene aggiungere crema solare e cappellino." }
+    ]
+    };
+    function renderFaq() {
+    const sec = document.getElementById('faqSection');
+    const list = document.getElementById('faqList');
+    if (!sec || !list) return;
+    const items = FAQ_DATA[currentFilter] || [];
+    if (items.length === 0 || showArchived || currentSearch !== '') { sec.classList.add('hidden'); return; }
+    const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    list.innerHTML = items.map(f => `<details class="faq-item"><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('');
+    sec.classList.remove('hidden');
+    lucide.createIcons();
+    }
+
     async function renderNotices() {
     // --- GESTIONE HEADER CATEGORIE SPECIFICHE (Antierrore e con Fallback forzato) ---
     try {
@@ -3712,6 +3797,7 @@
     // --- PAGINA CONTATTI (sezione a parte, senza avvisi) ---
     const contactPage = document.getElementById('contactPage');
     if (contactPage) contactPage.classList.toggle('hidden', currentFilter !== 'contatti');
+    renderFaq();
     if (currentFilter === 'contatti') {
     grid.innerHTML = '';
     empty.classList.add('hidden');
