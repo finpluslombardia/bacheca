@@ -573,11 +573,25 @@
     .faq-act { padding: 0.3rem; border-radius: 0.4rem; color: #94a3b8; background: transparent; border: 0; cursor: pointer; }
     .faq-act:hover { background-color: #f1f5f9; color: #334155; }
     .faq-act svg { width: 18px; height: 18px; }
+    .faq-act:disabled { opacity: .3; cursor: default; pointer-events: none; }
     html.dark .faq-act:hover { background-color: #334155; color: #e2e8f0; }
     html.dark .faq-modal-box { background-color: #1e293b; color: #e2e8f0; }
     html.dark .faq-field { background-color: #0f172a; color: #e2e8f0; border-color: #334155; }
         .faq-body { padding: 0 1.1rem 1rem; color: #475569; font-size: 0.925rem; line-height: 1.55; }
     html.dark .faq-body { color: #cbd5e1; }
+        .acc-add-bar { display: none; }
+    body.is-admin .acc-add-bar { display: block; }
+    body:not(.is-admin) .acc-admin-only { display: none !important; }
+        .course-tile { display: flex; align-items: center; gap: 0.85rem; width: 100%; text-align: left; padding: 0.9rem 1rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.85rem; box-shadow: 0 1px 2px rgba(0,0,0,.04); cursor: pointer; transition: border-color .15s, box-shadow .15s, transform .15s; }
+    .course-tile:hover { border-color: #818cf8; box-shadow: 0 4px 12px rgba(79,70,229,.12); transform: translateY(-1px); }
+    .course-tile-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 0.65rem; background: #eef2ff; color: #4f46e5; flex-shrink: 0; }
+    .course-tile-icon svg { width: 20px; height: 20px; }
+    .course-tile-label { flex: 1; font-weight: 700; color: #1e293b; }
+    .course-tile-arrow { width: 18px; height: 18px; color: #94a3b8; flex-shrink: 0; }
+    html.dark .course-tile { background-color: #1e293b; border-color: #334155; }
+    html.dark .course-tile:hover { border-color: #818cf8; }
+    html.dark .course-tile-icon { background-color: #312e81; color: #c7d2fe; }
+    html.dark .course-tile-label { color: #f1f5f9; }
         /* === MENU CATEGORIE: tab desktop + drawer mobile === */
     @media (max-width: 767px) {
     .cat-desktop-only { display: none !important; }
@@ -752,6 +766,7 @@
     <div class="space-y-3" id="aquafitnessAccordionContainer">
     <!-- I menu a tendina verranno caricati qui tramite Javascript -->
     </div>
+    <div class="acc-add-bar mt-3"><button type="button" onclick="openAccModal(-1)" class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full shadow-sm transition text-sm font-medium"><i data-lucide="plus" class="w-4 h-4"></i>Aggiungi sezione</button></div>
     </div>
     </div>
 
@@ -766,6 +781,7 @@
     <div class="space-y-3" id="artisticoAccordionContainer">
     <!-- I menu a tendina verranno caricati qui tramite Javascript -->
     </div>
+    <div class="acc-add-bar mt-3"><button type="button" onclick="openAccModal(-1)" class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full shadow-sm transition text-sm font-medium"><i data-lucide="plus" class="w-4 h-4"></i>Aggiungi sezione</button></div>
     </div>
     </div>
 
@@ -780,6 +796,7 @@
     <div class="space-y-3" id="aquagolAccordionContainer">
     <!-- I menu a tendina verranno caricati qui tramite Javascript -->
     </div>
+    <div class="acc-add-bar mt-3"><button type="button" onclick="openAccModal(-1)" class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full shadow-sm transition text-sm font-medium"><i data-lucide="plus" class="w-4 h-4"></i>Aggiungi sezione</button></div>
     </div>
     </div>
 
@@ -794,6 +811,7 @@
     <div class="space-y-3" id="propagandaAccordionContainer">
     <!-- I menu a tendina verranno caricati qui tramite Javascript -->
     </div>
+    <div class="acc-add-bar mt-3"><button type="button" onclick="openAccModal(-1)" class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full shadow-sm transition text-sm font-medium"><i data-lucide="plus" class="w-4 h-4"></i>Aggiungi sezione</button></div>
     </div>
     </div>
 
@@ -808,10 +826,17 @@
     <div class="space-y-3" id="masterAccordionContainer">
     <!-- I menu a tendina verranno caricati qui tramite Javascript -->
     </div>
+    <div class="acc-add-bar mt-3"><button type="button" onclick="openAccModal(-1)" class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full shadow-sm transition text-sm font-medium"><i data-lucide="plus" class="w-4 h-4"></i>Aggiungi sezione</button></div>
     </div>
     </div>
 
     <!-- Griglia Avvisi (items-start aggiunto per evitare stiramento verticale) -->
+    <!-- SOTTOMENU CORSI (solo "Tutti i Corsi") -->
+    <section id="corsiSubmenu" class="hidden mb-10 fade-in">
+    <h2 class="cc-title text-xl font-bold mb-4 flex items-center gap-2"><i data-lucide="users" class="w-6 h-6 faq-head-icon"></i>I nostri corsi</h2>
+    <div id="corsiSubmenuGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+    </section>
+
     <h2 id="newsTitle" class="hidden cc-title text-xl font-bold mb-4 flex items-center gap-2"><i data-lucide="newspaper" class="w-6 h-6 faq-head-icon"></i>News</h2>
     <div id="noticesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start"></div>
 
@@ -1016,6 +1041,21 @@
     <div class="flex justify-end gap-3">
     <button type="button" onclick="closeFaqModal()" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">Annulla</button>
     <button type="button" onclick="saveFaq()" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium">Salva</button>
+    </div>
+    </div>
+    </div>
+
+    <!-- MODALE SEZIONE A TENDINA (admin) -->
+    <div id="accModal" class="hidden fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
+    <div class="faq-modal-box bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-5">
+    <h3 id="accModalTitle" class="text-lg font-bold mb-4">Modifica sezione</h3>
+    <label class="block text-sm font-semibold mb-1" for="accTitleInput">Titolo</label>
+    <input id="accTitleInput" type="text" class="faq-field w-full border border-slate-300 rounded-lg px-3 py-2 mb-3" maxlength="150" placeholder="Es. Stagione 2026/27">
+    <label class="block text-sm font-semibold mb-1">Contenuto</label>
+    <div class="mini-quill-editor mb-4" id="accContentEditorWrap"><div id="accContentEditor"></div></div>
+    <div class="flex justify-end gap-3">
+    <button type="button" onclick="closeAccModal()" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">Annulla</button>
+    <button type="button" onclick="saveAcc()" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium">Salva</button>
     </div>
     </div>
     </div>
@@ -1751,6 +1791,7 @@
     });
 
     function updateAdminUI(isAdmin) {
+    document.body.classList.toggle('is-admin', !!isAdmin);
     try { renderFaq(); } catch (e) {}
     const adminControls = document.getElementById('adminControls');
     const addBtn = document.getElementById('addNoticeBtn');
@@ -2029,6 +2070,7 @@
 
     window.saveAquafitnessConfig = async function() {
     hoursConfig.aquafitnessDesc = document.getElementById('aquaFitDescInput').value;
+    const _prev_aquafitnessAccordion = (hoursConfig.aquafitnessAccordion || []).slice(3);
     hoursConfig.aquafitnessAccordion = [];
     for(let i=0; i<3; i++) {
     const edEl = document.getElementById(`aquaFitContent${i+1}Editor`);
@@ -2038,6 +2080,7 @@
     content: html
     });
     }
+    hoursConfig.aquafitnessAccordion = hoursConfig.aquafitnessAccordion.concat(_prev_aquafitnessAccordion).filter(it => it && ((it.title || '').trim() !== '' || (it.content || '').replace(/<[^>]*>/g, '').trim() !== ''));
     try {
     await setDoc(doc(db, CONFIG_COLLECTION, HOURS_DOC_ID), hoursConfig);
     showToast("Sezione Aquafitness aggiornata!");
@@ -2087,6 +2130,7 @@
 
     window.saveArtisticoConfig = async function() {
     hoursConfig.artisticoDesc = document.getElementById('artDescInput').value;
+    const _prev_artisticoAccordion = (hoursConfig.artisticoAccordion || []).slice(3);
     hoursConfig.artisticoAccordion = [];
     for(let i=0; i<3; i++) {
     const edSave_artistico = document.getElementById(`artContent${i+1}Editor`);
@@ -2096,6 +2140,7 @@
     content: html_artistico
     });
     }
+    hoursConfig.artisticoAccordion = hoursConfig.artisticoAccordion.concat(_prev_artisticoAccordion).filter(it => it && ((it.title || '').trim() !== '' || (it.content || '').replace(/<[^>]*>/g, '').trim() !== ''));
     try {
     await setDoc(doc(db, CONFIG_COLLECTION, HOURS_DOC_ID), hoursConfig);
     showToast("Sezione Artistico aggiornata!");
@@ -2145,6 +2190,7 @@
 
     window.saveAquagolConfig = async function() {
     hoursConfig.aquagolDesc = document.getElementById('aquaDescInput').value;
+    const _prev_aquagolAccordion = (hoursConfig.aquagolAccordion || []).slice(3);
     hoursConfig.aquagolAccordion = [];
     for(let i=0; i<3; i++) {
     const edSave_aquagol = document.getElementById(`aquaContent${i+1}Editor`);
@@ -2154,6 +2200,7 @@
     content: html_aquagol
     });
     }
+    hoursConfig.aquagolAccordion = hoursConfig.aquagolAccordion.concat(_prev_aquagolAccordion).filter(it => it && ((it.title || '').trim() !== '' || (it.content || '').replace(/<[^>]*>/g, '').trim() !== ''));
     try {
     await setDoc(doc(db, CONFIG_COLLECTION, HOURS_DOC_ID), hoursConfig);
     showToast("Sezione Aquagol aggiornata!");
@@ -2203,6 +2250,7 @@
 
     window.savePropagandaConfig = async function() {
     hoursConfig.propagandaDesc = document.getElementById('propDescInput').value;
+    const _prev_propagandaAccordion = (hoursConfig.propagandaAccordion || []).slice(3);
     hoursConfig.propagandaAccordion = [];
     for(let i=0; i<3; i++) {
     const edSave_propaganda = document.getElementById(`propContent${i+1}Editor`);
@@ -2212,6 +2260,7 @@
     content: html_propaganda
     });
     }
+    hoursConfig.propagandaAccordion = hoursConfig.propagandaAccordion.concat(_prev_propagandaAccordion).filter(it => it && ((it.title || '').trim() !== '' || (it.content || '').replace(/<[^>]*>/g, '').trim() !== ''));
     try {
     await setDoc(doc(db, CONFIG_COLLECTION, HOURS_DOC_ID), hoursConfig);
     showToast("Sezione Propaganda aggiornata!");
@@ -2261,6 +2310,7 @@
 
     window.saveMasterConfig = async function() {
     hoursConfig.masterDesc = document.getElementById('masterDescInput').value;
+    const _prev_masterAccordion = (hoursConfig.masterAccordion || []).slice(3);
     hoursConfig.masterAccordion = [];
     for(let i=0; i<3; i++) {
     const edSave_master = document.getElementById(`masterContent${i+1}Editor`);
@@ -2270,6 +2320,7 @@
     content: html_master
     });
     }
+    hoursConfig.masterAccordion = hoursConfig.masterAccordion.concat(_prev_masterAccordion).filter(it => it && ((it.title || '').trim() !== '' || (it.content || '').replace(/<[^>]*>/g, '').trim() !== ''));
     try {
     await setDoc(doc(db, CONFIG_COLLECTION, HOURS_DOC_ID), hoursConfig);
     showToast("Sezione Master aggiornata!");
@@ -3566,13 +3617,89 @@
     if (!isFaqPage || showArchived || currentSearch !== '' || (items.length === 0 && !isAdminLoggedIn)) { sec.classList.add('hidden'); return; }
     const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
     list.innerHTML = items.map((f, i) => {
-    const actions = isAdminLoggedIn ? `<span class="faq-actions"><button type="button" class="faq-act" title="Modifica" onclick="event.preventDefault();event.stopPropagation();openFaqModal(${i})"><i data-lucide="pencil"></i></button><button type="button" class="faq-act" title="Elimina" onclick="event.preventDefault();event.stopPropagation();deleteFaq(${i})"><i data-lucide="trash-2"></i></button></span>` : '';
+    const actions = isAdminLoggedIn ? `<span class="faq-actions"><button type="button" class="faq-act" title="Sposta su"${i === 0 ? ' disabled' : ''} onclick="event.preventDefault();event.stopPropagation();moveFaq(${i}, -1)"><i data-lucide="chevron-up"></i></button><button type="button" class="faq-act" title="Sposta giù"${i === items.length - 1 ? ' disabled' : ''} onclick="event.preventDefault();event.stopPropagation();moveFaq(${i}, 1)"><i data-lucide="chevron-down"></i></button><button type="button" class="faq-act" title="Modifica" onclick="event.preventDefault();event.stopPropagation();openFaqModal(${i})"><i data-lucide="pencil"></i></button><button type="button" class="faq-act" title="Elimina" onclick="event.preventDefault();event.stopPropagation();deleteFaq(${i})"><i data-lucide="trash-2"></i></button></span>` : '';
     return `<details class="faq-item"><summary><span class="faq-q">${esc(f.q)}</span>${actions}</summary><p>${esc(f.a)}</p></details>`;
     }).join('');
     if (addBar) addBar.classList.toggle('hidden', !isAdminLoggedIn);
     sec.classList.remove('hidden');
     lucide.createIcons();
     }
+
+    // --- SEZIONI A TENDINA DEI CORSI: aggiungi / modifica / elimina (admin) ---
+    const ACC_FIELDS = { corsi_aquafitness: 'aquafitnessAccordion', corsi_artistico: 'artisticoAccordion', corsi_aquagol: 'aquagolAccordion', corsi_propaganda: 'propagandaAccordion', corsi_master: 'masterAccordion' };
+    const ACC_DEFAULT = [
+    { title: "Stagione 2025/26", content: "Dettagli della stagione in via di definizione..." },
+    { title: "Giorni e orari 2025/26", content: "Giorni e orari in via di definizione..." },
+    { title: "Tariffe 2025/26", content: "Tariffe in via di definizione..." }
+    ];
+    function getAccList() {
+    const f = ACC_FIELDS[currentFilter];
+    const saved = (f && hoursConfig[f]) || [];
+    return saved.some(i => i && i.title && i.title.trim() !== '') ? saved : ACC_DEFAULT;
+    }
+    function accActions(idx) {
+    const total = getAccList().length;
+    return `<span class="faq-actions acc-admin-only"><button type="button" class="faq-act" title="Sposta su"${idx === 0 ? ' disabled' : ''} onclick="event.preventDefault();event.stopPropagation();moveAcc(${idx}, -1)"><i data-lucide="chevron-up"></i></button><button type="button" class="faq-act" title="Sposta giù"${idx === total - 1 ? ' disabled' : ''} onclick="event.preventDefault();event.stopPropagation();moveAcc(${idx}, 1)"><i data-lucide="chevron-down"></i></button><button type="button" class="faq-act" title="Modifica" onclick="event.preventDefault();event.stopPropagation();openAccModal(${idx})"><i data-lucide="pencil"></i></button><button type="button" class="faq-act" title="Elimina" onclick="event.preventDefault();event.stopPropagation();deleteAcc(${idx})"><i data-lucide="trash-2"></i></button></span>`;
+    }
+    let accEditIndex = -1;
+    function openAccModal(idx) {
+    if (!isAdminLoggedIn || !ACC_FIELDS[currentFilter]) return;
+    accEditIndex = (typeof idx === 'number') ? idx : -1;
+    const list = getAccList();
+    const item = accEditIndex >= 0 ? (list[accEditIndex] || { title: '', content: '' }) : { title: '', content: '' };
+    document.getElementById('accModalTitle').textContent = accEditIndex >= 0 ? 'Modifica sezione' : 'Nuova sezione';
+    document.getElementById('accTitleInput').value = item.title || '';
+    const editorEl = document.getElementById('accContentEditor');
+    if (!editorEl.__quill) {
+    editorEl.__quill = new Quill(editorEl, { theme: 'snow', modules: { toolbar: [['bold', 'italic', 'underline', 'clean']] } });
+    }
+    editorEl.__quill.root.innerHTML = item.content || '';
+    document.getElementById('accModal').classList.remove('hidden');
+    setTimeout(() => document.getElementById('accTitleInput').focus(), 50);
+    }
+    function closeAccModal() { document.getElementById('accModal').classList.add('hidden'); }
+    async function persistAcc(mutator) {
+    const f = ACC_FIELDS[currentFilter];
+    if (!isAdminLoggedIn || !f) return;
+    try {
+    await fetchHoursConfig(); // parte sempre dai dati più recenti
+    const list = getAccList().map(i => ({ title: i.title || '', content: i.content || '' }));
+    mutator(list);
+    hoursConfig[f] = list;
+    await setDoc(doc(db, CONFIG_COLLECTION, HOURS_DOC_ID), hoursConfig);
+    showToast("Sezioni salvate");
+    } catch (err) {
+    console.error(err);
+    showToast("Errore salvataggio: " + err.message, true);
+    }
+    renderNotices();
+    }
+    async function saveAcc() {
+    const title = document.getElementById('accTitleInput').value.trim();
+    const q = document.getElementById('accContentEditor').__quill;
+    const html = q ? q.root.innerHTML : '';
+    const hasText = q ? q.getText().trim() !== '' : false;
+    if (!title) { showToast("Inserisci un titolo", true); return; }
+    const idx = accEditIndex;
+    closeAccModal();
+    const content = hasText ? html : '';
+    await persistAcc(list => { if (idx >= 0 && idx < list.length) list[idx] = { title, content }; else list.push({ title, content }); });
+    }
+    async function deleteAcc(idx) {
+    if (!confirm("Eliminare questa sezione?")) return;
+    await persistAcc(list => { list.splice(idx, 1); });
+    }
+    async function moveAcc(idx, dir) {
+    const isEmpty = (it) => !it || (((it.title || '').trim() === '') && ((it.content || '').replace(/<[^>]*>/g, '').trim() === ''));
+    await persistAcc(list => {
+    let j = idx + dir;
+    while (j >= 0 && j < list.length && isEmpty(list[j])) j += dir; // salta eventuali voci vuote
+    if (j < 0 || j >= list.length) return;
+    [list[idx], list[j]] = [list[j], list[idx]];
+    });
+    }
+    window.moveAcc = moveAcc;
+    window.openAccModal = openAccModal; window.closeAccModal = closeAccModal; window.saveAcc = saveAcc; window.deleteAcc = deleteAcc;
 
     // --- FAQ: modifica da admin ---
     let faqEditIndex = -1;
@@ -3614,7 +3741,24 @@
     if (!confirm("Eliminare questa domanda?")) return;
     await persistFaq(list => { list.splice(idx, 1); });
     }
+    async function moveFaq(idx, dir) {
+    await persistFaq(list => { const j = idx + dir; if (j < 0 || j >= list.length) return; [list[idx], list[j]] = [list[j], list[idx]]; });
+    }
+    window.moveFaq = moveFaq;
     window.openFaqModal = openFaqModal; window.closeFaqModal = closeFaqModal; window.saveFaq = saveFaq; window.deleteFaq = deleteFaq;
+
+    function renderCorsiSubmenu() {
+    const sec = document.getElementById('corsiSubmenu');
+    const grid = document.getElementById('corsiSubmenuGrid');
+    if (!sec || !grid) return;
+    if (currentFilter !== 'corsi' || showArchived || currentSearch !== '') { sec.classList.add('hidden'); return; }
+    grid.innerHTML = CORSI_SUBS.filter(k => k !== 'corsi').map(k => {
+    const cat = CATEGORIES[k];
+    return `<button type="button" onclick="setFilter('${k}')" class="course-tile"><span class="course-tile-icon"><i data-lucide="${cat.icon}"></i></span><span class="course-tile-label">${cat.label}</span><i data-lucide="chevron-right" class="course-tile-arrow"></i></button>`;
+    }).join('');
+    sec.classList.remove('hidden');
+    lucide.createIcons();
+    }
 
     async function renderNotices() {
     // --- GESTIONE HEADER CATEGORIE SPECIFICHE (Antierrore e con Fallback forzato) ---
@@ -3643,11 +3787,11 @@
     const hasValidDataAquaFit = currentAccAquaFit.some(item => item && item.title && item.title.trim() !== '');
     if (!hasValidDataAquaFit) currentAccAquaFit = defAccAquaFit;
     
-    accContainerAquaFit.innerHTML = currentAccAquaFit.map(item => {
+    accContainerAquaFit.innerHTML = currentAccAquaFit.map((item, idx) => {
     if(!item || (!item.title && !item.content)) return '';
     return `
     <details class="faq-item">
-    <summary><span class="faq-q">${item.title || ''}</span></summary>
+    <summary><span class="faq-q">${item.title || ''}</span>${accActions(idx)}</summary>
     <div class="faq-body html-content-view">${item.content || ''}</div>
     </details>
     `;
@@ -3683,11 +3827,11 @@
     const hasValidData = currentAcc.some(item => item && item.title && item.title.trim() !== '');
     if (!hasValidData) currentAcc = defAcc;
     
-    accContainer.innerHTML = currentAcc.map(item => {
+    accContainer.innerHTML = currentAcc.map((item, idx) => {
     if(!item || (!item.title && !item.content)) return '';
     return `
     <details class="faq-item">
-    <summary><span class="faq-q">${item.title || ''}</span></summary>
+    <summary><span class="faq-q">${item.title || ''}</span>${accActions(idx)}</summary>
     <div class="faq-body html-content-view">${item.content || ''}</div>
     </details>
     `;
@@ -3723,11 +3867,11 @@
     const hasValidDataAqua = currentAccAqua.some(item => item && item.title && item.title.trim() !== '');
     if (!hasValidDataAqua) currentAccAqua = defAccAqua;
     
-    accContainerAqua.innerHTML = currentAccAqua.map(item => {
+    accContainerAqua.innerHTML = currentAccAqua.map((item, idx) => {
     if(!item || (!item.title && !item.content)) return '';
     return `
     <details class="faq-item">
-    <summary><span class="faq-q">${item.title || ''}</span></summary>
+    <summary><span class="faq-q">${item.title || ''}</span>${accActions(idx)}</summary>
     <div class="faq-body html-content-view">${item.content || ''}</div>
     </details>
     `;
@@ -3763,11 +3907,11 @@
     const hasValidDataProp = currentAccProp.some(item => item && item.title && item.title.trim() !== '');
     if (!hasValidDataProp) currentAccProp = defAccProp;
     
-    accContainerProp.innerHTML = currentAccProp.map(item => {
+    accContainerProp.innerHTML = currentAccProp.map((item, idx) => {
     if(!item || (!item.title && !item.content)) return '';
     return `
     <details class="faq-item">
-    <summary><span class="faq-q">${item.title || ''}</span></summary>
+    <summary><span class="faq-q">${item.title || ''}</span>${accActions(idx)}</summary>
     <div class="faq-body html-content-view">${item.content || ''}</div>
     </details>
     `;
@@ -3803,11 +3947,11 @@
     const hasValidDataMaster = currentAccMaster.some(item => item && item.title && item.title.trim() !== '');
     if (!hasValidDataMaster) currentAccMaster = defAccMaster;
     
-    accContainerMaster.innerHTML = currentAccMaster.map(item => {
+    accContainerMaster.innerHTML = currentAccMaster.map((item, idx) => {
     if(!item || (!item.title && !item.content)) return '';
     return `
     <details class="faq-item">
-    <summary><span class="faq-q">${item.title || ''}</span></summary>
+    <summary><span class="faq-q">${item.title || ''}</span>${accActions(idx)}</summary>
     <div class="faq-body html-content-view">${item.content || ''}</div>
     </details>
     `;
@@ -3871,6 +4015,7 @@
     const contactPage = document.getElementById('contactPage');
     if (contactPage) contactPage.classList.toggle('hidden', currentFilter !== 'contatti');
     renderFaq();
+    renderCorsiSubmenu();
     if (currentFilter === 'contatti') {
     const nt = document.getElementById('newsTitle'); if (nt) nt.classList.add('hidden');
     grid.innerHTML = '';
