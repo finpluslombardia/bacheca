@@ -576,6 +576,8 @@
     html.dark .faq-act:hover { background-color: #334155; color: #e2e8f0; }
     html.dark .faq-modal-box { background-color: #1e293b; color: #e2e8f0; }
     html.dark .faq-field { background-color: #0f172a; color: #e2e8f0; border-color: #334155; }
+        .faq-body { padding: 0 1.1rem 1rem; color: #475569; font-size: 0.925rem; line-height: 1.55; }
+    html.dark .faq-body { color: #cbd5e1; }
         /* === MENU CATEGORIE: tab desktop + drawer mobile === */
     @media (max-width: 767px) {
     .cat-desktop-only { display: none !important; }
@@ -741,12 +743,13 @@
 
     <!-- HEADER CATEGORIA: AQUAFITNESS (NEW) -->
     <div id="aquafitnessCategoryHeader" class="hidden mb-8 fade-in relative">
-    <button id="editAquafitnessBtn" onclick="openAquafitnessModal()" class="hidden absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 z-10 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
-    <div class="bg-white rounded-2xl shadow-sm border border-indigo-100 overflow-hidden">
-    <div class="bg-indigo-50/50 p-5 md:p-6 border-b border-indigo-100">
-    <p id="aquafitnessDescText" class="text-slate-700 leading-relaxed text-sm md:text-base whitespace-pre-line"></p>
+    <button id="editAquafitnessBtn" onclick="openAquafitnessModal()" class="hidden absolute top-0 right-0 bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 z-10 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+    <div>
+    <h2 class="cc-title text-xl font-bold mb-3 flex items-center gap-2"><i data-lucide="activity" class="w-6 h-6 faq-head-icon"></i>Aquafitness</h2>
+    <div class="mb-4">
+    <p id="aquafitnessDescText" class="cc-text leading-relaxed text-sm md:text-base whitespace-pre-line"></p>
     </div>
-    <div class="p-4 space-y-2" id="aquafitnessAccordionContainer">
+    <div class="space-y-3" id="aquafitnessAccordionContainer">
     <!-- I menu a tendina verranno caricati qui tramite Javascript -->
     </div>
     </div>
@@ -754,12 +757,13 @@
 
     <!-- HEADER CATEGORIA: ARTISTICO -->
     <div id="artisticoCategoryHeader" class="hidden mb-8 fade-in relative">
-    <button id="editArtisticoBtn" onclick="openArtisticoModal()" class="hidden absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 z-10 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
-    <div class="bg-white rounded-2xl shadow-sm border border-indigo-100 overflow-hidden">
-    <div class="bg-indigo-50/50 p-5 md:p-6 border-b border-indigo-100">
-    <p id="artisticoDescText" class="text-slate-700 leading-relaxed text-sm md:text-base whitespace-pre-line"></p>
+    <button id="editArtisticoBtn" onclick="openArtisticoModal()" class="hidden absolute top-0 right-0 bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 z-10 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+    <div>
+    <h2 class="cc-title text-xl font-bold mb-3 flex items-center gap-2"><i data-lucide="star" class="w-6 h-6 faq-head-icon"></i>Artistico</h2>
+    <div class="mb-4">
+    <p id="artisticoDescText" class="cc-text leading-relaxed text-sm md:text-base whitespace-pre-line"></p>
     </div>
-    <div class="p-4 space-y-2" id="artisticoAccordionContainer">
+    <div class="space-y-3" id="artisticoAccordionContainer">
     <!-- I menu a tendina verranno caricati qui tramite Javascript -->
     </div>
     </div>
@@ -767,12 +771,13 @@
 
     <!-- HEADER CATEGORIA: AQUAGOL (NEW) -->
     <div id="aquagolCategoryHeader" class="hidden mb-8 fade-in relative">
-    <button id="editAquagolBtn" onclick="openAquagolModal()" class="hidden absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 z-10 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
-    <div class="bg-white rounded-2xl shadow-sm border border-indigo-100 overflow-hidden">
-    <div class="bg-indigo-50/50 p-5 md:p-6 border-b border-indigo-100">
-    <p id="aquagolDescText" class="text-slate-700 leading-relaxed text-sm md:text-base whitespace-pre-line"></p>
+    <button id="editAquagolBtn" onclick="openAquagolModal()" class="hidden absolute top-0 right-0 bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 z-10 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+    <div>
+    <h2 class="cc-title text-xl font-bold mb-3 flex items-center gap-2"><i data-lucide="target" class="w-6 h-6 faq-head-icon"></i>Aquagol</h2>
+    <div class="mb-4">
+    <p id="aquagolDescText" class="cc-text leading-relaxed text-sm md:text-base whitespace-pre-line"></p>
     </div>
-    <div class="p-4 space-y-2" id="aquagolAccordionContainer">
+    <div class="space-y-3" id="aquagolAccordionContainer">
     <!-- I menu a tendina verranno caricati qui tramite Javascript -->
     </div>
     </div>
@@ -780,12 +785,13 @@
 
     <!-- HEADER CATEGORIA: PROPAGANDA (NEW) -->
     <div id="propagandaCategoryHeader" class="hidden mb-8 fade-in relative">
-    <button id="editPropagandaBtn" onclick="openPropagandaModal()" class="hidden absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 z-10 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
-    <div class="bg-white rounded-2xl shadow-sm border border-indigo-100 overflow-hidden">
-    <div class="bg-indigo-50/50 p-5 md:p-6 border-b border-indigo-100">
-    <p id="propagandaDescText" class="text-slate-700 leading-relaxed text-sm md:text-base whitespace-pre-line"></p>
+    <button id="editPropagandaBtn" onclick="openPropagandaModal()" class="hidden absolute top-0 right-0 bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 z-10 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+    <div>
+    <h2 class="cc-title text-xl font-bold mb-3 flex items-center gap-2"><i data-lucide="megaphone" class="w-6 h-6 faq-head-icon"></i>Propaganda</h2>
+    <div class="mb-4">
+    <p id="propagandaDescText" class="cc-text leading-relaxed text-sm md:text-base whitespace-pre-line"></p>
     </div>
-    <div class="p-4 space-y-2" id="propagandaAccordionContainer">
+    <div class="space-y-3" id="propagandaAccordionContainer">
     <!-- I menu a tendina verranno caricati qui tramite Javascript -->
     </div>
     </div>
@@ -793,18 +799,20 @@
 
     <!-- HEADER CATEGORIA: MASTER (NEW) -->
     <div id="masterCategoryHeader" class="hidden mb-8 fade-in relative">
-    <button id="editMasterBtn" onclick="openMasterModal()" class="hidden absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 z-10 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
-    <div class="bg-white rounded-2xl shadow-sm border border-indigo-100 overflow-hidden">
-    <div class="bg-indigo-50/50 p-5 md:p-6 border-b border-indigo-100">
-    <p id="masterDescText" class="text-slate-700 leading-relaxed text-sm md:text-base whitespace-pre-line"></p>
+    <button id="editMasterBtn" onclick="openMasterModal()" class="hidden absolute top-0 right-0 bg-white/90 p-2 rounded-full shadow hover:bg-slate-100 z-10 transition text-indigo-600" title="Modifica Testi"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+    <div>
+    <h2 class="cc-title text-xl font-bold mb-3 flex items-center gap-2"><i data-lucide="award" class="w-6 h-6 faq-head-icon"></i>Master</h2>
+    <div class="mb-4">
+    <p id="masterDescText" class="cc-text leading-relaxed text-sm md:text-base whitespace-pre-line"></p>
     </div>
-    <div class="p-4 space-y-2" id="masterAccordionContainer">
+    <div class="space-y-3" id="masterAccordionContainer">
     <!-- I menu a tendina verranno caricati qui tramite Javascript -->
     </div>
     </div>
     </div>
 
     <!-- Griglia Avvisi (items-start aggiunto per evitare stiramento verticale) -->
+    <h2 id="newsTitle" class="hidden cc-title text-xl font-bold mb-4 flex items-center gap-2"><i data-lucide="newspaper" class="w-6 h-6 faq-head-icon"></i>News</h2>
     <div id="noticesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start"></div>
 
     <!-- Stato Vuoto -->
@@ -3638,12 +3646,9 @@
     accContainerAquaFit.innerHTML = currentAccAquaFit.map(item => {
     if(!item || (!item.title && !item.content)) return '';
     return `
-    <details class="group border border-slate-200 rounded-lg bg-slate-50 [&_summary::-webkit-details-marker]:hidden">
-    <summary class="flex items-center justify-between px-4 py-3 md:p-4 cursor-pointer text-[15px] md:text-base font-bold text-slate-800 hover:bg-slate-100 transition-colors leading-tight">
-    ${item.title || ''}
-    <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform group-open:-rotate-180"></i>
-    </summary>
-    <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed html-content-view">${item.content || ''}</div>
+    <details class="faq-item">
+    <summary><span class="faq-q">${item.title || ''}</span></summary>
+    <div class="faq-body html-content-view">${item.content || ''}</div>
     </details>
     `;
     }).join('');
@@ -3681,12 +3686,9 @@
     accContainer.innerHTML = currentAcc.map(item => {
     if(!item || (!item.title && !item.content)) return '';
     return `
-    <details class="group border border-slate-200 rounded-lg bg-slate-50 [&_summary::-webkit-details-marker]:hidden">
-    <summary class="flex items-center justify-between px-4 py-3 md:p-4 cursor-pointer text-[15px] md:text-base font-bold text-slate-800 hover:bg-slate-100 transition-colors leading-tight">
-    ${item.title || ''}
-    <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform group-open:-rotate-180"></i>
-    </summary>
-    <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed html-content-view">${item.content || ''}</div>
+    <details class="faq-item">
+    <summary><span class="faq-q">${item.title || ''}</span></summary>
+    <div class="faq-body html-content-view">${item.content || ''}</div>
     </details>
     `;
     }).join('');
@@ -3724,12 +3726,9 @@
     accContainerAqua.innerHTML = currentAccAqua.map(item => {
     if(!item || (!item.title && !item.content)) return '';
     return `
-    <details class="group border border-slate-200 rounded-lg bg-slate-50 [&_summary::-webkit-details-marker]:hidden">
-    <summary class="flex items-center justify-between px-4 py-3 md:p-4 cursor-pointer text-[15px] md:text-base font-bold text-slate-800 hover:bg-slate-100 transition-colors leading-tight">
-    ${item.title || ''}
-    <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform group-open:-rotate-180"></i>
-    </summary>
-    <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed html-content-view">${item.content || ''}</div>
+    <details class="faq-item">
+    <summary><span class="faq-q">${item.title || ''}</span></summary>
+    <div class="faq-body html-content-view">${item.content || ''}</div>
     </details>
     `;
     }).join('');
@@ -3767,12 +3766,9 @@
     accContainerProp.innerHTML = currentAccProp.map(item => {
     if(!item || (!item.title && !item.content)) return '';
     return `
-    <details class="group border border-slate-200 rounded-lg bg-slate-50 [&_summary::-webkit-details-marker]:hidden">
-    <summary class="flex items-center justify-between px-4 py-3 md:p-4 cursor-pointer text-[15px] md:text-base font-bold text-slate-800 hover:bg-slate-100 transition-colors leading-tight">
-    ${item.title || ''}
-    <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform group-open:-rotate-180"></i>
-    </summary>
-    <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed html-content-view">${item.content || ''}</div>
+    <details class="faq-item">
+    <summary><span class="faq-q">${item.title || ''}</span></summary>
+    <div class="faq-body html-content-view">${item.content || ''}</div>
     </details>
     `;
     }).join('');
@@ -3810,12 +3806,9 @@
     accContainerMaster.innerHTML = currentAccMaster.map(item => {
     if(!item || (!item.title && !item.content)) return '';
     return `
-    <details class="group border border-slate-200 rounded-lg bg-slate-50 [&_summary::-webkit-details-marker]:hidden">
-    <summary class="flex items-center justify-between px-4 py-3 md:p-4 cursor-pointer text-[15px] md:text-base font-bold text-slate-800 hover:bg-slate-100 transition-colors leading-tight">
-    ${item.title || ''}
-    <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform group-open:-rotate-180"></i>
-    </summary>
-    <div class="p-4 border-t border-slate-200 bg-white text-slate-600 text-sm leading-relaxed html-content-view">${item.content || ''}</div>
+    <details class="faq-item">
+    <summary><span class="faq-q">${item.title || ''}</span></summary>
+    <div class="faq-body html-content-view">${item.content || ''}</div>
     </details>
     `;
     }).join('');
@@ -3879,6 +3872,7 @@
     if (contactPage) contactPage.classList.toggle('hidden', currentFilter !== 'contatti');
     renderFaq();
     if (currentFilter === 'contatti') {
+    const nt = document.getElementById('newsTitle'); if (nt) nt.classList.add('hidden');
     grid.innerHTML = '';
     empty.classList.add('hidden');
     lucide.createIcons();
@@ -3950,6 +3944,8 @@
     return dateB - dateA; // Discendente (più recente in alto)
     });
 
+    const newsTitleEl = document.getElementById('newsTitle');
+    if (newsTitleEl) { newsTitleEl.classList.toggle('hidden', filtered.length === 0); }
     if (filtered.length === 0) {     
     grid.innerHTML = '';     
     empty.classList.remove('hidden');     
