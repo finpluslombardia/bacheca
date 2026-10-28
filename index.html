@@ -600,6 +600,28 @@
     html.dark .panel-indigo { background-color: #1e2447; border-color: #312e81; }
     html.dark .panel-slate { background-color: #172033; border-color: #334155; }
     html.dark .panel-teal { background-color: #0f2f33; border-color: #134e4a; }
+        .panel-sky { background-color: #f0f9ff; border-color: #bae6fd; }
+    html.dark .panel-sky { background-color: #0c2a3d; border-color: #0c4a6e; }
+    .today-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.85rem; padding: 0.8rem 1rem; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+    .today-name { font-weight: 700; color: #1e293b; }
+    .today-slots { font-size: 0.875rem; color: #64748b; margin-top: 0.1rem; }
+    .today-var { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; background: #f3e8ff; color: #7e22ce; padding: 0.1rem 0.4rem; border-radius: 0.35rem; margin-left: 0.3rem; vertical-align: middle; }
+    .today-badge { flex-shrink: 0; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.7rem; border-radius: 9999px; border: 1px solid; white-space: nowrap; }
+    .today-badge.ok { background: #dcfce7; color: #15803d; border-color: #86efac; }
+    .today-badge.warn { background: #ffedd5; color: #c2410c; border-color: #fdba74; }
+    .today-badge.off { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+    .today-up-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; color: #64748b; margin-bottom: 0.4rem; }
+    .today-up-row { display: flex; gap: 0.75rem; font-size: 0.875rem; color: #334155; padding: 0.25rem 0; }
+    .today-up-date { font-weight: 700; min-width: 5.5rem; text-transform: capitalize; color: #0369a1; }
+    html.dark .today-row { background-color: #1e293b; border-color: #334155; }
+    html.dark .today-name { color: #f1f5f9; }
+    html.dark .today-slots { color: #94a3b8; }
+    html.dark .today-var { background: #3b0764; color: #e9d5ff; }
+    html.dark .today-badge.ok { background: #14532d; color: #86efac; border-color: #166534; }
+    html.dark .today-badge.warn { background: #431407; color: #fdba74; border-color: #7c2d12; }
+    html.dark .today-badge.off { background: #450a0a; color: #fca5a5; border-color: #7f1d1d; }
+    html.dark .today-up-row { color: #cbd5e1; }
+    html.dark .today-up-date { color: #7dd3fc; }
         /* === MENU CATEGORIE: tab desktop + drawer mobile === */
     @media (max-width: 767px) {
     .cat-desktop-only { display: none !important; }
@@ -843,6 +865,14 @@
     <section id="corsiSubmenu" class="hidden fade-in page-panel panel-indigo">
     <h2 class="cc-title text-xl font-bold mb-4 flex items-center gap-2"><i data-lucide="users" class="w-6 h-6 faq-head-icon"></i>I nostri corsi</h2>
     <div id="corsiSubmenuGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+    </section>
+
+    <!-- OGGI IN PISCINA (solo Home) -->
+    <section id="todayBox" class="hidden fade-in page-panel panel-sky">
+    <h2 class="cc-title text-xl font-bold mb-1 flex items-center gap-2"><i data-lucide="waves" class="w-6 h-6 faq-head-icon"></i>Oggi in piscina</h2>
+    <p id="todayDate" class="cc-muted text-sm mb-4"></p>
+    <div id="todayRows" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+    <div id="todayUpcoming" class="hidden mt-4"></div>
     </section>
 
     <div id="newsPanel" class="page-panel panel-slate">
@@ -2698,6 +2728,7 @@
     // Render Badge Corsi Nuoto (Speciale)
     if(document.getElementById('badgeCorsi')) renderCorsiBadge();
 
+    try { renderTodayBox(); } catch (e) { console.error(e); }
     lucide.createIcons();
     }
 
@@ -3566,6 +3597,13 @@
     { q: "Come vengo avvisato se una lezione cambia o non si svolge?", a: "Controlla il widget \"Corsi Nuoto\" in alto e gli avvisi nella Home: ogni variazione di calendario viene pubblicata lì." }
     ];
     const FAQ_DATA = {
+    all: [
+    { q: "Come faccio a sapere se la piscina è aperta?", a: "In alto trovi lo stato in tempo reale di Nuoto Libero, Segreteria e Corsi; il box \"Oggi in piscina\" mostra gli orari di oggi e le prossime variazioni. Toccando un widget in alto vedi gli orari di tutta la settimana." },
+    { q: "Dove si trova il Centro e come si arriva?", a: "Siamo in Via Lampugnano 76, 20151 Milano. Dalla metro M1 Uruguay sono circa 5 minuti a piedi; i bus 40, 68 e 69 fermano a 2 minuti, il 64 a 5. Nella sezione Contatti trovi la mappa." },
+    { q: "Come mi iscrivo a un corso?", a: "Le iscrizioni si effettuano in segreteria. Nella sezione Corsi trovi giorni, orari e tariffe di ogni attività; per qualsiasi dubbio puoi telefonare o scrivere." },
+    { q: "Come vengo avvisato di chiusure o variazioni?", a: "Gli avvisi importanti compaiono in evidenza in questa pagina e tra le News. Le chiusure straordinarie e i cambi di orario programmati sono indicati anche in \"Prossime variazioni\"." },
+    { q: "Come posso contattarvi?", a: "Puoi chiamare il 02.21061258, scrivere a cflampugnano@federnuoto.it oppure usare WhatsApp: tutti i riferimenti sono nella sezione Contatti." }
+    ],
     corsi: [
     { q: "Dove trovo giorni, orari e tariffe dei corsi?", a: "Nella pagina di ciascun corso (Scuola Nuoto, Aquafitness, Propaganda, Artistico, Aquagol, Master) trovi i menu a tendina con stagione, giorni e orari, tariffe. Dal menu \"Corsi\" scegli quello che ti interessa." },
     { q: "Come scelgo il corso giusto?", a: "Dipende da età, livello e obiettivo. Se hai dubbi, contatta la segreteria: ti indicheremo il corso più adatto." },
@@ -3756,6 +3794,68 @@
     }
     window.moveFaq = moveFaq;
     window.openFaqModal = openFaqModal; window.closeFaqModal = closeFaqModal; window.saveFaq = saveFaq; window.deleteFaq = deleteFaq;
+
+    // --- OGGI IN PISCINA (Home) ---
+    const TODAY_NAMES = { segreteria: 'Segreteria', nuoto: 'Nuoto Libero', vascaEsterna: 'Vasca Esterna', corsi: 'Corsi Nuoto' };
+    function getTodayDayData(type, now) {
+    const dateKey = now.toISOString().split('T')[0]; // stessa logica dei widget in alto
+    if (hoursConfig.specialClosures && hoursConfig.specialClosures.includes(dateKey)) return { active: false, slots: [], override: true };
+    const sp = hoursConfig.specialHours && hoursConfig.specialHours[dateKey] && hoursConfig.specialHours[dateKey][type];
+    if (sp) return { active: !!sp.active, slots: sp.slots || [], override: true };
+    const base = (hoursConfig[type] && hoursConfig[type][now.getDay()]) || { active: false, slots: [] };
+    return { active: !!base.active, slots: base.slots || [], override: false };
+    }
+    function renderTodayBox() {
+    const box = document.getElementById('todayBox');
+    if (!box) return;
+    if (currentFilter !== 'all' || showArchived || currentSearch !== '') { box.classList.add('hidden'); return; }
+    const now = new Date();
+    const order = hoursConfig.widgetOrder || ['segreteria', 'nuoto', 'corsi', 'vascaEsterna'];
+    const visible = hoursConfig.widgetVisible || { segreteria: true, nuoto: true, corsi: true, vascaEsterna: false };
+    const badge = (cls, label) => `<span class="today-badge ${cls}">${label}</span>`;
+    const rows = order.filter(t => visible[t] && TODAY_NAMES[t]).map(t => {
+    if (t === 'corsi') {
+    const dateKey = now.toISOString().split('T')[0];
+    let status = hoursConfig.corsi ? hoursConfig.corsi.status : 'regular';
+    if (hoursConfig.specialClosures && hoursConfig.specialClosures.includes(dateKey)) status = 'holiday';
+    else if (hoursConfig.specialHours && hoursConfig.specialHours[dateKey] && hoursConfig.specialHours[dateKey].corsi) status = hoursConfig.specialHours[dateKey].corsi.status;
+    const b = status === 'regular' ? badge('ok', 'Regolari') : status === 'holiday' ? badge('warn', 'Pausa festività') : badge('off', 'Sospesi');
+    return `<div class="today-row"><div><p class="today-name">${TODAY_NAMES[t]}</p><p class="today-slots">Lezioni di oggi</p></div>${b}</div>`;
+    }
+    const d = getTodayDayData(t, now);
+    const slotsText = (d.active && d.slots.length) ? d.slots.map(s => `${s.start} – ${s.end}`).join(' · ') : 'Chiuso oggi';
+    const st = calculateStatus(t, now);
+    const b = st === 'OPEN' ? badge('ok', 'Aperto') : st === 'CLOSING_SOON' ? badge('warn', 'Chiude tra poco') : st === 'OPENING_SOON' ? badge('warn', 'Apre tra poco') : badge('off', 'Chiuso');
+    const variation = d.override ? '<span class="today-var">Variazione</span>' : '';
+    return `<div class="today-row"><div><p class="today-name">${TODAY_NAMES[t]} ${variation}</p><p class="today-slots">${slotsText}</p></div>${b}</div>`;
+    }).join('');
+    document.getElementById('todayRows').innerHTML = rows;
+    document.getElementById('todayDate').textContent = now.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
+
+    // Prossime variazioni (chiusure o orari speciali dei giorni successivi)
+    const todayKey = now.toISOString().split('T')[0];
+    const dates = Array.from(new Set([...(hoursConfig.specialClosures || []), ...Object.keys(hoursConfig.specialHours || {})])).filter(d => d > todayKey).sort().slice(0, 3);
+    const up = document.getElementById('todayUpcoming');
+    if (dates.length === 0) { up.classList.add('hidden'); }
+    else {
+    up.innerHTML = '<p class="today-up-title">Prossime variazioni</p>' + dates.map(date => {
+    const label = new Date(date + 'T12:00:00').toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' });
+    let text;
+    if (hoursConfig.specialClosures && hoursConfig.specialClosures.includes(date)) text = 'Chiusura straordinaria';
+    else {
+    const sp = hoursConfig.specialHours[date] || {};
+    text = Object.keys(sp).filter(t => TODAY_NAMES[t] && (t === 'corsi' || visible[t])).map(t => {
+    if (t === 'corsi') return `${TODAY_NAMES[t]}: ${sp[t].status === 'regular' ? 'regolari' : sp[t].status === 'holiday' ? 'pausa festività' : 'sospesi'}`;
+    return `${TODAY_NAMES[t]}: ${(sp[t].active && sp[t].slots && sp[t].slots.length) ? sp[t].slots.map(s => `${s.start}–${s.end}`).join(' / ') : 'chiuso'}`;
+    }).join(' · ');
+    }
+    return text ? `<p class="today-up-row"><span class="today-up-date">${label}</span><span>${text}</span></p>` : '';
+    }).join('');
+    up.classList.toggle('hidden', up.innerHTML.indexOf('today-up-row') === -1);
+    }
+    box.classList.remove('hidden');
+    lucide.createIcons();
+    }
 
     function renderCorsiSubmenu() {
     const sec = document.getElementById('corsiSubmenu');
@@ -4026,6 +4126,7 @@
     if (contactPage) contactPage.classList.toggle('hidden', currentFilter !== 'contatti');
     renderFaq();
     renderCorsiSubmenu();
+    renderTodayBox();
     if (currentFilter === 'contatti') {
     const nt = document.getElementById('newsTitle'); if (nt) nt.classList.add('hidden');
     const np = document.getElementById('newsPanel'); if (np) np.classList.add('hidden');
