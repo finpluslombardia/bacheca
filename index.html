@@ -600,6 +600,27 @@
     html.dark .panel-indigo { background-color: #1e2447; border-color: #312e81; }
     html.dark .panel-slate { background-color: #172033; border-color: #334155; }
     html.dark .panel-teal { background-color: #0f2f33; border-color: #134e4a; }
+        .search-btn { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; flex-shrink: 0; border-radius: 0.6rem; border: 0; background: transparent; color: #64748b; cursor: pointer; transition: background-color .15s, color .15s; }
+    .search-btn:hover, .search-btn.active { background-color: #f1f5f9; color: #1e293b; }
+    .search-btn svg { width: 20px; height: 20px; }
+    .search-btn-mobile { border: 1px solid #e2e8f0; background: #ffffff; border-radius: 0.75rem; height: auto; }
+    .search-row-icon { width: 20px; height: 20px; color: #94a3b8; flex-shrink: 0; }
+    .search-row-input { flex: 1; min-width: 0; padding: 0.55rem 0.5rem; font-size: 1rem; color: #1e293b; background: transparent; border: 0; outline: none; }
+    html.dark .search-btn { color: #94a3b8; }
+    html.dark .search-btn:hover, html.dark .search-btn.active { background-color: #334155; color: #f1f5f9; }
+    html.dark .search-btn-mobile { background-color: #1e293b; border-color: #334155; }
+    html.dark .search-row { background-color: #1e293b; border-color: #334155; }
+    html.dark .search-row-input { color: #f1f5f9; }
+    .mobile-contact-bar { display: none; }
+    @media (max-width: 767px) {
+    .mobile-contact-bar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; gap: 0.5rem; padding: 0.5rem 0.75rem calc(0.5rem + env(safe-area-inset-bottom)); background: #ffffff; border-top: 1px solid #e2e8f0; box-shadow: 0 -2px 10px rgba(0,0,0,.08); }
+    body { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
+    #toast { bottom: 5.5rem !important; }
+    }
+    .mcb-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.7rem; border-radius: 0.75rem; font-weight: 700; color: #ffffff; text-decoration: none; }
+    .mcb-call { background-color: #0d9488; }
+    .mcb-wa { background-color: #16a34a; }
+    html.dark .mobile-contact-bar { background-color: #1e293b; border-color: #334155; }
         /* === MENU CATEGORIE: tab desktop + drawer mobile === */
     @media (max-width: 767px) {
     .cat-desktop-only { display: none !important; }
@@ -716,24 +737,35 @@
     <!-- BANNER CATEGORIE UNIFICATO (Desktop: tab / Mobile: bottone menu) -->
     <div class="bg-white dark:bg-slate-900 border-b border-slate-200 shadow-sm relative z-10" style="background-color: #ffffff; z-index: 15;">
     <!-- DESKTOP: tab -->
-    <div class="max-w-6xl mx-auto px-4 cat-desktop-only relative">
-    <div class="scroll-fade-wrapper" id="categoryFadeWrapper">
+    <div class="max-w-6xl mx-auto px-4 cat-desktop-only relative flex items-center gap-2">
+    <div class="scroll-fade-wrapper flex-1 min-w-0" id="categoryFadeWrapper">
     <div class="flex gap-1 overflow-x-auto no-scrollbar items-stretch" id="categoryFiltersContainer">
     <!-- Generato via JS -->
     </div>
     </div><!-- /scroll-fade-wrapper -->
+    <button type="button" id="searchBtnDesktop" onclick="toggleTopSearch()" class="search-btn" aria-label="Cerca negli avvisi" title="Cerca"><i data-lucide="search"></i></button>
     <div id="corsiDropdown" class="hidden absolute top-full z-30 min-w-[210px] bg-white border border-slate-200 rounded-xl shadow-lg py-1" onmouseenter="cancelHideCorsi()" onmouseleave="scheduleHideCorsi()"></div>
     </div>
 
     <!-- MOBILE: bottone menu -->
-    <div class="max-w-6xl mx-auto px-4 py-2 cat-mobile-only">
-    <button id="mobileMenuBtn" type="button" onclick="toggleMobileMenu()" aria-label="Apri il menu delle categorie" aria-haspopup="true" class="mobile-menu-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 active:bg-slate-50">
+    <div class="max-w-6xl mx-auto px-4 py-2 cat-mobile-only flex gap-2">
+    <button id="mobileMenuBtn" type="button" onclick="toggleMobileMenu()" aria-label="Apri il menu delle categorie" aria-haspopup="true" class="mobile-menu-btn flex-1 flex items-center gap-3 px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 active:bg-slate-50">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
     <span class="flex flex-col items-start leading-tight">
     <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Menu</span>
     <span id="mobileMenuLabel" class="text-sm font-bold">Home</span>
     </span>
     </button>
+    <button type="button" id="searchBtnMobile" onclick="toggleTopSearch()" class="search-btn search-btn-mobile" aria-label="Cerca negli avvisi"><i data-lucide="search"></i></button>
+    </div>
+
+    <!-- RICERCA -->
+    <div id="searchRow" class="hidden border-t border-slate-100 search-row">
+    <div class="max-w-6xl mx-auto px-4 py-2 flex items-center gap-2">
+    <i data-lucide="search" class="search-row-icon"></i>
+    <input id="topSearchInput" type="search" placeholder="Cerca negli avvisi..." autocomplete="off" oninput="onTopSearch(this.value)" onkeydown="if(event.key==='Escape') toggleTopSearch(false)" class="search-row-input">
+    <button type="button" onclick="toggleTopSearch(false)" class="search-btn" aria-label="Chiudi ricerca"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+    </div>
     </div>
 
     <!-- SOTTOCATEGORIE (solo desktop) -->
@@ -922,7 +954,7 @@
     <div class="mb-10 flex flex-col md:flex-row justify-between items-center gap-4">
     <div class="relative w-full md:w-1/4">
     <i data-lucide="search" class="absolute left-4 top-3.5 text-slate-400 w-5 h-5"></i>
-    <input type="text" placeholder="Cerca avvisi..." class="w-full bg-slate-700 border border-slate-600 rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-inner" oninput="updateSearch(this.value)">
+    <input id="footerSearchInput" type="text" placeholder="Cerca avvisi..." class="w-full bg-slate-700 border border-slate-600 rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-inner" oninput="updateSearch(this.value)">
     </div>
     
     <!-- Tasto Dark Mode -->
@@ -1068,6 +1100,12 @@
     <button type="button" onclick="saveAcc()" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium">Salva</button>
     </div>
     </div>
+    </div>
+
+    <!-- BARRA CONTATTI (solo mobile) -->
+    <div id="mobileContactBar" class="mobile-contact-bar">
+    <a href="tel:0221061258" class="mcb-btn mcb-call"><i data-lucide="phone" class="w-5 h-5"></i><span>Chiama</span></a>
+    <a href="https://wa.me/message/SIT75DBXZR2EF1" target="_blank" rel="noopener" class="mcb-btn mcb-wa"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg><span>WhatsApp</span></a>
     </div>
 
     <!-- TOAST NOTIFICATION (Modificato z-index per stare sopra i modali) -->
@@ -3462,7 +3500,25 @@
     dd.classList.remove('hidden');
     }
     window.showCorsiDropdown = showCorsiDropdown; window.scheduleHideCorsi = scheduleHideCorsi; window.cancelHideCorsi = cancelHideCorsi;
-        // --- MENU MOBILE (drawer) ---
+        // --- RICERCA vicino al menu ---
+    function onTopSearch(v) {
+    const f = document.getElementById('footerSearchInput');
+    if (f) f.value = v;
+    updateSearch(v);
+    }
+    function toggleTopSearch(force) {
+    const row = document.getElementById('searchRow');
+    const inp = document.getElementById('topSearchInput');
+    if (!row || !inp) return;
+    const open = (typeof force === 'boolean') ? force : row.classList.contains('hidden');
+    row.classList.toggle('hidden', !open);
+    ['searchBtnDesktop', 'searchBtnMobile'].forEach(id => { const b = document.getElementById(id); if (b) b.classList.toggle('active', open); });
+    if (open) { inp.value = currentSearch; setTimeout(() => inp.focus(), 50); }
+    else if (currentSearch !== '') { onTopSearch(''); inp.value = ''; }
+    }
+    window.onTopSearch = onTopSearch; window.toggleTopSearch = toggleTopSearch;
+
+    // --- MENU MOBILE (drawer) ---
     function renderMobileMenuList() {
     const list = document.getElementById('mobileMenuList');
     if (!list) return;
@@ -4180,6 +4236,13 @@
 
     badgesHtml += `<span class="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wide border ${badgeStyle} mr-1 mb-1">${catData.label}</span>`;
     });
+
+    // Badge "Nuovo": data mostrata sulla card negli ultimi 7 giorni
+    const _shownTs = n.displayDate ? new Date(n.displayDate).getTime() : n.timestamp;
+    const _nowTs = Date.now();
+    if (_shownTs && _shownTs <= _nowTs + 86400000 && (_nowTs - _shownTs) <= 7 * 86400000) {
+    badgesHtml += `<span class="px-2 py-0.5 rounded-md text-xs font-bold uppercase tracking-wide bg-rose-500 text-white mr-1 mb-1">Nuovo</span>`;
+    }
 
     // Calcolo euristico per "Leggi di più": se testo lungo (>130 car) o più di 3 a capo
     const plainText = n.content.replace(/<[^>]+>/g, '');
