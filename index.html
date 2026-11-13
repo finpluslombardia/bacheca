@@ -864,7 +864,8 @@
     </section>
 
     <div id="newsPanel" class="page-panel panel-slate">
-    <h2 id="newsTitle" class="hidden cc-title text-xl font-bold mb-4 flex items-center gap-2"><i data-lucide="newspaper" class="w-6 h-6 faq-head-icon"></i>News</h2>
+    <h2 id="newsTitle" class="cc-title text-xl font-bold mb-4 flex items-center gap-2"><i data-lucide="newspaper" class="w-6 h-6 faq-head-icon"></i>News</h2>
+    <div id="newsLoading" class="flex flex-col items-center justify-center text-center text-slate-500 dark:text-slate-400" style="min-height:280px"><div class="loader mb-4"></div><p class="font-semibold">Notizie in caricamento…</p></div>
     <div id="noticesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start"></div>
     </div><!-- /newsPanel -->
 
@@ -1721,6 +1722,7 @@
     const HOURS_DOC_ID = 'opening_hours';
 
     let notices = [];
+    let noticesLoaded = false;
     let currentFilter = 'all';
     let currentSearch = '';
     let isAdminLoggedIn = false;
@@ -3358,7 +3360,7 @@
 
     unsubscribeSnapshot = onSnapshot(collection(db, NOTICES_COLLECTION), (snapshot) => {
     notices = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    loading.classList.add('hidden'); renderNotices();
+    loading.classList.add('hidden'); noticesLoaded = true; renderNotices();
 
     // CHECK URL PARAM FOR SHARED NOTICE OR POPUP
     if (!initialLoadHandled) {
@@ -3390,7 +3392,7 @@
     }
 
     }, (error) => {
-    console.error("Errore listener:", error); loading.classList.add('hidden');
+    console.error("Errore listener:", error); loading.classList.add('hidden'); noticesLoaded = true; try { renderNotices(); } catch(e) {}
     if (error.code === 'permission-denied') { showToast("Errore permessi DB. Controlla console Firebase.", true); }
     });
     }
@@ -4151,9 +4153,12 @@
     });
 
     const newsTitleEl = document.getElementById('newsTitle');
-    if (newsTitleEl) { newsTitleEl.classList.toggle('hidden', filtered.length === 0); }
+    const hideNews = noticesLoaded && filtered.length === 0;
+    if (newsTitleEl) { newsTitleEl.classList.toggle('hidden', hideNews); }
     const newsPanelEl = document.getElementById('newsPanel');
-    if (newsPanelEl) { newsPanelEl.classList.toggle('hidden', filtered.length === 0); }
+    if (newsPanelEl) { newsPanelEl.classList.toggle('hidden', hideNews); }
+    const newsLoadingEl = document.getElementById('newsLoading');
+    if (newsLoadingEl) { newsLoadingEl.classList.toggle('hidden', noticesLoaded); }
     if (filtered.length === 0) {     
     grid.innerHTML = '';     
     empty.classList.remove('hidden');     
