@@ -917,17 +917,7 @@
       background: rgba(255,255,255,.18); box-shadow: inset 0 1px 0 rgba(255,255,255,.4); filter: none;
     }
 
-    /* ---- Luce che segue puntatore/dito su card, domande e tessere ---- */
-    body.glass .card, body.glass .course-tile, body.glass .faq-item { position: relative; }
-    body.glass .card::after, body.glass .course-tile::after, body.glass .faq-item::after {
-      content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 2;
-      background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 0%), rgba(255,255,255,.34), transparent 62%);
-      opacity: 0; transition: opacity .25s ease;
-    }
-    html.dark body.glass .card::after, html.dark body.glass .course-tile::after, html.dark body.glass .faq-item::after {
-      background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 0%), rgba(255,255,255,.14), transparent 62%);
-    }
-    body.glass .card.lg-lit::after, body.glass .course-tile.lg-lit::after, body.glass .faq-item.lg-lit::after { opacity: 1; }
+    /* ---- Sollevamento morbido su domande e tessere ---- */
     body.glass .course-tile, body.glass .faq-item { transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease; }
     body.glass .course-tile:hover, body.glass .faq-item:hover { transform: translateY(-1px); box-shadow: 0 10px 26px rgba(31,45,100,.12), inset 0 1px 0 var(--g-edge) !important; }
     body.glass .card:active, body.glass .course-tile:active { transform: scale(.992); }
@@ -2009,32 +1999,6 @@
     </div>
 
     <!-- APP LOGIC -->
-    <script>
-    /* Liquid glass: luce che segue il puntatore (solo effetto visivo) */
-    (function () {
-      var SEL = '.card, .course-tile, .faq-item', last = null, raf = 0;
-      function lit(el, x, y) {
-        var r = el.getBoundingClientRect();
-        el.style.setProperty('--mx', (x - r.left) + 'px');
-        el.style.setProperty('--my', (y - r.top) + 'px');
-        if (last !== el) { if (last) last.classList.remove('lg-lit'); el.classList.add('lg-lit'); last = el; }
-      }
-      function move(e) {
-        if (!e.target || !e.target.closest) return;
-        var el = e.target.closest(SEL), x = e.clientX, y = e.clientY;
-        cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(function () {
-          if (el) lit(el, x, y); else if (last) { last.classList.remove('lg-lit'); last = null; }
-        });
-      }
-      function off() { if (last) { last.classList.remove('lg-lit'); last = null; } }
-      document.addEventListener('pointermove', move, { passive: true });
-      document.addEventListener('pointerdown', move, { passive: true });
-      document.addEventListener('pointerup', function (e) { if (e.pointerType !== 'mouse') setTimeout(off, 220); }, { passive: true });
-      document.addEventListener('pointerleave', off);
-      document.addEventListener('scroll', function () { if (last) off(); }, { passive: true });
-    })();
-    </script>
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
