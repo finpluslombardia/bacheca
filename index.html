@@ -671,6 +671,33 @@
     html.dark .mobile-item { color: #cbd5e1; }
     html.dark .mobile-item.active { color: var(--accent-dk); }
     html.dark .mobile-item.active svg { color: var(--accent-dk); }
+    /* ---- Finestra orari (vista pubblico): righe compatte con fasce a pillola ---- */
+    .sch-status { display: flex; align-items: center; gap: .6rem; padding: .6rem .95rem; border-radius: 1rem; margin-bottom: .6rem; font-size: .9rem; font-weight: 500; }
+    .sch-dot { width: .6rem; height: .6rem; border-radius: 999px; flex-shrink: 0; }
+    .sch-open { background: rgba(34,197,94,.14); color: #15803d; border: 1px solid rgba(34,197,94,.30); }
+    .sch-open .sch-dot { background: #22c55e; box-shadow: 0 0 10px rgba(34,197,94,.7); }
+    .sch-shut { background: rgba(100,116,139,.12); color: #475569; border: 1px solid rgba(100,116,139,.25); }
+    .sch-shut .sch-dot { background: #94a3b8; }
+    .sch-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; padding: .6rem .25rem; border-bottom: 1px solid rgba(148,163,184,.25); }
+    .sch-row:last-child { border-bottom: 0; }
+    .sch-day { font-weight: 500; color: #475569; padding-top: .22rem; }
+    .sch-hours { flex: 1; display: flex; justify-content: flex-end; }
+    .sch-slots { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .35rem; }
+    .sch-chip { font-variant-numeric: tabular-nums; font-size: .85rem; padding: .2rem .65rem; border-radius: 999px; background: rgba(99,102,241,.10); color: #1e293b; border: 1px solid rgba(99,102,241,.18); white-space: nowrap; }
+    .sch-closed { background: rgba(239,68,68,.10); color: #dc2626; border-color: rgba(239,68,68,.25); }
+    .sch-today { background: rgba(99,132,255,.14); border-radius: 1rem; margin: .15rem -.5rem; padding-left: .75rem; padding-right: .75rem; border-bottom-color: transparent; }
+    .sch-today .sch-day { color: #1d4ed8; font-weight: 600; }
+    .sch-future .sch-day { font-size: .85rem; text-transform: capitalize; }
+    html.dark .sch-day { color: #cbd5e1; }
+    html.dark .sch-today .sch-day { color: #93b4ff; }
+    html.dark .sch-chip { color: #e2e8f0; background: rgba(129,140,248,.16); border-color: rgba(129,140,248,.28); }
+    html.dark .sch-closed { color: #fca5a5; background: rgba(239,68,68,.16); border-color: rgba(239,68,68,.32); }
+    html.dark .sch-open { color: #86efac; }
+    html.dark .sch-shut { color: #cbd5e1; background: rgba(148,163,184,.12); }
+    #scheduleModal > div { max-width: 33rem; }
+    .sch-chip { padding: .2rem .55rem; }
+    @media (max-width: 480px) { .sch-row { flex-direction: column; gap: .35rem; padding: .55rem .25rem; } .sch-day { padding-top: 0; } .sch-hours, .sch-slots { justify-content: flex-start; } .sch-slots { gap: .3rem; } .sch-chip { font-size: .76rem; padding: .16rem .4rem; letter-spacing: -.01em; } .sch-slots { gap: .25rem; } }
+
     /* =====================================================================
        LIQUID GLASS  (strato solo grafico: per disattivarlo basta togliere
        la classe "glass" dal tag body)
@@ -970,6 +997,28 @@
     @media (prefers-reduced-motion: reduce) {
       body.glass *, body.glass *::after { animation: none !important; transition: none !important; }
     }
+
+    /* "I nostri corsi": una sola riga compatta di pillole di vetro */
+    body.glass #corsiSubmenu { padding: .9rem 1rem 1rem; }
+    body.glass #corsiSubmenu .cc-title { margin-bottom: .65rem; font-size: 1rem; }
+    body.glass #corsiSubmenuGrid {
+      display: flex; flex-wrap: nowrap; gap: .5rem; overflow-x: auto; padding: .15rem .1rem .3rem;
+      scroll-snap-type: x proximity; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+    }
+    body.glass #corsiSubmenuGrid::-webkit-scrollbar { display: none; }
+    body.glass #corsiSubmenuGrid .course-tile {
+      flex: 1 1 auto; width: auto; min-width: max-content; scroll-snap-align: start;
+      gap: .5rem; padding: .4rem .95rem .4rem .45rem; border-radius: 999px !important; justify-content: center;
+      -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    }
+    body.glass #corsiSubmenuGrid .course-tile-icon {
+      width: 28px; height: 28px; border-radius: 999px; background-color: rgba(99,102,241,.16);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
+    }
+    body.glass #corsiSubmenuGrid .course-tile-icon svg { width: 15px; height: 15px; }
+    body.glass #corsiSubmenuGrid .course-tile-label { flex: 0 1 auto; font-weight: 500; font-size: .9rem; white-space: nowrap; }
+    body.glass #corsiSubmenuGrid .course-tile-arrow { display: none; }
+    html.dark body.glass #corsiSubmenuGrid .course-tile-icon { background-color: rgba(129,140,248,.22); }
 
     /* Se il dispositivo chiede meno trasparenze, torna a colori pieni */
     @media (prefers-reduced-transparency: reduce) {
@@ -3228,6 +3277,21 @@
     return;
     }
 
+    // Stato "adesso" calcolato sugli orari di oggi (solo visualizzazione)
+    function schedStatus(dayData) {
+    try {
+    if (!dayData || !dayData.active || !dayData.slots || !dayData.slots.length) return { open: false, text: 'Chiuso oggi' };
+    const toM = t => { const p = String(t).split(':').map(Number); return p[0] * 60 + (p[1] || 0); };
+    const m = now.getHours() * 60 + now.getMinutes();
+    const sl = dayData.slots.map(x => ({ a: toM(x.start), b: toM(x.end), s: x })).sort((x, y) => x.a - y.a);
+    for (const x of sl) { if (m >= x.a && m < x.b) return { open: true, text: 'Aperto ora · fino alle ' + x.s.end }; }
+    const nx = sl.find(x => x.a > m);
+    if (nx) return { open: false, text: 'Chiuso ora · riapre alle ' + nx.s.start };
+    return { open: false, text: 'Chiuso per oggi' };
+    } catch (e) { return null; }
+    }
+    let todayData = null;
+
     const titles = { 'segreteria': 'Orari Segreteria', 'nuoto': 'Orari Nuoto Libero', 'vascaEsterna': 'Orari Vasca Esterna' };
     document.getElementById('scheduleModalTitle').innerText = titles[type];
     
@@ -3257,11 +3321,11 @@
     }
     }
 
-    let hoursText = '<span class="text-red-500 font-bold">Chiuso</span>';
+    if (isToday) todayData = dayData;
+    let hoursText = '<span class="sch-chip sch-closed">Chiuso</span>';
     if (dayData.active && dayData.slots && dayData.slots.length > 0) {
-    // MODIFICA: Ora genera una lista verticale di div invece di una stringa con /
-    hoursText = `<div class="flex flex-col items-end gap-1">
-    ${dayData.slots.map(s => `<span>${s.start} - ${s.end}</span>`).join('')}
+    hoursText = `<div class="sch-slots">
+    ${dayData.slots.map(s => `<span class="sch-chip">${s.start} – ${s.end}</span>`).join('')}
     </div>`;
     }
 
@@ -3270,17 +3334,19 @@
 
     // MODIFICA: items-center per centratura verticale
     html += `
-    <div class="flex justify-between items-center py-3 border-b border-gray-100 last:border-0 ${isToday ? 'bg-blue-50 px-3 -mx-3 rounded-lg' : ''}">
-    <span class="font-medium ${isToday ? 'text-blue-700 font-bold' : 'text-gray-600'}">
-    ${DAYS_MAP[dayIdx]}     
+    <div class="sch-row ${isToday ? 'sch-today' : ''}">
+    <span class="sch-day">
+    ${DAYS_MAP[dayIdx]}
     ${isToday ? '<span class="text-[10px] bg-blue-100 text-blue-600 px-1.5 rounded ml-1">OGGI</span>' : ''}
     ${overrideBadge}
     </span>
-    <div class="text-sm ${dayData.active ? 'text-gray-800' : 'text-red-500'} text-right">
-    ${hoursText}
-    </div>
+    <div class="sch-hours">${hoursText}</div>
     </div>`;
     });
+
+    // Riga di stato in cima: aperto/chiuso adesso
+    const stNow = schedStatus(todayData);
+    if (stNow) html = `<div class="sch-status ${stNow.open ? 'sch-open' : 'sch-shut'}"><span class="sch-dot"></span>${stNow.text}</div>` + html;
 
     // Sezione Variazioni Future (Esclude OGGI perché già mostrato sopra)
     const upcomingSpecial = Object.keys(hoursConfig.specialHours || {})
@@ -3296,19 +3362,17 @@
     const spData = hoursConfig.specialHours[date][type];
     if(spData) {
     hasItems = true;
-    let spText = '<span class="text-red-500 font-bold">Chiuso</span>';
+    let spText = '';
     if (spData.active && spData.slots && spData.slots.length > 0) {
     // MODIFICA: Anche qui lista verticale
-    spText = `<div class="flex flex-col items-end gap-0.5">
-    ${spData.slots.map(s => `<span>${s.start} - ${s.end}</span>`).join('')}
+    spText = `<div class="sch-slots">
+    ${spData.slots.map(s => `<span class="sch-chip">${s.start} – ${s.end}</span>`).join('')}
     </div>`;
-    }
+    } else { spText = '<span class="sch-chip sch-closed">Chiuso</span>'; }
     specialHtml += `
-    <div class="flex justify-between items-center py-2 text-xs border-b border-gray-50 last:border-0">
-    <span class="font-semibold text-gray-700">${new Date(date).toLocaleDateString('it-IT')}</span>
-    <div class="${spData.active ? 'text-gray-800' : 'text-red-500'} text-right">
-    ${spText}
-    </div>
+    <div class="sch-row sch-future">
+    <span class="sch-day">${new Date(date + 'T12:00:00').toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
+    <div class="sch-hours">${spText}</div>
     </div>`;
     }
     });
