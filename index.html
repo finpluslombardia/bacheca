@@ -30,7 +30,7 @@
     <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 
     <!-- Font: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
     :root { color-scheme: light only; }
@@ -832,6 +832,72 @@
       background-color: var(--g-fill) !important; border-top: 1px solid var(--g-border) !important;
       -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
     }
+
+    /* Scritte più leggere */
+    body.glass h1, body.glass h2, body.glass h3, body.glass h4,
+    body.glass .font-bold, body.glass .font-extrabold, body.glass .font-black { font-weight: 600; letter-spacing: -.01em; }
+    body.glass .font-semibold { font-weight: 500; }
+    body.glass .font-medium { font-weight: 400; }
+    body.glass .cc-title { font-weight: 600; }
+    body.glass .faq-item summary, body.glass .faq-item summary .faq-q, body.glass .faq-q { font-weight: 400; }
+    body.glass .cat-tab { font-weight: 500; }
+    body.glass .cat-tab.active { font-weight: 600; }
+    body.glass .html-content-view strong, body.glass .html-content-view b { font-weight: 600; }
+    @media (max-width: 639px) {
+      body.glass .cc-title { font-size: 1.15rem; }
+      body.glass .card h3 { font-size: 1.05rem; }
+    }
+
+    /* Piè di pagina scuro in vetro + barra di ricerca visibile */
+    body.glass div.bg-slate-800.text-white.py-12 {
+      background-color: rgba(38,60,160,.66) !important;
+      border-top: 1px solid rgba(255,255,255,.28) !important;
+      -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
+    }
+    html.dark body.glass div.bg-slate-800.text-white.py-12 { background-color: rgba(8,13,30,.55) !important; border-top-color: rgba(255,255,255,.12) !important; }
+    body.glass #footerSearchInput {
+      background-color: rgba(255,255,255,.16) !important;
+      border: 1px solid rgba(255,255,255,.38) !important;
+      border-radius: 999px !important;
+      color: #fff !important;
+      -webkit-backdrop-filter: blur(14px) saturate(170%); backdrop-filter: blur(14px) saturate(170%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 4px 16px rgba(0,0,0,.12) !important;
+    }
+    body.glass #footerSearchInput::placeholder { color: rgba(255,255,255,.72) !important; }
+    body.glass #footerSearchInput:focus { background-color: rgba(255,255,255,.24) !important; border-color: rgba(255,255,255,.6) !important; box-shadow: 0 0 0 3px rgba(255,255,255,.18) !important; }
+    body.glass div.bg-slate-800 .bg-slate-700 {
+      background-color: rgba(255,255,255,.12) !important;
+      border: 1px solid rgba(255,255,255,.28) !important;
+      border-radius: 999px !important;
+      -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.28);
+    }
+    body.glass div.bg-slate-800 a.bg-slate-700, body.glass div.bg-slate-800 button.bg-slate-700 { border-radius: 999px !important; }
+    body.glass div.bg-slate-800 .text-slate-400, body.glass div.bg-slate-800 .text-slate-300 { color: rgba(255,255,255,.78) !important; }
+    body.glass div.bg-slate-800 .hover\:bg-slate-600:hover { background-color: rgba(255,255,255,.22) !important; }
+
+    /* Box orari (Nuoto Libero / Segreteria / Corsi) */
+    html:not(.dark) body.glass #scheduleModal > div, html.dark body.glass #scheduleModal > div, body.glass #hoursModal > div {
+      background-color: var(--g-fill-strong) !important;
+    }
+    html.dark body.glass #scheduleModal > div, html.dark body.glass #hoursModal > div { background-color: rgba(20,28,52,.78) !important; }
+    body.glass #scheduleModal .bg-gray-50, body.glass #scheduleModal [style*="background-color: #ffffff"],
+    html:not(.dark) body.glass #scheduleModal .bg-gray-50, html.dark body.glass #scheduleModal .bg-gray-50 { background-color: transparent !important; }
+    body.glass #scheduleModal .border-gray-100, body.glass #scheduleModalContent .border-gray-100,
+    html:not(.dark) body.glass #scheduleModalContent .border-gray-100, html:not(.dark) body.glass #scheduleModalContent .border-b { border-color: rgba(100,116,139,.22) !important; }
+    html:not(.dark) body.glass #scheduleModalContent .bg-blue-50 {
+      background-color: rgba(99,132,255,.16) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.7), inset 0 0 0 1px rgba(255,255,255,.55); border-radius: 1rem;
+    }
+    html.dark body.glass #scheduleModalContent .bg-blue-50 { background-color: rgba(99,132,255,.20) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.18); border-radius: 1rem; }
+    html.dark body.glass #scheduleModalContent { color: #e2e8f0 !important; }
+    html.dark body.glass #scheduleModalContent .text-gray-600 { color: #cbd5e1 !important; }
+    html.dark body.glass #scheduleModalContent .text-gray-800 { color: #f1f5f9 !important; }
+    html.dark body.glass #scheduleModalContent .text-blue-700 { color: #93b4ff !important; }
+    html.dark body.glass #scheduleModalContent .border-gray-100, html.dark body.glass #scheduleModalContent .border-b { border-color: rgba(255,255,255,.10) !important; }
+    body.glass #scheduleModalContent .bg-blue-100 { background-color: rgba(99,132,255,.22) !important; }
+    body.glass #scheduleSpecialNote { background-color: rgba(251,146,60,.14) !important; border-color: rgba(251,146,60,.35) !important; border-radius: 1rem; }
+    html.dark body.glass #scheduleSpecialNote { color: #fdba74 !important; }
 
     /* Se il dispositivo chiede meno trasparenze, torna a colori pieni */
     @media (prefers-reduced-transparency: reduce) {
