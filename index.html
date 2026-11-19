@@ -759,19 +759,22 @@
 
     /* Header e barra stato */
     body.glass > header {
-      background-color: rgba(65,105,225,.62) !important;
+      background-color: rgba(65,105,225,.97) !important;
       -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
-      border-bottom: 1px solid rgba(255,255,255,.28);
-      box-shadow: 0 6px 24px rgba(31,45,100,.18), inset 0 1px 0 rgba(255,255,255,.35);
+      border-bottom: 1px solid rgba(255,255,255,.22);
+      box-shadow: 0 6px 22px rgba(40,70,190,.22), inset 0 1px 0 rgba(255,255,255,.30);
     }
-    html.dark body.glass > header { background-color: rgba(28,45,110,.55) !important; border-bottom-color: rgba(255,255,255,.10); }
+    html.dark body.glass > header { background-color: rgba(38,62,165,.97) !important; border-bottom-color: rgba(255,255,255,.12); }
     body.glass > div.bg-blue-950 {
-      background-color: rgba(12,22,64,.55) !important;
+      background-color: rgba(23,37,84,.97) !important;
       -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
       border-bottom: 1px solid rgba(255,255,255,.10) !important;
       box-shadow: none !important;
     }
+    html.dark body.glass > div.bg-blue-950 { background-color: rgba(9,16,46,.97) !important; }
     body.glass .widget-badge { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+    /* niente fumetto/ombra scura al passaggio sulle pillole orari */
+    .widget-badge::after, .widget-badge:hover::after { display: none !important; content: none !important; }
 
     /* Barra menu */
     body.glass > div.bg-white[style*="z-index: 15"] {
