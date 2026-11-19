@@ -844,9 +844,13 @@
     body.glass .cat-tab.active { font-weight: 600; }
     body.glass .html-content-view strong, body.glass .html-content-view b { font-weight: 600; }
     @media (max-width: 639px) {
-      body.glass .cc-title { font-size: 1.15rem; }
+      body.glass .cc-title { font-size: 1rem; }
+      body.glass #viewNoticeTitle { font-size: 1.2rem; margin-bottom: 1rem; }
       body.glass .card h3 { font-size: 1.05rem; }
     }
+
+    /* Titolo della notizia aperta: proporzionato al testo */
+    @media (min-width: 768px) { body.glass #viewNoticeTitle { font-size: 1.5rem; line-height: 1.3; margin-bottom: 1.1rem; } }
 
     /* Piè di pagina scuro in vetro + barra di ricerca visibile */
     body.glass div.bg-slate-800.text-white.py-12 {
