@@ -802,6 +802,22 @@
     }
     html.dark body.glass [id$="Modal"] > div:not(.absolute) { background-color: rgba(20,28,52,.80) !important; }
 
+    /* Sfondo delle finestre: velo chiaro e sfocato invece del nero */
+    body.glass [id$="Modal"], body.glass #mobileMenu > .absolute.inset-0 {
+      background-color: rgba(190,206,255,.30) !important;
+      -webkit-backdrop-filter: blur(14px) saturate(160%); backdrop-filter: blur(14px) saturate(160%);
+    }
+    html.dark body.glass [id$="Modal"], html.dark body.glass #mobileMenu > .absolute.inset-0 { background-color: rgba(4,8,22,.45) !important; }
+    /* Notizia aperta */
+    body.glass #viewNoticeInnerContainer {
+      background-color: var(--g-fill-strong) !important;
+      -webkit-backdrop-filter: blur(30px) saturate(180%); backdrop-filter: blur(30px) saturate(180%);
+    }
+    html.dark body.glass #viewNoticeInnerContainer { background-color: rgba(20,28,52,.78) !important; }
+    body.glass #viewNoticeInnerContainer .bg-white, body.glass #viewNoticeInnerContainer .bg-slate-50, body.glass #viewNoticeInnerContainer .bg-gray-50 { background-color: transparent !important; }
+    html.dark body.glass #viewNoticeInnerContainer { color: #e2e8f0; }
+    html.dark body.glass #viewNoticeInnerContainer .text-slate-800, html.dark body.glass #viewNoticeInnerContainer .text-gray-800, html.dark body.glass #viewNoticeInnerContainer h2, html.dark body.glass #viewNoticeInnerContainer h3 { color: #f1f5f9 !important; }
+
     /* Pulsanti principali e campi */
     body.glass .rounded-xl.bg-green-600, body.glass button.bg-green-600 { border-radius: 999px; box-shadow: 0 6px 18px rgba(22,163,74,.30), inset 0 1px 0 rgba(255,255,255,.35); }
     body.glass button.bg-gray-100, body.glass button.bg-slate-100, body.glass button.bg-gray-200 { background-color: var(--g-card) !important; border: 1px solid var(--g-border); border-radius: 999px; }
