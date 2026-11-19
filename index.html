@@ -671,6 +671,158 @@
     html.dark .mobile-item { color: #cbd5e1; }
     html.dark .mobile-item.active { color: var(--accent-dk); }
     html.dark .mobile-item.active svg { color: var(--accent-dk); }
+    /* =====================================================================
+       LIQUID GLASS  (strato solo grafico: per disattivarlo basta togliere
+       la classe "glass" dal tag body)
+       ===================================================================== */
+    body.glass {
+      --g-fill: rgba(255,255,255,.46);
+      --g-fill-strong: rgba(255,255,255,.72);
+      --g-card: rgba(255,255,255,.66);
+      --g-border: rgba(255,255,255,.75);
+      --g-edge: rgba(255,255,255,.95);
+      --g-shadow: 0 8px 32px rgba(31,45,100,.10), 0 1px 2px rgba(31,45,100,.06);
+      --g-blur: blur(22px) saturate(180%);
+      background-color: #e9eefc !important;
+      background-image:
+        radial-gradient(60rem 38rem at 8% -6%, rgba(99,132,255,.42), transparent 60%),
+        radial-gradient(48rem 34rem at 96% 4%, rgba(45,212,191,.30), transparent 60%),
+        radial-gradient(52rem 40rem at 70% 105%, rgba(167,139,250,.30), transparent 62%),
+        radial-gradient(40rem 30rem at 0% 92%, rgba(56,189,248,.28), transparent 60%) !important;
+      background-attachment: fixed !important;
+    }
+    html.dark body.glass {
+      --g-fill: rgba(30,41,70,.42);
+      --g-fill-strong: rgba(22,30,54,.78);
+      --g-card: rgba(36,48,82,.52);
+      --g-border: rgba(255,255,255,.11);
+      --g-edge: rgba(255,255,255,.20);
+      --g-shadow: 0 10px 36px rgba(0,0,0,.40), 0 1px 2px rgba(0,0,0,.30);
+      background-color: #070b18 !important;
+      background-image:
+        radial-gradient(60rem 38rem at 8% -6%, rgba(59,92,225,.38), transparent 60%),
+        radial-gradient(48rem 34rem at 96% 4%, rgba(20,184,166,.22), transparent 60%),
+        radial-gradient(52rem 40rem at 70% 105%, rgba(124,92,230,.28), transparent 62%),
+        radial-gradient(40rem 30rem at 0% 92%, rgba(14,116,190,.24), transparent 60%) !important;
+    }
+
+    /* Header e barra stato */
+    body.glass > header {
+      background-color: rgba(65,105,225,.62) !important;
+      -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
+      border-bottom: 1px solid rgba(255,255,255,.28);
+      box-shadow: 0 6px 24px rgba(31,45,100,.18), inset 0 1px 0 rgba(255,255,255,.35);
+    }
+    html.dark body.glass > header { background-color: rgba(28,45,110,.55) !important; border-bottom-color: rgba(255,255,255,.10); }
+    body.glass > div.bg-blue-950 {
+      background-color: rgba(12,22,64,.55) !important;
+      -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
+      border-bottom: 1px solid rgba(255,255,255,.10) !important;
+      box-shadow: none !important;
+    }
+    body.glass .widget-badge { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+
+    /* Barra menu */
+    body.glass > div.bg-white[style*="z-index: 15"] {
+      background-color: var(--g-fill-strong) !important;
+      -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
+      border-bottom: 1px solid var(--g-border) !important;
+      box-shadow: 0 6px 22px rgba(31,45,100,.07), inset 0 1px 0 var(--g-edge) !important;
+    }
+    html.dark body.glass > div.bg-white[style*="z-index: 15"] { background-color: rgba(15,22,42,.62) !important; }
+    body.glass .cat-tab { border-bottom-color: transparent !important; border-radius: 999px; margin: .4rem .1rem; padding: .55rem .95rem; }
+    body.glass .cat-tab:hover { background-color: rgba(255,255,255,.55); }
+    body.glass .cat-tab.active {
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.62));
+      box-shadow: 0 2px 10px rgba(31,45,100,.12), inset 0 1px 0 #fff, inset 0 0 0 1px rgba(255,255,255,.8);
+    }
+    html.dark body.glass .cat-tab:hover { background-color: rgba(255,255,255,.08); }
+    html.dark body.glass .cat-tab.active {
+      background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.07));
+      box-shadow: 0 2px 12px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.28), inset 0 0 0 1px rgba(255,255,255,.12);
+    }
+    body.glass .search-inline.open, body.glass .search-inline-mobile { background-color: var(--g-card) !important; border-color: var(--g-border) !important; border-radius: 999px; }
+    body.glass .search-btn:hover { background-color: rgba(255,255,255,.5); }
+    html.dark body.glass .search-btn:hover { background-color: rgba(255,255,255,.10); }
+    body.glass .mobile-menu-btn { background-color: var(--g-card) !important; border-color: var(--g-border) !important; border-radius: 999px !important; box-shadow: var(--g-shadow); }
+    html.dark body.glass .mobile-menu-btn { color: #e2e8f0; }
+
+    body.glass #categoryFadeWrapper, body.glass #categoryFiltersContainer, body.glass #subCategoryFiltersContainer, html:not(.dark) body.glass #categoryFadeWrapper, html:not(.dark) body.glass #categoryFiltersContainer, html:not(.dark) body.glass #subCategoryFiltersContainer, html.dark body.glass #categoryFadeWrapper, html.dark body.glass #categoryFiltersContainer, html.dark body.glass #subCategoryFiltersContainer { background-color: transparent !important; border-color: transparent !important; }
+    body.glass .scroll-fade-wrapper::after { background: none !important; }
+
+    /* Pannelli */
+    body.glass .page-panel {
+      border-radius: 1.75rem;
+      background-color: var(--g-fill) !important;
+      border: 1px solid var(--g-border) !important;
+      -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
+      box-shadow: var(--g-shadow), inset 0 1px 0 var(--g-edge);
+    }
+    body.glass .panel-indigo { background-image: linear-gradient(160deg, rgba(99,102,241,.16), rgba(99,102,241,.04)) !important; }
+    body.glass .panel-teal   { background-image: linear-gradient(160deg, rgba(20,184,166,.16), rgba(20,184,166,.04)) !important; }
+    body.glass .panel-slate  { background-image: linear-gradient(160deg, rgba(255,255,255,.35), rgba(255,255,255,.05)) !important; }
+    html.dark body.glass .panel-slate { background-image: linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.01)) !important; }
+
+    /* Card, FAQ, tessere: vetro più leggero (senza sfocatura, per le prestazioni) */
+    body.glass .card, body.glass .faq-item, body.glass .course-tile, body.glass .contact-card, body.glass .notice-box {
+      background-color: var(--g-card) !important;
+      border: 1px solid var(--g-border) !important;
+      border-radius: 1.25rem !important;
+      box-shadow: 0 4px 18px rgba(31,45,100,.07), inset 0 1px 0 var(--g-edge) !important;
+    }
+    body.glass .card:hover { box-shadow: 0 12px 32px rgba(31,45,100,.14), inset 0 1px 0 var(--g-edge) !important; }
+    html.dark body.glass .card:hover { box-shadow: 0 12px 32px rgba(0,0,0,.45), inset 0 1px 0 var(--g-edge) !important; }
+    body.glass .faq-item { border-radius: 1rem !important; }
+    body.glass .card .card-image-container { border-radius: 0; }
+    body.glass .course-tile:hover { background-color: var(--g-fill-strong) !important; }
+
+    /* Menu a tendina e drawer mobile */
+    body.glass #corsiDropdown {
+      background-color: var(--g-fill-strong) !important; border: 1px solid var(--g-border) !important;
+      -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
+      border-radius: 1.1rem; box-shadow: 0 16px 40px rgba(31,45,100,.18), inset 0 1px 0 var(--g-edge); padding: .35rem;
+    }
+    body.glass .dd-item { border-radius: .7rem; }
+    body.glass .mobile-drawer-panel {
+      background-color: var(--g-fill-strong) !important;
+      -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
+      border-right: 1px solid var(--g-border);
+      border-radius: 0 1.75rem 1.75rem 0;
+    }
+    body.glass .mobile-drawer-head { border-color: rgba(148,163,184,.25) !important; }
+
+    /* Finestre (modali) */
+    body.glass [id$="Modal"] { -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+    body.glass [id$="Modal"] > div:not(.absolute) {
+      background-color: var(--g-fill-strong) !important;
+      -webkit-backdrop-filter: blur(30px) saturate(180%); backdrop-filter: blur(30px) saturate(180%);
+      border: 1px solid var(--g-border);
+      border-radius: 1.75rem !important;
+      box-shadow: 0 24px 64px rgba(15,23,60,.28), inset 0 1px 0 var(--g-edge) !important;
+    }
+    html.dark body.glass [id$="Modal"] > div:not(.absolute) { background-color: rgba(20,28,52,.80) !important; }
+
+    /* Pulsanti principali e campi */
+    body.glass .rounded-xl.bg-green-600, body.glass button.bg-green-600 { border-radius: 999px; box-shadow: 0 6px 18px rgba(22,163,74,.30), inset 0 1px 0 rgba(255,255,255,.35); }
+    body.glass button.bg-gray-100, body.glass button.bg-slate-100, body.glass button.bg-gray-200 { background-color: var(--g-card) !important; border: 1px solid var(--g-border); border-radius: 999px; }
+    body.glass input[type="text"], body.glass input[type="email"], body.glass input[type="password"], body.glass input[type="date"], body.glass select, body.glass textarea {
+      background-color: rgba(255,255,255,.55) !important; border-radius: .85rem !important;
+    }
+    html.dark body.glass input[type="text"], html.dark body.glass input[type="email"], html.dark body.glass input[type="password"],
+    html.dark body.glass input[type="date"], html.dark body.glass select, html.dark body.glass textarea { background-color: rgba(10,16,34,.55) !important; }
+
+    /* Piè di pagina */
+    body.glass footer {
+      background-color: var(--g-fill) !important; border-top: 1px solid var(--g-border) !important;
+      -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
+    }
+
+    /* Se il dispositivo chiede meno trasparenze, torna a colori pieni */
+    @media (prefers-reduced-transparency: reduce) {
+      body.glass { --g-fill: rgba(255,255,255,.92); --g-fill-strong: rgba(255,255,255,.97); --g-card: #fff; }
+      html.dark body.glass { --g-fill: rgba(22,30,54,.96); --g-fill-strong: rgba(18,26,48,.98); --g-card: #1e293b; }
+      body.glass * { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+    }
     </style>
     
     <script>
@@ -682,7 +834,7 @@
     }
     </script>
 </head>
-<body class="dark:bg-slate-950 bg-slate-50 text-slate-800 min-h-screen flex flex-col transition-colors duration-200">
+<body class="glass dark:bg-slate-950 bg-slate-50 text-slate-800 min-h-screen flex flex-col transition-colors duration-200">
 
     <!-- HEADER -->
     <header class="bg-[#4169e1] text-white shadow-sm sticky top-0 z-20">
