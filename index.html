@@ -698,6 +698,23 @@
     .sch-chip { padding: .2rem .55rem; }
     @media (max-width: 480px) { .sch-row { flex-direction: column; gap: .35rem; padding: .55rem .25rem; } .sch-day { padding-top: 0; } .sch-hours, .sch-slots { justify-content: flex-start; } .sch-slots { gap: .3rem; } .sch-chip { font-size: .76rem; padding: .16rem .4rem; letter-spacing: -.01em; } .sch-slots { gap: .25rem; } }
 
+    /* ---- Caricamento notizie: schede di vetro che pulsano piano ---- */
+    .lg-skel-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+    .lg-skel-md, .lg-skel-lg { display: none; }
+    @media (min-width: 768px) { .lg-skel-grid { grid-template-columns: repeat(2, 1fr); } .lg-skel-md { display: block; } }
+    @media (min-width: 1024px) { .lg-skel-grid { grid-template-columns: repeat(3, 1fr); } .lg-skel-lg { display: block; } }
+    .lg-skel-card { position: relative; overflow: hidden; border-radius: 1.25rem; background: rgba(148,163,184,.16); border: 1px solid rgba(255,255,255,.55); text-align: left; }
+    .lg-skel-img { height: 150px; background: rgba(148,163,184,.26); }
+    .lg-skel-body { padding: 1rem; display: flex; flex-direction: column; gap: .6rem; }
+    .lg-skel-pill { width: 64px; height: 18px; border-radius: 999px; background: rgba(148,163,184,.30); }
+    .lg-skel-line { height: 11px; width: 100%; border-radius: 999px; background: rgba(148,163,184,.26); }
+    .lg-skel-card::after { content: ''; position: absolute; inset: 0; transform: translateX(-100%);
+      background: linear-gradient(100deg, transparent 20%, rgba(255,255,255,.55) 50%, transparent 80%); animation: lgShimmer 1.6s ease-in-out infinite; }
+    @keyframes lgShimmer { to { transform: translateX(100%); } }
+    html.dark .lg-skel-card { background: rgba(148,163,184,.10); border-color: rgba(255,255,255,.12); }
+    html.dark .lg-skel-card::after { background: linear-gradient(100deg, transparent 20%, rgba(255,255,255,.16) 50%, transparent 80%); }
+    @media (prefers-reduced-motion: reduce) { .lg-skel-card::after { animation: none; display: none; } }
+
     /* =====================================================================
        LIQUID GLASS  (strato solo grafico: per disattivarlo basta togliere
        la classe "glass" dal tag body)
@@ -719,34 +736,42 @@
       background-attachment: fixed !important;
     }
     html.dark body.glass {
-      --g-fill: rgba(30,41,70,.42);
-      --g-fill-strong: rgba(22,30,54,.78);
-      --g-card: rgba(36,48,82,.52);
-      --g-border: rgba(255,255,255,.11);
-      --g-edge: rgba(255,255,255,.20);
-      --g-shadow: 0 10px 36px rgba(0,0,0,.40), 0 1px 2px rgba(0,0,0,.30);
-      background-color: #070b18 !important;
+      --g-fill: rgba(26,36,72,.58);
+      --g-fill-strong: rgba(18,26,54,.84);
+      --g-card: rgba(38,52,98,.62);
+      --g-border: rgba(255,255,255,.17);
+      --g-edge: rgba(255,255,255,.30);
+      --g-shadow: 0 12px 40px rgba(0,0,0,.50), 0 1px 2px rgba(0,0,0,.35);
+      background-color: #050813 !important;
       background-image:
-        radial-gradient(60rem 38rem at 8% -6%, rgba(59,92,225,.38), transparent 60%),
-        radial-gradient(48rem 34rem at 96% 4%, rgba(20,184,166,.22), transparent 60%),
-        radial-gradient(52rem 40rem at 70% 105%, rgba(124,92,230,.28), transparent 62%),
-        radial-gradient(40rem 30rem at 0% 92%, rgba(14,116,190,.24), transparent 60%) !important;
+        radial-gradient(60rem 38rem at 8% -6%, rgba(66,104,255,.46), transparent 60%),
+        radial-gradient(48rem 34rem at 96% 4%, rgba(20,200,180,.28), transparent 60%),
+        radial-gradient(52rem 40rem at 70% 105%, rgba(140,100,255,.36), transparent 62%),
+        radial-gradient(40rem 30rem at 0% 92%, rgba(24,140,220,.30), transparent 60%) !important;
     }
 
     /* Header e barra stato */
     body.glass > header {
-      background-color: rgba(65,105,225,.62) !important;
-      -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
-      border-bottom: 1px solid rgba(255,255,255,.28);
-      box-shadow: 0 6px 24px rgba(31,45,100,.18), inset 0 1px 0 rgba(255,255,255,.35);
+      background-color: rgba(46,84,232,.92) !important;
+      background-image: linear-gradient(180deg, rgba(255,255,255,.40) 0%, rgba(255,255,255,.12) 40%, rgba(255,255,255,0) 52%, rgba(0,10,70,.14) 100%) !important;
+      -webkit-backdrop-filter: blur(16px) saturate(200%); backdrop-filter: blur(16px) saturate(200%);
+      border-bottom: 1px solid rgba(255,255,255,.35);
+      box-shadow: 0 8px 26px rgba(30,60,200,.28), inset 0 1px 0 rgba(255,255,255,.65), inset 0 -1px 0 rgba(0,10,70,.25);
     }
-    html.dark body.glass > header { background-color: rgba(28,45,110,.55) !important; border-bottom-color: rgba(255,255,255,.10); }
+    html.dark body.glass > header {
+      background-color: rgba(34,62,190,.90) !important;
+      background-image: linear-gradient(180deg, rgba(255,255,255,.26) 0%, rgba(255,255,255,.07) 40%, rgba(255,255,255,0) 52%, rgba(0,0,40,.22) 100%) !important;
+      border-bottom-color: rgba(255,255,255,.18);
+      box-shadow: 0 8px 26px rgba(0,0,0,.40), inset 0 1px 0 rgba(255,255,255,.40), inset 0 -1px 0 rgba(0,0,40,.4);
+    }
     body.glass > div.bg-blue-950 {
-      background-color: rgba(12,22,64,.55) !important;
-      -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
-      border-bottom: 1px solid rgba(255,255,255,.10) !important;
-      box-shadow: none !important;
+      background-color: rgba(10,26,96,.88) !important;
+      background-image: linear-gradient(180deg, rgba(255,255,255,.20) 0%, rgba(255,255,255,.05) 45%, rgba(255,255,255,0) 52%) !important;
+      -webkit-backdrop-filter: blur(16px) saturate(200%); backdrop-filter: blur(16px) saturate(200%);
+      border-bottom: 1px solid rgba(255,255,255,.16) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.28), inset 0 -1px 0 rgba(0,0,40,.35) !important;
     }
+    html.dark body.glass > div.bg-blue-950 { background-color: rgba(5,12,48,.90) !important; border-bottom-color: rgba(255,255,255,.10) !important; }
     body.glass .widget-badge { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 
     /* Barra menu */
@@ -1020,6 +1045,23 @@
     body.glass #corsiSubmenuGrid .course-tile-arrow { display: none; }
     html.dark body.glass #corsiSubmenuGrid .course-tile-icon { background-color: rgba(129,140,248,.22); }
 
+    /* Tema scuro: più contrasto su bordi e testi */
+    html.dark body.glass .page-panel { border-color: rgba(255,255,255,.16) !important; box-shadow: var(--g-shadow), inset 0 1px 0 rgba(255,255,255,.26), inset 0 0 0 1px rgba(255,255,255,.03); }
+    html.dark body.glass .card, html.dark body.glass .faq-item, html.dark body.glass .course-tile, html.dark body.glass .contact-card, html.dark body.glass .notice-box {
+      border-color: rgba(255,255,255,.15) !important;
+      box-shadow: 0 6px 22px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.22) !important;
+    }
+    html.dark body.glass .card h3, html.dark body.glass .card h2, html.dark body.glass .faq-item summary, html.dark body.glass .course-tile-label { color: #f8fafc !important; }
+    html.dark body.glass .card p, html.dark body.glass .card .text-slate-600, html.dark body.glass .card .text-gray-600 { color: #cbd5e1 !important; }
+    html.dark body.glass .card .text-slate-400, html.dark body.glass .card .text-slate-500 { color: #94a3b8 !important; }
+    html.dark body.glass .cc-label { color: #94a3b8; }
+    html.dark body.glass span.uppercase.rounded-md.border { filter: brightness(2.1) saturate(1.1); }
+    html.dark body.glass .cat-tab { color: #cbd5e1; }
+    html.dark body.glass .cat-tab.active { color: #fff; }
+    html.dark body.glass > div.bg-white[style*="z-index: 15"] { border-bottom-color: rgba(255,255,255,.14) !important; box-shadow: 0 8px 26px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.14) !important; }
+    html.dark body.glass #archiveToggleBtn { border-color: rgba(255,255,255,.20); }
+    html.dark body.glass #addNoticeBtn { border-color: rgba(255,255,255,.35); box-shadow: 0 8px 24px rgba(34,197,94,.30), inset 0 1px 0 rgba(255,255,255,.45) !important; }
+
     /* Se il dispositivo chiede meno trasparenze, torna a colori pieni */
     @media (prefers-reduced-transparency: reduce) {
       body.glass { --g-fill: rgba(255,255,255,.92); --g-fill-strong: rgba(255,255,255,.97); --g-card: #fff; }
@@ -1220,7 +1262,13 @@
 
     <div id="newsPanel" class="page-panel panel-slate">
     <h2 id="newsTitle" class="cc-title text-xl font-bold mb-4 flex items-center gap-2"><i data-lucide="newspaper" class="w-6 h-6 faq-head-icon"></i>News</h2>
-    <div id="newsLoading" class="flex flex-col items-center justify-center text-center text-slate-500 dark:text-slate-400" style="min-height:280px"><div class="loader mb-4"></div><p class="font-semibold">Notizie in caricamento…</p></div>
+    <div id="newsLoading" class="text-center text-slate-500 dark:text-slate-400" style="min-height:280px" aria-live="polite">
+    <div class="lg-skel-grid">
+    <div class="lg-skel-card"><div class="lg-skel-img"></div><div class="lg-skel-body"><span class="lg-skel-pill"></span><span class="lg-skel-line" style="width:78%"></span><span class="lg-skel-line"></span><span class="lg-skel-line" style="width:62%"></span></div></div>
+    <div class="lg-skel-card lg-skel-md"><div class="lg-skel-img"></div><div class="lg-skel-body"><span class="lg-skel-pill"></span><span class="lg-skel-line" style="width:70%"></span><span class="lg-skel-line"></span><span class="lg-skel-line" style="width:55%"></span></div></div>
+    <div class="lg-skel-card lg-skel-lg"><div class="lg-skel-img"></div><div class="lg-skel-body"><span class="lg-skel-pill"></span><span class="lg-skel-line" style="width:82%"></span><span class="lg-skel-line"></span><span class="lg-skel-line" style="width:48%"></span></div></div>
+    </div>
+    <p class="font-medium mt-4">Notizie in caricamento…</p></div>
     <div id="noticesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start"></div>
     </div><!-- /newsPanel -->
 
