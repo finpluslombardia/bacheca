@@ -695,6 +695,9 @@
     html.dark .sch-open { color: #86efac; }
     html.dark .sch-shut { color: #cbd5e1; background: rgba(148,163,184,.12); }
     #scheduleModal > div { max-width: 33rem; }
+    .sch-note { display: flex; gap: .5rem; align-items: flex-start; margin-top: .9rem; padding: .6rem .8rem; border-radius: .9rem; font-size: .8rem; color: #475569; background: rgba(99,102,241,.08); border: 1px solid rgba(99,102,241,.16); }
+    .sch-note svg { flex-shrink: 0; margin-top: .1rem; color: #6366f1; }
+    html.dark .sch-note { color: #cbd5e1; background: rgba(129,140,248,.12); border-color: rgba(129,140,248,.25); }
     .sch-chip { padding: .2rem .55rem; }
     @media (max-width: 480px) { .sch-row { flex-direction: column; gap: .35rem; padding: .55rem .25rem; } .sch-day { padding-top: 0; } .sch-hours, .sch-slots { justify-content: flex-start; } .sch-slots { gap: .3rem; } .sch-chip { font-size: .76rem; padding: .16rem .4rem; letter-spacing: -.01em; } .sch-slots { gap: .25rem; } }
 
@@ -714,6 +717,10 @@
     html.dark .lg-skel-card { background: rgba(148,163,184,.10); border-color: rgba(255,255,255,.12); }
     html.dark .lg-skel-card::after { background: linear-gradient(100deg, transparent 20%, rgba(255,255,255,.16) 50%, transparent 80%); }
     @media (prefers-reduced-motion: reduce) { .lg-skel-card::after { animation: none; display: none; } }
+
+    /* Sfondo fermo quando è aperta una finestra */
+    html.lg-lock, html.lg-lock body { overflow: hidden !important; }
+    html.lg-lock body { overscroll-behavior: none; }
 
     /* =====================================================================
        LIQUID GLASS  (strato solo grafico: per disattivarlo basta togliere
@@ -752,26 +759,18 @@
 
     /* Header e barra stato */
     body.glass > header {
-      background-color: rgba(46,84,232,.92) !important;
-      background-image: linear-gradient(180deg, rgba(255,255,255,.40) 0%, rgba(255,255,255,.12) 40%, rgba(255,255,255,0) 52%, rgba(0,10,70,.14) 100%) !important;
-      -webkit-backdrop-filter: blur(16px) saturate(200%); backdrop-filter: blur(16px) saturate(200%);
-      border-bottom: 1px solid rgba(255,255,255,.35);
-      box-shadow: 0 8px 26px rgba(30,60,200,.28), inset 0 1px 0 rgba(255,255,255,.65), inset 0 -1px 0 rgba(0,10,70,.25);
+      background-color: rgba(65,105,225,.62) !important;
+      -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
+      border-bottom: 1px solid rgba(255,255,255,.28);
+      box-shadow: 0 6px 24px rgba(31,45,100,.18), inset 0 1px 0 rgba(255,255,255,.35);
     }
-    html.dark body.glass > header {
-      background-color: rgba(34,62,190,.90) !important;
-      background-image: linear-gradient(180deg, rgba(255,255,255,.26) 0%, rgba(255,255,255,.07) 40%, rgba(255,255,255,0) 52%, rgba(0,0,40,.22) 100%) !important;
-      border-bottom-color: rgba(255,255,255,.18);
-      box-shadow: 0 8px 26px rgba(0,0,0,.40), inset 0 1px 0 rgba(255,255,255,.40), inset 0 -1px 0 rgba(0,0,40,.4);
-    }
+    html.dark body.glass > header { background-color: rgba(28,45,110,.55) !important; border-bottom-color: rgba(255,255,255,.10); }
     body.glass > div.bg-blue-950 {
-      background-color: rgba(10,26,96,.88) !important;
-      background-image: linear-gradient(180deg, rgba(255,255,255,.20) 0%, rgba(255,255,255,.05) 45%, rgba(255,255,255,0) 52%) !important;
-      -webkit-backdrop-filter: blur(16px) saturate(200%); backdrop-filter: blur(16px) saturate(200%);
-      border-bottom: 1px solid rgba(255,255,255,.16) !important;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.28), inset 0 -1px 0 rgba(0,0,40,.35) !important;
+      background-color: rgba(12,22,64,.55) !important;
+      -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
+      border-bottom: 1px solid rgba(255,255,255,.10) !important;
+      box-shadow: none !important;
     }
-    html.dark body.glass > div.bg-blue-950 { background-color: rgba(5,12,48,.90) !important; border-bottom-color: rgba(255,255,255,.10) !important; }
     body.glass .widget-badge { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 
     /* Barra menu */
@@ -2096,6 +2095,31 @@
     </div>
 
     <!-- APP LOGIC -->
+    <script>
+    /* Blocca lo scorrimento della pagina mentre una finestra o il menu mobile è aperto */
+    (function () {
+      var SEL = '[id$="Modal"]:not(.hidden), #mobileMenu:not(.hidden)';
+      var root = document.documentElement, locked = false;
+      function sync() {
+        var open = !!document.querySelector(SEL);
+        if (open === locked) return;
+        locked = open;
+        if (open) {
+          var sb = window.innerWidth - root.clientWidth;
+          if (sb > 0) document.body.style.paddingRight = sb + 'px';
+          root.classList.add('lg-lock');
+        } else {
+          root.classList.remove('lg-lock');
+          document.body.style.paddingRight = '';
+        }
+      }
+      function start() {
+        new MutationObserver(sync).observe(document.body, { subtree: true, attributes: true, attributeFilter: ['class'] });
+        sync();
+      }
+      if (document.body) start(); else document.addEventListener('DOMContentLoaded', start);
+    })();
+    </script>
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -3332,7 +3356,17 @@
     const toM = t => { const p = String(t).split(':').map(Number); return p[0] * 60 + (p[1] || 0); };
     const m = now.getHours() * 60 + now.getMinutes();
     const sl = dayData.slots.map(x => ({ a: toM(x.start), b: toM(x.end), s: x })).sort((x, y) => x.a - y.a);
-    for (const x of sl) { if (m >= x.a && m < x.b) return { open: true, text: 'Aperto ora · fino alle ' + x.s.end }; }
+    const hm = v => String(Math.floor(v / 60)).padStart(2, '0') + ':' + String(v % 60).padStart(2, '0');
+    for (const x of sl) {
+    if (m >= x.a && m < x.b) {
+    if (type === 'nuoto') {
+    const last = x.b - 30; // ultimo accesso: 30 minuti prima della fine
+    if (m < last) return { open: true, text: 'Aperto ora · fino alle ' + x.s.end + ' (ultimo accesso ' + hm(last) + ')' };
+    return { open: true, text: 'Aperto ora · accessi chiusi, fino alle ' + x.s.end };
+    }
+    return { open: true, text: 'Aperto ora · fino alle ' + x.s.end };
+    }
+    }
     const nx = sl.find(x => x.a > m);
     if (nx) return { open: false, text: 'Chiuso ora · riapre alle ' + nx.s.start };
     return { open: false, text: 'Chiuso per oggi' };
@@ -3429,7 +3463,9 @@
     if(hasItems) html += specialHtml;
     }
 
+    if (type === 'nuoto') html += `<p class="sch-note"><i data-lucide="info" class="w-4 h-4"></i><span>L'ultimo accesso è consentito fino a <strong>30 minuti prima</strong> dell'orario di fine.</span></p>`;
     document.getElementById('scheduleModalContent').innerHTML = html;
+    if (type === 'nuoto' && window.lucide) lucide.createIcons();
 
     // Mostra avviso chiusure speciali se ce ne sono in futuro (Esclude OGGI)
     const upcomingClosures = hoursConfig.specialClosures.filter(d => d > todayStr).sort(); // Usa > invece di >=
