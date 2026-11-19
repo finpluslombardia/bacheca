@@ -844,7 +844,8 @@
     body.glass .cat-tab.active { font-weight: 600; }
     body.glass .html-content-view strong, body.glass .html-content-view b { font-weight: 600; }
     @media (max-width: 639px) {
-      body.glass .cc-title { font-size: 1rem; }
+      body.glass .cc-title { font-size: 1.15rem; }
+      body.glass .faq-item summary { font-size: 0.9rem; padding: 0.8rem 1rem; }
       body.glass #viewNoticeTitle { font-size: 1.2rem; margin-bottom: 1rem; }
       body.glass .card h3 { font-size: 1.05rem; }
     }
@@ -902,6 +903,83 @@
     body.glass #scheduleModalContent .bg-blue-100 { background-color: rgba(99,132,255,.22) !important; }
     body.glass #scheduleSpecialNote { background-color: rgba(251,146,60,.14) !important; border-color: rgba(251,146,60,.35) !important; border-radius: 1rem; }
     html.dark body.glass #scheduleSpecialNote { color: #fdba74 !important; }
+
+    /* Freccia "scorri" delle pillole orari su mobile: niente fascia scura, sfumatura sul bordo */
+    @media (max-width: 767px) {
+      body.glass #statusWidgetsContainer {
+        -webkit-mask-image: linear-gradient(to right, #000 0, #000 82%, transparent 100%);
+        mask-image: linear-gradient(to right, #000 0, #000 82%, transparent 100%);
+      }
+    }
+    body.glass .bg-gradient-to-l.from-blue-950 { background-image: none !important; background-color: transparent !important; }
+    body.glass .bg-gradient-to-l.from-blue-950 > svg, body.glass .bg-gradient-to-l.from-blue-950 > i {
+      width: 22px; height: 22px; padding: 2px; border-radius: 999px; color: #fff;
+      background: rgba(255,255,255,.18); box-shadow: inset 0 1px 0 rgba(255,255,255,.4); filter: none;
+    }
+
+    /* ---- Luce che segue puntatore/dito su card, domande e tessere ---- */
+    body.glass .card, body.glass .course-tile, body.glass .faq-item { position: relative; }
+    body.glass .card::after, body.glass .course-tile::after, body.glass .faq-item::after {
+      content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 2;
+      background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 0%), rgba(255,255,255,.34), transparent 62%);
+      opacity: 0; transition: opacity .25s ease;
+    }
+    html.dark body.glass .card::after, html.dark body.glass .course-tile::after, html.dark body.glass .faq-item::after {
+      background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 0%), rgba(255,255,255,.14), transparent 62%);
+    }
+    body.glass .card.lg-lit::after, body.glass .course-tile.lg-lit::after, body.glass .faq-item.lg-lit::after { opacity: 1; }
+    body.glass .course-tile, body.glass .faq-item { transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease; }
+    body.glass .course-tile:hover, body.glass .faq-item:hover { transform: translateY(-1px); box-shadow: 0 10px 26px rgba(31,45,100,.12), inset 0 1px 0 var(--g-edge) !important; }
+    body.glass .card:active, body.glass .course-tile:active { transform: scale(.992); }
+
+    /* ---- Etichette notizie: pillole di vetro nel loro colore ---- */
+    body.glass span.uppercase.rounded-md.border {
+      border-radius: 999px !important; font-weight: 500 !important; font-size: .68rem !important; letter-spacing: .05em;
+      padding: .15rem .7rem !important;
+      background-color: color-mix(in srgb, currentColor 13%, transparent) !important;
+      border-color: color-mix(in srgb, currentColor 28%, transparent) !important;
+      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.45);
+    }
+
+    /* ---- Pulsanti Nuovo e Mostra Archivio ---- */
+    body.glass #addNoticeBtn {
+      background: linear-gradient(180deg, rgba(74,222,128,.78), rgba(22,163,74,.62)) !important;
+      border: 1px solid rgba(255,255,255,.5); color: #fff; font-weight: 500;
+      -webkit-backdrop-filter: blur(14px) saturate(170%); backdrop-filter: blur(14px) saturate(170%);
+      box-shadow: 0 8px 22px rgba(22,163,74,.32), inset 0 1px 0 rgba(255,255,255,.6) !important;
+      transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+    }
+    body.glass #addNoticeBtn:hover { filter: brightness(1.06) saturate(1.1); transform: translateY(-1px); box-shadow: 0 12px 28px rgba(22,163,74,.42), inset 0 1px 0 rgba(255,255,255,.7) !important; }
+    body.glass #archiveToggleBtn {
+      background-color: var(--g-card) !important; border: 1px solid var(--g-border); color: #334155; font-weight: 500;
+      -webkit-backdrop-filter: blur(14px) saturate(170%); backdrop-filter: blur(14px) saturate(170%);
+      box-shadow: 0 6px 18px rgba(31,45,100,.10), inset 0 1px 0 var(--g-edge);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    html.dark body.glass #archiveToggleBtn { color: #e2e8f0; }
+    body.glass #archiveToggleBtn:hover { transform: translateY(-1px); background-color: var(--g-fill-strong) !important; }
+    body.glass #addNoticeBtn:active, body.glass #archiveToggleBtn:active { transform: scale(.97); }
+
+    /* ---- Pillole orari: più luminose, con alone ---- */
+    body.glass .widget-badge { transition: transform .2s ease, box-shadow .2s ease; box-shadow: inset 0 1px 0 rgba(255,255,255,.25); }
+    body.glass .widget-badge.text-green-400  { background-color: rgba(34,197,94,.20) !important;  border-color: rgba(134,239,172,.45) !important; box-shadow: 0 0 14px rgba(74,222,128,.38), inset 0 1px 0 rgba(255,255,255,.30); }
+    body.glass .widget-badge.text-orange-400 { background-color: rgba(251,146,60,.20) !important; border-color: rgba(253,186,116,.45) !important; box-shadow: 0 0 14px rgba(251,146,60,.38), inset 0 1px 0 rgba(255,255,255,.30); }
+    body.glass .widget-badge.text-red-400    { background-color: rgba(239,68,68,.20) !important;  border-color: rgba(252,165,165,.45) !important; box-shadow: 0 0 14px rgba(248,113,113,.38), inset 0 1px 0 rgba(255,255,255,.30); }
+
+    /* ---- Animazioni morbide (niente rimbalzi) ---- */
+    @keyframes lgFade  { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes lgPop   { from { opacity: 0; transform: translateY(10px) scale(.965); } to { opacity: 1; transform: none; } }
+    @keyframes lgDrop  { from { opacity: 0; transform: translateY(-6px) scale(.97); } to { opacity: 1; transform: none; } }
+    @keyframes lgSlide { from { transform: translateX(-24px); opacity: 0; } to { transform: none; opacity: 1; } }
+    body.glass [id$="Modal"].fade-in { animation: lgFade .25s ease both; }
+    body.glass [id$="Modal"]:not(.hidden) > div:not(.absolute) { animation: lgPop .32s cubic-bezier(.2,.8,.2,1) both; }
+    body.glass #corsiDropdown:not(.hidden) { animation: lgDrop .22s cubic-bezier(.2,.8,.2,1) both; transform-origin: top left; }
+    body.glass #mobileMenu:not(.hidden) > .absolute.inset-0 { animation: lgFade .25s ease both; }
+    body.glass #mobileMenu:not(.hidden) .mobile-drawer-panel { animation: lgSlide .3s cubic-bezier(.2,.8,.2,1) both; }
+    @media (prefers-reduced-motion: reduce) {
+      body.glass *, body.glass *::after { animation: none !important; transition: none !important; }
+    }
 
     /* Se il dispositivo chiede meno trasparenze, torna a colori pieni */
     @media (prefers-reduced-transparency: reduce) {
@@ -1931,6 +2009,32 @@
     </div>
 
     <!-- APP LOGIC -->
+    <script>
+    /* Liquid glass: luce che segue il puntatore (solo effetto visivo) */
+    (function () {
+      var SEL = '.card, .course-tile, .faq-item', last = null, raf = 0;
+      function lit(el, x, y) {
+        var r = el.getBoundingClientRect();
+        el.style.setProperty('--mx', (x - r.left) + 'px');
+        el.style.setProperty('--my', (y - r.top) + 'px');
+        if (last !== el) { if (last) last.classList.remove('lg-lit'); el.classList.add('lg-lit'); last = el; }
+      }
+      function move(e) {
+        if (!e.target || !e.target.closest) return;
+        var el = e.target.closest(SEL), x = e.clientX, y = e.clientY;
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(function () {
+          if (el) lit(el, x, y); else if (last) { last.classList.remove('lg-lit'); last = null; }
+        });
+      }
+      function off() { if (last) { last.classList.remove('lg-lit'); last = null; } }
+      document.addEventListener('pointermove', move, { passive: true });
+      document.addEventListener('pointerdown', move, { passive: true });
+      document.addEventListener('pointerup', function (e) { if (e.pointerType !== 'mouse') setTimeout(off, 220); }, { passive: true });
+      document.addEventListener('pointerleave', off);
+      document.addEventListener('scroll', function () { if (last) off(); }, { passive: true });
+    })();
+    </script>
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
